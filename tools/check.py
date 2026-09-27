@@ -11,6 +11,8 @@
      src/Apps/AG-xxxxx/         that app's assets (same name, no .lua)
      src/Apps/lib/ag_xxxxx.lua  shared module: "ag_" + 1-5 chars
    Nothing else may sit at the top of src/Apps.
+5. Checks every checked .lua file declares its license in the first 15 lines
+   ("SPDX-License-Identifier: MIT"), per LICENSE and constitution VIII.
 
 Exit code is non-zero if anything fails. Run from anywhere:
     python tools/check.py
@@ -51,6 +53,8 @@ CAUTION = [
 APP_NAME = re.compile(r"^AG-[A-Za-z0-9]{1,5}$")        # stem of app script / asset folder
 LIB_NAME = re.compile(r"^ag_[a-z0-9]{1,5}\.lua$")      # shared module file
 IGNORED = {".gitkeep", ".DS_Store", "Thumbs.db"}
+SPDX = "SPDX-License-Identifier: MIT"
+SPDX_LINES = 15
 
 
 def check_layout(errors: list[str]) -> None:
@@ -140,6 +144,8 @@ def main() -> int:
             continue
         if b"\r\n" in raw:
             errors.append(f"{rel}: CRLF line endings (Principle V)")
+        if SPDX not in "\n".join(text.splitlines()[:SPDX_LINES]):
+            errors.append(f"{rel}: missing '-- {SPDX}' in the first {SPDX_LINES} lines (Principle VIII)")
 
         if luac:
             result = subprocess.run(

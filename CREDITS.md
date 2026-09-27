@@ -2,7 +2,9 @@
 
 Apps in this repository build on work that others shared freely with the Jeti
 community. This file credits that work and carries the license notices it
-requires.
+requires. The repository itself is MIT-licensed; see [LICENSE](LICENSE).
+Where an app is derived from someone else's work, both that author's notice
+(below) and this repository's notice apply.
 
 ## Speed Gauge (`AG-SpdGa`) — based on DFM Speed Announcer
 

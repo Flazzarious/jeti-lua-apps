@@ -13,6 +13,18 @@ built spec-first with GitHub Spec Kit (`/speckit-specify`, `/speckit-plan`,
 
 Keep this table current when an app is added.
 
+## License
+
+The repo is MIT (`LICENSE`). Every app, lib module and style reference starts
+with:
+
+```lua
+-- Copyright (c) 2026 Aaron George
+-- SPDX-License-Identifier: MIT
+```
+
+`check.py` fails any `.lua` file without the SPDX line.
+
 ## Credit what you build on
 
 When an app is derived from someone else's work, credit it everywhere

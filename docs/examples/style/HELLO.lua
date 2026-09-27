@@ -1,4 +1,6 @@
 -- HELLO.lua — style reference app for the JETI DS-24 (Lua 5.3).
+-- Copyright (c) 2026 Aaron George
+-- SPDX-License-Identifier: MIT
 --
 -- A switch-driven flight timer that shows in a small desktop telemetry window
 -- and announces elapsed minutes. It exercises the app lifecycle, a settings

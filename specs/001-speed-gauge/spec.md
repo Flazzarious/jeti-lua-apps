@@ -400,9 +400,11 @@ reading its label and hint.
   This can be turned off in settings.
 - **FR-029**: The app MUST credit DFM Speed Announcer by DFM (Dave McQueeney)
   as its basis in all of these places:
-  - **Source file header:** a credit line and the original's MIT copyright
-    notice ("Copyright (c) 2018, 2019 DFM (Dave McQueeney)"), with a pointer
-    to `CREDITS.md` for the full license text.
+  - **Source file header:** this repo's copyright ("Copyright (c) 2026 Aaron
+    George") and license tag (`SPDX-License-Identifier: MIT`), plus a credit
+    line and the original's MIT copyright notice ("Copyright (c) 2018, 2019
+    DFM (Dave McQueeney)"), with a pointer to `CREDITS.md` for the full
+    license text.
   - **Settings screen:** a line at the bottom, e.g. "Based on DFM Speed
     Announcer by Dave McQueeney", next to the app version.
   - **Repository documentation:** the README and `CREDITS.md`.

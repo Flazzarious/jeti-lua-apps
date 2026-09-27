@@ -121,7 +121,16 @@ goes in a shared module rather than being copied between apps.
   uses it. The plan for such a change MUST list the affected apps, and each
   of them MUST be re-verified.
 
-### VIII. Credit What We Build On
+### VIII. License and Credit
+
+This repository is MIT-licensed (`LICENSE`, Copyright (c) 2026 Aaron George).
+
+- **License tag:** every app script, `lib` module and style reference MUST
+  carry `-- SPDX-License-Identifier: MIT` in its first 15 lines. `check.py`
+  enforces this.
+- **Derived work** keeps the original author's copyright line as well, as
+  described below.
+
 
 Apps here are often derived from other authors' published work. That work is
 credited, and its license terms are honored.
@@ -163,10 +172,13 @@ Principle I cannot be relaxed for convenience; an amendment to it must name
 the specific API, the specific app, and why failure of that app cannot affect
 flight.
 
-**Version**: 1.2.0 | **Ratified**: 2026-09-26 | **Last Amended**: 2026-09-27
+**Version**: 1.3.0 | **Ratified**: 2026-09-26 | **Last Amended**: 2026-09-27
 
 ### Amendment history
 
+- **1.3.0 (2026-09-27):** the repository adopts the MIT license. Principle
+  VIII (renamed "License and Credit") requires an SPDX license tag in every
+  app and module.
 - **1.2.0 (2026-09-27):** new Principle VIII requires crediting and honoring
   the licenses of work apps are derived from. Prompted by Speed Gauge being
   based on DFM Speed Announcer.

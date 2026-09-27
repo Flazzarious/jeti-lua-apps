@@ -107,6 +107,15 @@ Much of its behavior comes from that app, and this rewrite wouldn't exist
 without it. See [CREDITS.md](CREDITS.md) for all credits and license notices,
 including JETI's demos.
 
+## License
+
+MIT. See [LICENSE](LICENSE). Anyone may use, modify and share these apps, as
+long as they keep the copyright and license notice. Apps derived from other
+people's work also carry those authors' notices, listed in
+[CREDITS.md](CREDITS.md). Third-party code copied unmodified into
+`docs/examples/` (JETI's demos, DFM Speed Announcer) keeps its own license,
+stated in each file.
+
 ## References
 
 - Official apps and demos: https://github.com/JETImodel/Lua-Apps
