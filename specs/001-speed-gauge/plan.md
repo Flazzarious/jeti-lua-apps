@@ -1,6 +1,6 @@
 # Implementation Plan: Speed Gauge
 
-**Branch**: `001-speed-gauge` (work is on `main`; no feature branch created) | **Date**: 2026-09-27 | **Spec**: [spec.md](spec.md)
+**Branch**: `feature/001-speed-gauge` (Gitflow: merges to `develop`, then `main` on release) | **Date**: 2026-09-27 | **Spec**: [spec.md](spec.md)
 
 **Input**: Feature specification from `specs/001-speed-gauge/spec.md`
 
