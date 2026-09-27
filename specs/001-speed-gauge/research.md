@@ -73,6 +73,14 @@ the JETI Studio emulator as an early implementation task (see
   recomputed only when units or calibration change. Per tick:
   `sensorSpd = raw · kSensor`, `shownSpd = sensorSpd · kDens`. `loop()` reads
   the sensor with the lighter `getSensorValueByID`.
+- **Always call the `system.getSensor*` functions through `system`** at each
+  use, never through a local copy made when the file loads. LeonAirRC's
+  Emulator Telemetry app (used for testing, see `tools/emulator/sensors.json`)
+  replaces those functions after other apps may already have loaded. A cached
+  copy would bypass the emulated sensors.
+- **Emulator sensors send m/s**, like real ones: `tools/emulator/sensors.json`
+  defines MSpeed 450 Velocity 0–125 m/s (≈ 0–450 km/h) on P5 and GPS Speed
+  0–83.3 m/s (≈ 0–300 km/h) on P6.
 - **Alternatives considered:** Read `SensorEntry.unit` and convert from it
   (adds a lookup and a retry path for sensors that aren't connected yet, to
   fix a problem nobody has seen); ask the user for the sensor's unit (a
