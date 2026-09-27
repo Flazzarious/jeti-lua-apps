@@ -22,6 +22,8 @@ comes directly from that app:
 Speed Gauge exists because that work made it possible. The original is kept
 unmodified in
 [`docs/examples/dfm-speed-announce/`](docs/examples/dfm-speed-announce/).
+The WAV files Speed Gauge reuses carry their own credit note in
+[`src/Apps/AG-SpdGa/CREDITS.txt`](src/Apps/AG-SpdGa/CREDITS.txt).
 
 DFM Speed Announcer was itself inspired by Tero's Altitude Announcer
 from [RC-Thoughts.com](https://www.rc-thoughts.com), whose style it followed.

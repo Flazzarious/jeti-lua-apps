@@ -86,6 +86,7 @@ Reset by `init()`, so it resets on power-on, model load and app reload
 | `shownSpd` | number\|nil | nil | `sensorSpd · kDens`: shown, spoken, overspeed |
 | `maxSpd` | number | 0 | Session max of `shownSpd`, spike-filtered (R5) |
 | `prevDistinct` | number\|nil | nil | Previous distinct `shownSpd`, for R5 |
+| `distinctSince` | int ms | 0 | When `shownSpd` last changed; a value held 1 s counts for the max (R5) |
 | `everAboveLanding` | bool | false | Sensor speed has exceeded `vLand` this session |
 | `belowLanding` | bool | false | Currently at/below `vLand` after being above |
 | `everAboveHalf` | bool | false | Sensor speed has exceeded `vLand / 2` this session (FR-009 gate) |

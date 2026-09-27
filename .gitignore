@@ -9,3 +9,6 @@ docs/vendor/
 .DS_Store
 Thumbs.db
 *.swp
+
+# Python bytecode from tools/
+__pycache__/

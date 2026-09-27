@@ -101,15 +101,29 @@ the JETI Studio emulator as an early implementation task (see
 
 ## R5. Spike rejection for session max
 
-- **Decision:** A new maximum must be confirmed by two consecutive *distinct*
-  readings: when the reading changes, `max = math.max(max, math.min(prev,
-  cur))`, where `prev` is the previous distinct reading. A single-sample spike
-  is ignored; a real peak registers one sample late (~100 ms).
-- **Rationale:** The spec requires that one bad sample not ruin the max and
+- **Decision:** A value only raises the session max once it is confirmed,
+  in one of two ways:
+  - **Two distinct readings in a row:** when the reading changes,
+    `candidate = math.min(prev, cur)`, where `prev` is the previous distinct
+    reading. A single-sample spike never counts. A real peak registers one
+    sample late (about 100 ms).
+  - **Held for 1 s:** if the reading hasn't changed for `HOLD_MS` (1,000 ms),
+    `candidate = cur`. A perfectly steady speed would otherwise never count.
+    That happens with the emulator's held controls, and after "Reset max
+    speed" at constant speed.
+
+  `max = math.max(max, candidate)`.
+- **Rationale:** The spec requires that one bad sample not ruin the max, and
   that the rule be documented. "Distinct" matters because `loop()` ticks
-  faster than many sensors update, so the same spike value can be read twice.
-- **Documented limitation:** Two consecutive bad samples will still register.
-  The user can "Reset max speed".
+  faster than many sensors update, so the same spike value can be read
+  twice. The 1-s hold is longer than any plausible repeat of a single
+  telemetry sample.
+- **Documented limitation:** Two consecutive bad samples, or a bad value that
+  stays on the sensor for a second, will still register. The user can
+  "Reset max speed".
+- **Found in testing:** The first version had only the distinct-readings rule.
+  A mock-API run showed the max never rising at constant speed, so the hold
+  rule was added (2026-09-27).
 - **Alternatives considered:** Median of three (needs a buffer, same
   staleness issue); acceleration limit (needs airframe assumptions).
 

@@ -7,7 +7,7 @@ spec-driven workflow (GitHub Spec Kit + Claude Code) in VS Code.
 
 | App | Script | Status | Spec | Based on |
 | --- | --- | --- | --- | --- |
-| Speed Gauge | `AG-SpdGa.lua` | Spec written | [001](specs/001-speed-gauge/spec.md) | DFM Speed Announcer by Dave McQueeney (MIT) |
+| Speed Gauge | [`AG-SpdGa.lua`](src/Apps/AG-SpdGa.lua) | In development | [001](specs/001-speed-gauge/spec.md) | DFM Speed Announcer by Dave McQueeney (MIT) |
 
 Apps here are for telemetry, timers, announcements and displays only. Nothing
 in this repo may control surfaces, throttle or any flight function. See the
@@ -31,6 +31,7 @@ src/Apps/                         Mirrors /Apps on the transmitter SD card
   lib/ag_xxxxx.lua                Shared modules, require("ag_xxxxx")
 tools/check.py                    Syntax, forbidden-API, naming, encoding checks
 tools/pdf2md.py                   Converts Jeti's API PDF for local reference
+tests/test_ag_dens.lua            Optional desktop test for the density module (any Lua 5.3)
 tools/probe/PROBE.lua             Dev tool: prints the screen/window sizes in the emulator
 ```
 

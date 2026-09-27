@@ -9,7 +9,7 @@ built spec-first with GitHub Spec Kit (`/speckit-specify`, `/speckit-plan`,
 
 | App (menu name) | Script | Spec | Based on |
 | --- | --- | --- | --- |
-| Speed Gauge | `src/Apps/AG-SpdGa.lua` (planned) | `specs/001-speed-gauge/` | DFM Speed Announcer (Dave McQueeney, MIT) |
+| Speed Gauge | `src/Apps/AG-SpdGa.lua` | `specs/001-speed-gauge/` | DFM Speed Announcer (Dave McQueeney, MIT) |
 
 Keep this table current when an app is added.
 

@@ -9,6 +9,9 @@
 --   MODE = 1: "Probe small" (size 1) and "Probe large" (size 2)
 --   MODE = 2: "Probe full+bar" (size 3, keeps the status bar) and
 --             "Probe full" (size 4, whole screen)
+--   MODE = 3: "Probe auto" (size 0, documented only as "auto") and
+--             "Probe small" (size 1, for comparison). Check whether the
+--             desktop lets you place "Probe auto" at single or double size.
 -- Open the app's form ("Screen Probe" in the Applications menu) to see the
 -- form canvas size.
 -- Every size is shown on screen and printed once to the Lua debug console.
@@ -38,6 +41,7 @@ local function printSmall(w, h) drawInfo("small", w, h) end
 local function printLarge(w, h) drawInfo("large", w, h) end
 local function printFullBar(w, h) drawInfo("full+bar", w, h) end
 local function printFull(w, h) drawInfo("full", w, h) end
+local function printAuto(w, h) drawInfo("auto", w, h) end
 local function printForm(w, h) drawInfo("form", w, h) end
 
 local function init()
@@ -46,6 +50,9 @@ local function init()
   if MODE == 1 then
     system.registerTelemetry(1, "Probe small", 1, printSmall)
     system.registerTelemetry(2, "Probe large", 2, printLarge)
+  elseif MODE == 3 then
+    system.registerTelemetry(1, "Probe auto", 0, printAuto)
+    system.registerTelemetry(2, "Probe small", 1, printSmall)
   else
     system.registerTelemetry(1, "Probe full+bar", 3, printFullBar)
     system.registerTelemetry(2, "Probe full", 4, printFull)
@@ -53,4 +60,4 @@ local function init()
   system.registerForm(1, MENU_APPS, "Screen Probe", nil, nil, printForm)
 end
 
-return { init = init, loop = nil, author = "Aaron George", version = "1.1", name = "Screen Probe" }
+return { init = init, loop = nil, author = "Aaron George", version = "1.2", name = "Screen Probe" }
