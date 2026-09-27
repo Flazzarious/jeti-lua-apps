@@ -3,12 +3,17 @@
 -- SPDX-License-Identifier: MIT
 --
 -- Copy to the emulator's (or a test transmitter's) Apps folder, add
--- "Screen Probe" in Applications > User Applications, then put each of its
--- windows on the desktop via Timers/Sensors > Displayed telemetry:
---   "Probe small" (size 1), "Probe large" (size 2).
+-- "Screen Probe" in Applications > User Applications, then put its windows on
+-- the desktop via Timers/Sensors > Displayed telemetry. An app may register
+-- only two windows, so each run measures one pair (set MODE below):
+--   MODE = 1: "Probe small" (size 1) and "Probe large" (size 2)
+--   MODE = 2: "Probe full+bar" (size 3, keeps the status bar) and
+--             "Probe full" (size 4, whole screen)
 -- Open the app's form ("Screen Probe" in the Applications menu) to see the
--- full-screen form canvas size.
+-- form canvas size.
 -- Every size is shown on screen and printed once to the Lua debug console.
+
+local MODE = 2
 
 local reported = {}
 
@@ -31,14 +36,21 @@ end
 
 local function printSmall(w, h) drawInfo("small", w, h) end
 local function printLarge(w, h) drawInfo("large", w, h) end
+local function printFullBar(w, h) drawInfo("full+bar", w, h) end
+local function printFull(w, h) drawInfo("full", w, h) end
 local function printForm(w, h) drawInfo("form", w, h) end
 
 local function init()
   print("PROBE device: " .. tostring(system.getDeviceType())
     .. ", firmware " .. tostring(system.getVersion()))
-  system.registerTelemetry(1, "Probe small", 1, printSmall)
-  system.registerTelemetry(2, "Probe large", 2, printLarge)
+  if MODE == 1 then
+    system.registerTelemetry(1, "Probe small", 1, printSmall)
+    system.registerTelemetry(2, "Probe large", 2, printLarge)
+  else
+    system.registerTelemetry(1, "Probe full+bar", 3, printFullBar)
+    system.registerTelemetry(2, "Probe full", 4, printFull)
+  end
   system.registerForm(1, MENU_APPS, "Screen Probe", nil, nil, printForm)
 end
 
-return { init = init, loop = nil, author = "Aaron George", version = "1.0", name = "Screen Probe" }
+return { init = init, loop = nil, author = "Aaron George", version = "1.1", name = "Screen Probe" }

@@ -29,17 +29,21 @@ Official PDF: https://github.com/JETImodel/Lua-Apps/tree/master/Doc
 - **Screen:** JETI lists the DC/DS-24 II display as 4", 480 × 480 px, color,
   with the JUi2 interface. The original DC/DS-24 was 320 × 240; the v1.5 API
   document and most community apps assume that older screen.
-- **Window sizes:** the pixel size of each telemetry window and of the form
-  canvas on the II isn't published. Measure it with `tools/probe/PROBE.lua`
-  in the emulator and record the result here.
+- **Window sizes:** measured in the emulator with `tools/probe/PROBE.lua`
+  (firmware 6.04, 2026-09-27). They match the original DS-24's layout
+  (157 px ≈ half of a 320-px-wide screen), not a 480-px canvas. Lua on the II
+  apparently keeps the older coordinate space, and the II may scale it up on
+  its larger display. Design with these numbers, not with 480 × 480.
 - **Firmware:** the emulator in use runs 6.04; the transmitter runs 6.03 or
   newer.
 
 | Area | Size on DS-24 II (px) |
 | --- | --- |
-| Small telemetry window | *to be measured* |
-| Large telemetry window | *to be measured* |
-| App form canvas | *to be measured* |
+| Small telemetry window | 157 × 60 (measured) |
+| Large telemetry window | 157 × 127 (measured) |
+| Full screen, status bar kept (size 3) | *not yet measured* |
+| Full screen (size 4+) | *not yet measured* |
+| App form canvas | *not yet measured* |
 
 ## Files and names
 

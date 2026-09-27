@@ -160,6 +160,9 @@ moves, the max marker stays at the peak, and both numbers match.
    rim scale, colored value arc, overspeed zone, max marker, and the current
    speed as a large center number with its unit. Max, stall and overspeed
    appear as small labeled rows as room permits.
+2a. **Given** the full-screen window is selected, **Then** it shows a large
+   dial with a side panel of labeled values, as in the visual design
+   reference.
 3. **Given** speed rises to a new peak and then falls, **Then** the max-speed
    marker stays at the peak in its own color while the current-speed indicator
    follows the current speed in front of it.
@@ -207,18 +210,31 @@ lists as 480 × 480 px, running the JUi2 interface. Earlier transmitters (the
 original DC/DS-24, DC/DS-16/14, DS-12) have smaller screens and are **not
 supported for the gauge** (see FR-013a).
 
-The exact pixel size of each telemetry window on the DS-24 II MUST be measured
-before the layout is designed. The measurement uses `tools/probe/PROBE.lua`
-in the JETI Studio emulator set to DS-24 II, firmware 6.04, and its numbers
-are recorded in `plan.md`. The layout adapts to each size:
+**Measured window sizes** (JETI Studio emulator, firmware 6.04, with
+`tools/probe/PROBE.lua`, 2026-09-27):
 
-- **Double window.** The full dial described above, with the max, stall and
-  overspeed rows below or beside it.
-- **Single window.** If the measured single window can't fit a full round dial
-  at a readable size, it uses a compact version: a wider, shallower arc (for
-  example about 180°) with the center number. Max speed appears as a small
-  number beside it. Other elements are dropped before the dial becomes
-  unreadable.
+| Window | Size |
+| --- | --- |
+| Single (small) | **157 × 60 px**, about 2.6 : 1, wide and short |
+| Double (large) | **157 × 127 px**, a little wider than tall |
+| Full screen | *to be measured with PROBE.lua (MODE = 2) before planning the layout* |
+
+Lua on the II uses these window sizes even though JETI lists the display as
+480 × 480. The layout is designed for these numbers and adapts to each size:
+
+- **Double window (157 × 127).** The full ~270° dial, about 110–120 px across,
+  centered, with the large center number and unit. The Max / Stall /
+  Overspeed rows go in the corners around the dial, because there is no room
+  for a side panel.
+- **Full screen.** The layout closest to the reference photo: a large dial on
+  the left, and on the right a side panel with labeled rows (Max, Stall,
+  Overspeed, and room for more, such as density-correction factor or sensor
+  speed). The pilot chooses in settings whether the full-screen version keeps
+  the transmitter's status bar; the default keeps it.
+- **Single window (157 × 60).** Too short for a round dial. It uses the compact
+  version: a shallow arc (about 180° or less) of the same style, with the
+  current speed as a large number and max as a small number beside it. Other
+  elements are dropped before the arc becomes unreadable.
 
 ---
 
@@ -389,8 +405,10 @@ reading its label and hint.
 
 **Gauge**
 
-- **FR-013**: The app MUST offer a main-screen telemetry window that works in
-  both single and double sizes on the DS-24 II (and DC-24 II).
+- **FR-013**: The app MUST offer two main-screen telemetry windows on the
+  DS-24 II (and DC-24 II), the maximum an app may register:
+  - "Speed Gauge": the pilot places it at single or double size;
+  - "Speed Gauge (full screen)".
 - **FR-013a**: The gauge is not supported on other transmitters. If the app
   runs on one, the telemetry window MUST show a short notice (e.g. "Speed
   Gauge needs DS-24 II") instead of a mis-drawn gauge. Callouts and warnings
@@ -515,7 +533,8 @@ reading its label and hint.
 ## Assumptions
 
 - **Target and baseline.** The gauge targets the DS-24 II / DC-24 II
-  (480 × 480 px per JETI, firmware 6.x) only. The original app was tested
+  (firmware 6.x) only, using the measured Lua window sizes (157 × 60 and
+  157 × 127), not the panel's 480 × 480. The original app was tested
   only on the original DS-24. The original's
   behavior (v2.1) is the baseline; where this spec is silent, match it.
 - **Existing audio.** The existing WAV files (stall warning, overspeed,
