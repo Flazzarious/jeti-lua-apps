@@ -1,0 +1,44 @@
+[
+    {
+        "id" : 1,
+        "param" : 0,
+        "decimals" : 0,
+        "type" : 1,
+        "label" : "MSpeed 450",
+        "unit" : "",
+        "sensorName" : "MSpeed 450"
+    },
+    {
+        "id" : 1,
+        "param" : 1,
+        "decimals" : 0,
+        "type" : 1,
+        "label" : "Velocity",
+        "unit" : "km/h",
+        "sensorName" : "MSpeed 450",
+        "lowerBound" : 0,
+        "upperBound" : 450,
+        "input" : "P5"
+    },
+    {
+        "id" : 2,
+        "param" : 0,
+        "decimals" : 0,
+        "type" : 1,
+        "label" : "GPS",
+        "unit" : "",
+        "sensorName" : "GPS"
+    },
+    {
+        "id" : 2,
+        "param" : 1,
+        "decimals" : 1,
+        "type" : 1,
+        "label" : "Speed",
+        "unit" : "km/h",
+        "sensorName" : "GPS",
+        "lowerBound" : 0,
+        "upperBound" : 300,
+        "input" : "P6"
+    }
+]
