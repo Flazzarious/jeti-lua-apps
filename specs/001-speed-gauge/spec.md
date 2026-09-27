@@ -152,13 +152,17 @@ moves, the max marker stays at the peak, and both numbers match.
 **Acceptance Scenarios**:
 
 1. **Given** the window is placed in the normal (single) size, **Then** it
-   shows a round gauge with the current-speed indicator and max-speed marker,
-   the current speed as a number, and the session max as a number, all
-   readable without overlap.
+   shows the compact arc gauge. The value arc and max marker are visible, and
+   the current speed and session max appear as numbers, all readable without
+   overlap.
 2. **Given** the window is placed in the double size, **Then** it shows the
-   same content larger. As room permits it also shows secondary information:
-   the stall and overspeed speeds, marked on the gauge dial and/or as labeled
-   numbers, and the current speed as a number in the center of the dial.
+   full dial from the visual design reference below. That means a dark face,
+   rim scale, colored value arc, overspeed zone, max marker, and the current
+   speed as a large center number with its unit. Max, stall and overspeed
+   appear as small labeled rows as room permits.
+2a. **Given** the full-screen window is selected, **Then** it shows a large
+   dial with a side panel of labeled values, as in the visual design
+   reference.
 3. **Given** speed rises to a new peak and then falls, **Then** the max-speed
    marker stays at the peak in its own color while the current-speed indicator
    follows the current speed in front of it.
@@ -172,6 +176,67 @@ moves, the max marker stays at the peak, and both numbers match.
    clears and the marker restarts from the current speed.
 7. **Given** speed is above the gauge's full scale, **Then** the indicator
    stops at full scale and the numeric value still shows the actual speed.
+
+**Visual design reference** (provided by the user, 2026-09-27): a car
+head-up-display speedometer. The photo is a third-party product image, so it
+isn't committed. A local copy is at `docs/vendor/gauge-reference.jpg` on the
+development PC; `docs/vendor/` is gitignored. Open it when planning or building
+the gauge. The elements to carry over:
+
+- **Dark round face.** A dark, circular dial background inside the window,
+  independent of the transmitter's screen theme. This gives the colored arc
+  its contrast.
+- **About 270° sweep.** The dial runs clockwise from lower-left (zero) over the
+  top to lower-right (full scale), leaving the bottom open.
+- **Rim scale.** Major ticks with numbers around the outside, and lighter minor
+  ticks between them.
+- **Glowing value arc.** Current speed is shown mainly as a thick colored arc
+  that fills the rim from zero up to the current speed, like the blue sweep in
+  the reference. A thin needle or bright tip at the arc's end is optional.
+- **Warning zone.** A red/orange band on the rim from the overspeed warning
+  speed to full scale, like the reference's red zone near the top. The stall
+  and landing marks sit on the rim as small ticks (FR-016a).
+- **Big center number.** Current speed as a large number in the middle of the
+  dial, with the unit in smaller text underneath. This is the primary numeric
+  readout.
+- **Session max, kept subtle.** A thin tick or small dot on the rim in the max
+  color. It stays at the peak while the value arc moves beneath it, and the
+  max also appears as a small labeled number.
+- **Secondary data as small rows.** "Max", "Stall" and "Overspeed", each a
+  short label with a value. They go beside or below the dial wherever room
+  allows, like the reference's side panel.
+
+**Target screen: DS-24 II only.** The gauge is designed for the DS-24 II
+(and the DC-24 II, which shares its display): a 4" color screen that JETI
+lists as 480 × 480 px, running the JUi2 interface. Earlier transmitters (the
+original DC/DS-24, DC/DS-16/14, DS-12) have smaller screens and are **not
+supported for the gauge** (see FR-013a).
+
+**Measured window sizes** (JETI Studio emulator, firmware 6.04, with
+`tools/probe/PROBE.lua`, 2026-09-27):
+
+| Window | Size |
+| --- | --- |
+| Single (small) | **157 × 60 px**, about 2.6 : 1, wide and short |
+| Double (large) | **157 × 127 px**, a little wider than tall |
+| Full screen | **320 × 260 px** (sizes 3 and 4 measure the same) |
+
+Lua on the II uses these window sizes even though JETI lists the display as
+480 × 480. The layout is designed for these numbers and adapts to each size:
+
+- **Double window (157 × 127).** The full ~270° dial, about 110–120 px across,
+  centered, with the large center number and unit. The Max / Stall /
+  Overspeed rows go in the corners around the dial, because there is no room
+  for a side panel.
+- **Full screen.** The layout closest to the reference photo: a large dial on
+  the left, and on the right a side panel with labeled rows (Max, Stall,
+  Overspeed, and room for more, such as density-correction factor or sensor
+  speed). At 320 × 260 the dial can be about 200–220 px across, with a
+  side panel roughly 100 px wide.
+- **Single window (157 × 60).** Too short for a round dial. It uses the compact
+  version: a shallow arc (about 180° or less) of the same style, with the
+  current speed as a large number and max as a small number beside it. Other
+  elements are dropped before the arc becomes unreadable.
 
 ---
 
@@ -342,26 +407,40 @@ reading its label and hint.
 
 **Gauge**
 
-- **FR-013**: The app MUST offer a main-screen telemetry window that works in
-  both single and double sizes.
-- **FR-014**: The window MUST show a round, speedometer-style gauge. It shows
-  current speed as the dominant indicator and session max speed as a less
-  prominent marker, in a different color, drawn behind the current-speed
-  indicator.
+- **FR-013**: The app MUST offer two main-screen telemetry windows on the
+  DS-24 II (and DC-24 II), the maximum an app may register:
+  - "Speed Gauge": the pilot places it at single or double size;
+  - "Speed Gauge (full screen)".
+- **FR-013a**: The gauge is not supported on other transmitters. If the app
+  runs on one, the telemetry window MUST show a short notice (e.g. "Speed
+  Gauge needs DS-24 II") instead of a mis-drawn gauge. Callouts and warnings
+  MUST still work, because they don't depend on the screen.
+- **FR-014**: The window MUST show a round, speedometer-style gauge following
+  the visual design reference in User Story 3:
+  - a dark dial face;
+  - a rim scale with ticks and numbers;
+  - current speed as a filled colored arc from zero to the current speed (the
+    dominant indicator);
+  - session max as a thin marker in a different color, which the value arc
+    passes beneath;
+  - an overspeed zone from the overspeed warning speed to full scale.
+- **FR-014a**: Current speed MUST also be shown as a large number with its unit
+  at the center of the dial (double size) or next to the arc (single size).
 - **FR-015**: The window MUST show current speed and session max speed as
   numbers, with units.
 - **FR-016**: In the double size, and in the single size where it fits, the
-  window SHOULD show secondary information: stall and overspeed speeds on
-  the dial or as labels, and current speed in the center of the dial.
+  window SHOULD show secondary information: stall and overspeed speeds as rim
+  marks and as small labeled rows (Max / Stall / Overspeed).
 - **FR-016a**: When correction is on, stall and landing-speed marks on the
   dial MUST be placed at their true-airspeed equivalents (setting × correction
   factor). The needle then crosses a mark at the moment its warning or
   callout change happens. Any numeric label for these speeds shows the
   setting as entered.
 - **FR-017**: Users MUST be able to choose the current-speed and max-speed
-  colors from a preset list of at least 6 distinct colors. The defaults MUST be
-  clearly distinguishable from each other and readable on the transmitter's
-  default display theme.
+  colors from a preset list of at least 6 distinct colors. The defaults are a
+  blue/cyan value arc (as in the reference) and a white max marker, which is
+  visible on the dark face but less prominent than the arc. Neither color
+  choice may be the same as the red/orange overspeed zone.
 - **FR-018**: Gauge full scale MUST be user-settable. The default is derived
   from the overspeed warning speed, so overspeed sits near the top of the
   dial.
@@ -442,7 +521,7 @@ reading its label and hint.
   dial's stall mark.
 - **SC-004**: The gauge is readable at a glance in both single and double
   window sizes. A pilot can read current speed within 5% from the dial alone,
-  and read both numbers without overlap, on the DS-24 screen.
+  and read both numbers without overlap, on the DS-24 II screen.
 - **SC-005**: The gauge reflects a speed change within 0.5 s.
 - **SC-006**: A pilot new to the app configures sensor, switch, landing speed
   and stall warning in under 3 minutes without referring to documentation.
@@ -455,8 +534,10 @@ reading its label and hint.
 
 ## Assumptions
 
-- **Target and baseline.** The target is the DS-24 II transmitter only (color
-  screen); the original app was also only tested on the DS-24. The original's
+- **Target and baseline.** The gauge targets the DS-24 II / DC-24 II
+  (firmware 6.x) only, using the measured Lua window sizes (157 × 60 and
+  157 × 127), not the panel's 480 × 480. The original app was tested
+  only on the original DS-24. The original's
   behavior (v2.1) is the baseline; where this spec is silent, match it.
 - **Existing audio.** The existing WAV files (stall warning, overspeed,
   airspeed alive, "stall speed warning at", cal factor) are reused. New voice

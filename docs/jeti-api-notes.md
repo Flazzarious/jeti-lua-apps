@@ -24,6 +24,29 @@ Official PDF: https://github.com/JETImodel/Lua-Apps/tree/master/Doc
 - DC/DS-24 runs up to 10 apps per model. The hard 50 kB memory cap applies to
   DC/DS-14/16, not the 24 series, but memory is still shared by all apps.
 
+## Target hardware (DS-24 II)
+
+- **Screen:** JETI lists the DC/DS-24 II display as 4", 480 × 480 px, color,
+  with the JUi2 interface. The original DC/DS-24 was 320 × 240; the v1.5 API
+  document and most community apps assume that older screen.
+- **Window sizes:** measured in the emulator with `tools/probe/PROBE.lua`
+  (firmware 6.04, 2026-09-27). They match the original DS-24's layout
+  (157 px ≈ half of a 320-px-wide screen), and full screen is 320 × 260,
+  not a 480-px canvas. On the II, full-screen sizes 3 and 4 give the same
+  area. Lua on the II
+  apparently keeps the older coordinate space, and the II may scale it up on
+  its larger display. Design with these numbers, not with 480 × 480.
+- **Firmware:** the emulator in use runs 6.04; the transmitter runs 6.03 or
+  newer.
+
+| Area | Size on DS-24 II (px) |
+| --- | --- |
+| Small telemetry window | 157 × 60 (measured) |
+| Large telemetry window | 157 × 127 (measured) |
+| Full screen, status bar kept (size 3) | 320 × 260 (measured) |
+| Full screen (size 4+) | 320 × 260 (measured, same as size 3) |
+| App form canvas | *not yet measured* |
+
 ## Files and names
 
 - Apps live in `/Apps` on the SD card as `NAME.lua`, filename in 8.3 format.

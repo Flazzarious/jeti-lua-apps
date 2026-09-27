@@ -97,6 +97,12 @@ src/Apps/lib/ag_xxxxx.lua  shared module, loaded with require("ag_xxxxx")
 
 ## Environment
 
+- **Target:** DS-24 II / DC-24 II only for anything drawn on screen. Design
+  for the measured Lua window sizes, not the panel's 480 × 480: small
+  157 × 60, large 157 × 127, full screen 320 × 260 (see
+  `docs/jeti-api-notes.md`; measure more with `tools/probe/PROBE.lua`). The
+  emulator runs firmware 6.04.
+
 - Windows, PowerShell. Spec Kit scripts are the PowerShell variants.
 - The deploy target is `/Apps` on the transmitter's SD card; `src/Apps/` mirrors
   it. The emulator's copy is `%LOCALAPPDATA%\JETI-Studio\Emulator\Apps`.

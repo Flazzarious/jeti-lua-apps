@@ -31,6 +31,7 @@ src/Apps/                         Mirrors /Apps on the transmitter SD card
   lib/ag_xxxxx.lua                Shared modules, require("ag_xxxxx")
 tools/check.py                    Syntax, forbidden-API, naming, encoding checks
 tools/pdf2md.py                   Converts Jeti's API PDF for local reference
+tools/probe/PROBE.lua             Dev tool: prints the screen/window sizes in the emulator
 ```
 
 ### Multiple apps, one repo
