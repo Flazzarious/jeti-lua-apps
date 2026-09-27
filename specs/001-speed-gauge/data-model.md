@@ -10,7 +10,7 @@ Two kinds of state: **model settings**, persisted per model with
 
 All values are integers, strings or SwitchItems (no floats). Speeds are stored
 in the selected units; elevation and temperature in the unit system the speed
-units imply (FR-023). 24 keys, under the limit of 30.
+units imply (FR-023). 24 keys, or 25 with the `winSz` fallback, under the limit of 30.
 
 | Key | Type | Range | Default | Setting (label) |
 | --- | --- | --- | --- | --- |
@@ -34,10 +34,11 @@ units imply (FR-023). 24 keys, under the limit of 30.
 | `elev` | int ft or m | −1000–15000 ft / −300–4600 m | 0 | Field elevation |
 | `temp` | int °F or °C | −22–122 °F / −30–50 °C | 59 °F / 15 °C | Temperature |
 | `tStd` | int 0/1 | | 1 | Use standard temperature |
-| `colCur` | int | 1–8 (R8) | 1 Blue | Current speed color |
-| `colMax` | int | 1–8 | 2 Orange | Max speed color |
+| `colCur` | int | 1–8 (R8: Cyan, Blue, White, Green, Lime, Magenta, Purple, Grey) | 1 Cyan | Current speed color |
+| `colMax` | int | 1–8 | 3 White | Max speed color |
 | `fScale` | int unit | 0 = Auto, 10–2000 | 0 | Gauge full scale |
 | `cfgV` | int | | 1 | Settings layout version (for future migrations) |
+| `winSz` | int | 1 Single, 2 Double | 2 | Gauge window size. **Only if size 0 fails** (research R7); otherwise not created |
 
 Defaults for speeds match v2.1 (`VrefSpd` 60, `Vs0Spd` 45, `maxSpd` 200 in
 mph). Keys are new, so nothing is read from the original app's settings
@@ -66,9 +67,10 @@ too. All are saved immediately.
 | `kSensor` | `unitsMult[units] · cal / 100` (sensor value is m/s, R3) | `units`, `cal` |
 | `kDens` | `ag_dens.factor(elevM, tempC or nil)` if `densOn = 1` and `sType = 1`, else 1 | `densOn`, `sType`, `elev`, `temp`, `tStd`, `units` |
 | `fullScale` | `fScale`, or if 0: `ceil(vOver · 1.15 / 10) · 10` | `fScale`, `vOver` |
-| `fStall`, `fOver` | dial fractions of `vStall · kDens` and `vOver` over `fullScale` (FR-016a) | any of the above |
+| `fStall`, `fLand`, `fOver` | dial fractions of `vStall · kDens`, `vLand · kDens` and `vOver` over `fullScale` (FR-016a) | any of the above |
+| `scaleStep`, scale labels | `ag_gauge.scaleStep(fullScale)`; array of label strings "0", "50", ... | `fullScale`, `units` |
 | `unitText`, `unitSpoken` | display "kt" / spoken "kt." etc. from the v2.1 list | `units` |
-| threshold texts | e.g. "Stall 45" | thresholds, `units` |
+| row texts | Stall, Overspeed values as entered (e.g. "45"); unit; density row "+8%" | thresholds, `units`, `kDens` |
 
 `unitsMult` is v2.1's m/s-to-unit table: mph 2.23694, km/h 3.6, kt 1.94384,
 m/s 1, ft/s 3.28084.
@@ -93,7 +95,10 @@ Reset by `init()`, so it resets on power-on, model load and app reload
 | `lastSpokenSpd` | int | 0 | Rounded value of the last callout |
 | `lastSpokenAt` | int ms | 0 | `getTimeCounter()` at last callout |
 | `lastTick` | int ms | now | Rate limiter for `loop()` (100 ms) |
-| `curText`, `maxText` | string | "---", "0" | Cached number strings, rebuilt only when the rounded value changes |
+| `curText`, `maxText`, `sensText` | string | "---", "0", "" | Cached number strings, rebuilt only when the rounded value changes. `sensText` is the uncorrected sensor speed for the full-screen density row |
+| `gaugeOk` | bool | set in `init()` | Device is a DS-24 II (research R12). Only the print function reads it |
+| `layout` | table | nil | Layout cache for the last `(w, h)` per window (research R6); rebuilt when size or scale changes |
+| `rend` | Renderer | nil | Created lazily in the print function and reused (research R6) |
 
 ## State transitions
 

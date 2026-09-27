@@ -46,7 +46,7 @@ the JETI Studio emulator as an early implementation task (see
   - `src/Apps/lib/ag_dens.lua`: density factor, standard temperature, and
     ft↔m / °F↔°C conversions. Pure functions.
   - `src/Apps/lib/ag_gauge.lua`: dial geometry constructor and arc, tick and
-    needle drawing helpers. Called only from the app's print function.
+    rim-mark drawing helpers. Called only from the app's print function.
 - **Rationale:** The constitution (VII) names exactly these two as examples of
   shared code, and the spec's Assumptions leave the call to the plan. Both are
   stateless: `ag_gauge.newDial()` returns a table the app owns; the module
@@ -113,59 +113,121 @@ the JETI Studio emulator as an early implementation task (see
 - **Alternatives considered:** Median of three (needs a buffer, same
   staleness issue); acceleration limit (needs airframe assumptions).
 
-## R6. Gauge drawing on the DS-24
+## R6. Gauge drawing on the DS-24 II
 
-- **Findings:** The API has `drawCircle`, `drawLine` and the anti-aliased
-  `lcd.renderer()` (V4.27+, DC/DS-24 only) with `renderPolyline(width,
-  alpha)`. There is no filled-circle or arc primitive.
-- **Decision:**
-  - Dial: 270° sweep, zero at lower-left (225°), full scale at lower-right
-    (−45°), clockwise.
-  - `ag_gauge.newDial(steps)` precomputes unit cos/sin for `steps + 1` points
-    (54 steps = 5° each) once at init. Drawing an arc to fraction `f` adds the
-    table points up to `f` plus one interpolated end point to a renderer and
-    calls `renderPolyline`. No trig per frame.
-  - Draw order (back to front): track arc (foreground color, low alpha),
-    stall and overspeed ticks, max arc (max color, thin) from 0 to max plus a
-    tick at max, current arc (current color, thick) from 0 to current, needle
-    line, numbers.
-  - Values above full scale clamp to `f = 1`; the number shows the real value
-    (US3 scenario 7).
+Design source: the visual design reference in spec US3 (a car head-up-display
+speedometer; local copy at `docs/vendor/gauge-reference.jpg`).
+
+- **Findings:** The API has `drawLine`, `drawFilledRectangle`, `drawText`
+  and the anti-aliased `lcd.renderer()` (V4.27+, DC/DS-24 only) with
+  `renderPolyline(width, alpha)` and `renderPolygon(alpha)`. There is no
+  filled-circle or arc primitive, so the dark face is a filled polygon and
+  every arc is a polyline.
+- **Decision: geometry**
+  - Round dial (double and full screen): 270° sweep, zero at lower-left
+    (225°), full scale at lower-right (−45°), clockwise, bottom open.
+  - Compact dial (single window): 180° sweep from the left (180°) over the
+    top to the right (0°), per the spec's "shallow arc".
+  - `ag_gauge.newDial(steps, startDeg, sweepDeg)` precomputes unit cos/sin
+    once in `init()`: 54 steps (5° each) for the round dial and 36 for the
+    compact one. A 72-point unit circle is precomputed for the face polygon.
+  - Arcs run from fraction `f0` to `f1`, so one helper draws the track
+    (0 → 1), the overspeed zone (fOver → 1) and the value arc (0 → current).
+- **Decision: scale**
+  - The major tick step is the smallest of 10, 20, 25, 50, 100, 200, 250, 500
+    (in the user's units) that gives at most 8 major intervals up to full
+    scale. Minor ticks between majors: 4 on the full-screen dial, 1 on the
+    double dial, none on the compact dial.
+  - Major labels ("0", "50", "100", ...) are built as strings in
+    `recomputeScale()`, only when full scale or units change.
+- **Decision: draw order, back to front**
+  1. Face: a dark polygon (RGB 20, 24, 32) covering the dial. The compact
+     layout fills the whole window with `drawFilledRectangle` instead.
+  2. Track: arc 0 → 1, grey (70, 78, 90), width 3.
+  3. Overspeed zone: arc fOver → 1, orange-red (255, 80, 0), width 4.
+  4. Scale: major ticks and labels in light grey (200, 200, 200), minor ticks
+     in darker grey.
+  5. Stall and landing marks: short light-grey ticks at `fStall` and `fLand`,
+     the true-airspeed equivalents (FR-016a).
+  6. Value arc: 0 → `fCur` in `colCur`, width 6 (round) or 5 (compact), with a
+     bright 2-px tip line at the end.
+  7. Max marker: a tick across the rim at `fMax` in `colMax`, width 2. It is
+     drawn after the value arc, so it stays visible while the arc passes
+     under it (FR-014).
+  8. Text: center number, unit and labeled rows.
+- Values above full scale clamp to `f = 1`; the number shows the real value
+  (US3 scenario 7).
+- **Decision: CPU (SC-007).** Everything that depends only on window size and
+  settings (tick end points, label positions, face polygon points, radii)
+  goes into a layout cache. It is computed the first time a `(w, h)` is drawn,
+  and again only when `w`, `h` or the scale changes. Per frame, the print
+  function only walks cached arrays.
+  - **Fallback** if the CPU figure is still over 20% with the full-screen
+    dial: draw the static parts (face, track, zone, ticks) once into an
+    off-screen image (`lcd.createImage` and `lcd.renderer(image)`, V5.00+),
+    `lcd.drawImage` it each frame, and draw the labels and moving parts live.
 - **Renderer reuse (UNVERIFIED):** Create one renderer lazily inside the print
-  function and call `:reset()` between arcs, to avoid allocating per frame. If
-  the emulator shows it can't be reused across frames, create one per frame
+  function and call `:reset()` between shapes, to avoid allocating per frame.
+  If the emulator shows it can't be reused across frames, create one per frame
   and re-check the CPU figure.
-- **Alternatives considered:** Pre-rendered PNG dial with `lcd.loadImage`
-  (fixed size, can't recolor, doesn't adapt to window size); plain
-  `drawLine` segments (jagged at this size).
+- **Alternatives considered:** A pre-rendered PNG dial with `lcd.loadImage`
+  (fixed size, can't recolor or re-scale); plain `drawLine` segments (jagged
+  at this size); a needle as the main indicator (the reference uses a filled
+  arc).
 
-## R7. Telemetry window sizes
+## R7. Telemetry windows and sizes
 
-- **Decision:** Register two windows with the same print function:
-  window 1, size 1 ("Speed Gauge"), and window 2, size 2 ("Speed Gauge
-  large"). The user places whichever fits. The print function lays out from the
-  `(w, h)` it is given, so a window moved between sizes adapts on the next
-  draw.
-- **Expected sizes (UNVERIFIED):** about 152×69 px (single) and 152×146 px
-  (double) on the DS-24. Quickstart step 1 measures them with the official
-  `10_telemw.lua` demo before layout work starts.
-- **Layouts:** see [contracts/telemetry-window.md](contracts/telemetry-window.md).
-  Compact when `h < 100`: dial on the left at the full window height, numbers
-  on the right. Large otherwise: centered dial, current number in the middle,
-  stall/overspeed labels and max below.
-- **Alternatives considered:** Size 0 ("auto"): its behavior isn't documented
-  in v1.5.
+- **Measured sizes** (spec US3 and `docs/jeti-api-notes.md`, firmware 6.04
+  emulator, `tools/probe/PROBE.lua`): single 157 × 60, double 157 × 127, full
+  screen 320 × 260 (sizes 3 and 4 identical). These replace the earlier
+  estimates.
+- **Decision:** FR-013 asks for two windows, the most an app may register:
+  - Window 1, "Speed Gauge", registered with **size 0**, so the pilot can
+    place it at single or double size.
+  - Window 2, "Speed Gauge (full screen)", registered with **size 3**, which
+    keeps the status bar.
 
-## R8. Colors and theme
+  One print function serves both. It picks the layout from `(w, h)` on every
+  call, so a window moved between sizes adapts on the next draw.
+- **Size 0 (UNVERIFIED):** v1.5 lists size 0 as "auto" without saying what it
+  does. Quickstart step 1 checks it with a size-0 mode added to `PROBE.lua`.
+  - **Fallback** if the pilot can't choose the size: a "Gauge window size"
+    setting (Single / Double, key `winSz`). Window 1 is registered at that size
+    in `init()`, and unregistered and registered again when the setting
+    changes.
+- **Layouts** (details in
+  [contracts/telemetry-window.md](contracts/telemetry-window.md)):
+  - `h < 100` → compact (single, 157 × 60)
+  - `w < 250` → round (double, 157 × 127)
+  - otherwise → full screen (320 × 260)
+- **Alternatives considered:** Separate single and double windows (the
+  previous plan). They would use both slots and leave none for full screen.
 
-- **Decision:** Eight presets: Blue (0,100,255), Orange (255,140,0), Red
-  (220,0,0), Green (0,160,0), Magenta (200,0,200), Cyan (0,170,210), Black,
-  White. Defaults: current = Blue, max = Orange (distinct hue and lightness,
-  both readable on the DS-24 default light theme). The track and text use
-  `lcd.getFgColor()` so they follow the user's theme; the track is drawn with
-  low alpha.
-- **Rationale:** FR-017 asks for at least 6. Red is left non-default because
-  pilots read red as an alarm.
+## R8. Colors
+
+- **Decision:** The dial face is always dark (spec US3), so the colors are
+  chosen for a dark background, not for the transmitter's theme. There are
+  eight presets. None is red, orange or yellow, so none can be confused with
+  the overspeed zone (FR-017):
+
+  | # | Name | RGB |
+  | --- | --- | --- |
+  | 1 | Cyan | 0, 190, 255 |
+  | 2 | Blue | 40, 110, 255 |
+  | 3 | White | 255, 255, 255 |
+  | 4 | Green | 0, 210, 100 |
+  | 5 | Lime | 170, 240, 0 |
+  | 6 | Magenta | 230, 60, 230 |
+  | 7 | Purple | 150, 100, 255 |
+  | 8 | Grey | 170, 170, 170 |
+
+  Defaults: current speed = Cyan, max = White. Numbers on the face are white;
+  labels are light grey.
+- **Rationale:** FR-017 asks for at least 6 colors, a blue/cyan arc and a
+  white max marker by default, and no clash with the red/orange zone. Black is
+  dropped because it would vanish on the dark face.
+- **Unsupported transmitters:** the notice (R12) uses the theme's foreground
+  color, since no face is drawn there.
 
 ## R9. Callout timing (checked against v2.1)
 
@@ -215,10 +277,29 @@ Everything else matches v2.1.
 | 4 | "Call at least every" 10–40 s | 10–60 s | FR-005 |
 | 5 | "Call < Vref every" default 3 in intbox, 2 on load | 2 everywhere | FR-005 |
 | 6 | Flight flags frozen while both switches off | Tracked whenever the reading is valid; only sounds need a switch | FR-012 |
-| 7 | Window: one text line "Calibrated Airspeed" | Round gauge, two sizes, session max | US3 |
+| 7 | Window: one text line "Calibrated Airspeed" | Round gauge (pilot-sized window + full screen), session max; DS-24 II only | US3, FR-013a |
 | 8 | Debug toggled by sensitivity 99/98 | Removed; debug prints only in the emulator | cleanup |
 | 9 | Startup stall announcement always | On by default, can be turned off | FR-028 |
 | 10 | Switch on only at `== 1` | `> 0.5` (R10) | R10 |
 | 11 | No density correction | Optional, airspeed sensors only | US4 |
 | 12 | Unused `V_ref_speed.wav`, `Spd_ann_act.wav` shipped | Not copied | cleanup |
 | 13 | Normal callouts need *current* speed > Vref/2 | Latched: once exceeded this session, stays open | FR-009, US1 #7 |
+
+## R12. Unsupported transmitters (FR-013a)
+
+- **Finding:** `system.getDeviceType()` returns the transmitter's name as a
+  string (`types/jeti.lua` gives "JETI DC-24" as an example). The exact
+  string on a DS-24 II, and in the emulator, isn't documented. `PROBE.lua`
+  already prints it to the console.
+- **Decision:** In `init()`, set `gaugeOk` once:
+  `gaugeOk = string.find(system.getDeviceType() or "", "24 II", 1, true) ~= nil`.
+  When `gaugeOk` is false, the print function draws only
+  "Speed Gauge needs DS-24 II" in the theme's colors (`FONT_MINI`) and
+  returns. The loop, callouts and warnings never check `gaugeOk` (FR-013a).
+- **UNVERIFIED:** the device string on the II and in the emulator. Quickstart
+  step 1 reads them from the probe's console output. If the II's string
+  doesn't contain "24 II", change the match to what it does contain, and
+  record the strings in `docs/jeti-api-notes.md`.
+- **Alternatives considered:** Detect by window size (the original DS-24
+  reports the same window sizes, so the two can't be told apart); detect by
+  `lcd.renderer` being present (also true on the original DS-24).
