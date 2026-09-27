@@ -1,4 +1,4 @@
-# Specification Quality Checklist: Speed Announcer (rewrite)
+# Specification Quality Checklist: Speed Gauge
 
 **Purpose**: Validate specification completeness and quality before proceeding to planning
 **Created**: 2026-09-27

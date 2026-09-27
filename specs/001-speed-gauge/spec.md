@@ -1,6 +1,6 @@
-# Feature Specification: Speed Announcer (rewrite)
+# Feature Specification: Speed Gauge
 
-**Feature Branch**: `001-speed-announcer`
+**Feature Branch**: `001-speed-gauge`
 
 **Created**: 2026-09-27
 
@@ -10,7 +10,7 @@
 
 ## Overview
 
-A transmitter app that speaks the model's airspeed during flight, warns about
+**Speed Gauge** is a transmitter app that speaks the model's airspeed during flight, warns about
 stall and overspeed, and shows speed on a round gauge on the transmitter's main
 screen. It replaces DFM's Speed Announcer (v2.1, kept unmodified in
 `docs/examples/dfm-speed-announce/` as the behavioral baseline). It keeps that
@@ -465,6 +465,7 @@ reading its label and hint.
   transmitter's telemetry log is a possible later feature.
 - **English only.** Labels and callouts are English for v1. Spoken numbers and
   units follow the transmitter's voice language.
-- **New app, new settings.** The new app has its own filename, so it installs
+- **New app, new settings.** The app is named "Speed Gauge" (shown in the
+  transmitter's app list and menu). It has its own filename, so it installs
   next to DFM-SpdA. Settings are not imported from the original.
 
