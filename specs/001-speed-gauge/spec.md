@@ -178,8 +178,10 @@ moves, the max marker stays at the peak, and both numbers match.
    stops at full scale and the numeric value still shows the actual speed.
 
 **Visual design reference** (provided by the user, 2026-09-27): a car
-head-up-display speedometer. The photo is not stored in the repo because it is
-a third-party product image. The elements to carry over:
+head-up-display speedometer. The photo is a third-party product image, so it
+isn't committed. A local copy is at `docs/vendor/gauge-reference.jpg` on the
+development PC; `docs/vendor/` is gitignored. Open it when planning or building
+the gauge. The elements to carry over:
 
 - **Dark round face.** A dark, circular dial background inside the window,
   independent of the transmitter's screen theme. This gives the colored arc
