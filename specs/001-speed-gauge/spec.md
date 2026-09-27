@@ -217,7 +217,7 @@ supported for the gauge** (see FR-013a).
 | --- | --- |
 | Single (small) | **157 × 60 px**, about 2.6 : 1, wide and short |
 | Double (large) | **157 × 127 px**, a little wider than tall |
-| Full screen | *to be measured with PROBE.lua (MODE = 2) before planning the layout* |
+| Full screen | **320 × 260 px** (sizes 3 and 4 measure the same) |
 
 Lua on the II uses these window sizes even though JETI lists the display as
 480 × 480. The layout is designed for these numbers and adapts to each size:
@@ -229,8 +229,8 @@ Lua on the II uses these window sizes even though JETI lists the display as
 - **Full screen.** The layout closest to the reference photo: a large dial on
   the left, and on the right a side panel with labeled rows (Max, Stall,
   Overspeed, and room for more, such as density-correction factor or sensor
-  speed). The pilot chooses in settings whether the full-screen version keeps
-  the transmitter's status bar; the default keeps it.
+  speed). At 320 × 260 the dial can be about 200–220 px across, with a
+  side panel roughly 100 px wide.
 - **Single window (157 × 60).** Too short for a round dial. It uses the compact
   version: a shallow arc (about 180° or less) of the same style, with the
   current speed as a large number and max as a small number beside it. Other

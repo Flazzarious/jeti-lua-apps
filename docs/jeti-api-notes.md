@@ -31,7 +31,9 @@ Official PDF: https://github.com/JETImodel/Lua-Apps/tree/master/Doc
   document and most community apps assume that older screen.
 - **Window sizes:** measured in the emulator with `tools/probe/PROBE.lua`
   (firmware 6.04, 2026-09-27). They match the original DS-24's layout
-  (157 px ≈ half of a 320-px-wide screen), not a 480-px canvas. Lua on the II
+  (157 px ≈ half of a 320-px-wide screen), and full screen is 320 × 260,
+  not a 480-px canvas. On the II, full-screen sizes 3 and 4 give the same
+  area. Lua on the II
   apparently keeps the older coordinate space, and the II may scale it up on
   its larger display. Design with these numbers, not with 480 × 480.
 - **Firmware:** the emulator in use runs 6.04; the transmitter runs 6.03 or
@@ -41,8 +43,8 @@ Official PDF: https://github.com/JETImodel/Lua-Apps/tree/master/Doc
 | --- | --- |
 | Small telemetry window | 157 × 60 (measured) |
 | Large telemetry window | 157 × 127 (measured) |
-| Full screen, status bar kept (size 3) | *not yet measured* |
-| Full screen (size 4+) | *not yet measured* |
+| Full screen, status bar kept (size 3) | 320 × 260 (measured) |
+| Full screen (size 4+) | 320 × 260 (measured, same as size 3) |
 | App form canvas | *not yet measured* |
 
 ## Files and names
