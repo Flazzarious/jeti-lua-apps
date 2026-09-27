@@ -35,6 +35,22 @@ principle I).
 - **Session**: from when the app starts (transmitter power-on, model load, or
   app reload) until it stops.
 
+## Clarifications
+
+### Session 2026-09-27
+
+- Q: What does density correction apply to? → A: The gauge, callouts,
+  session max and overspeed warning use true airspeed. The stall,
+  landing-speed and "airspeed alive" checks use sensor speed.
+  - **Why, in the user's words:** "if a wing stalls at 40 mph at 0 ft (sea
+    level) I want the warning to go off at the equivalent pressure when flying
+    at 5000 ft". A pitot sensor measures pressure, so the stall pressure reads
+    as the same sensor speed (40) at any altitude. Comparing sensor speed to
+    the stall setting therefore fires at the equivalent pressure. The stall
+    and landing speeds are entered as the model's sea-level values.
+- Q: Does GPS get density correction? → A: No. GPS measures ground speed,
+  which air density doesn't affect (confirmed by the user).
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Hear speed during flight (Priority: P1)
@@ -104,8 +120,14 @@ speed. Each warning should play exactly once per crossing.
    speed drops back to or below the overspeed speed.
 4. **Given** it is the first time this session that sensor speed exceeds half
    of landing speed, **Then** "airspeed alive" plays once.
-5. **Given** density correction is on, **Then** stall and landing-speed checks
-   still use sensor speed, not true airspeed.
+5. **Given** density correction is on at 5,000 ft (standard temperature) and
+   the stall warning is set to 40 mph, **When** the model slows, **Then** the
+   stall warning fires when sensor speed reaches 40 mph. At that moment the
+   gauge reads about 43 mph (true airspeed). The warning fires at the same air
+   pressure at which it would fire at 40 mph at sea level.
+6. **Given** the same setup, **Then** the landing-speed switch to fast callouts
+   and the "airspeed alive" check likewise use sensor speed, so they happen at
+   the same wing loading at any field elevation.
 
 ---
 
@@ -305,9 +327,12 @@ reading its label and hint.
 - **FR-010**: The app MUST give the stall, overspeed and "airspeed alive"
   warnings as described in User Story 2, each once per crossing, with the
   existing warning sounds and stick vibration patterns.
-- **FR-011**: Stall, landing-speed and "airspeed alive" checks MUST use sensor
-  speed (not density-corrected). The overspeed check MUST use the same speed
-  shown on the gauge (true airspeed when correction is on).
+- **FR-011**: Stall, landing-speed and "airspeed alive" checks MUST compare
+  sensor speed (not density-corrected) against the user's settings. Those
+  settings are the model's sea-level values, so the warnings fire at the same
+  air pressure at any field elevation. The overspeed check MUST use the same
+  speed shown on the gauge (true airspeed when correction is on), because the
+  overspeed limit is about the airframe's actual speed.
 - **FR-012**: Warnings MUST work whenever either switch is on, regardless of
   whether the gauge is displayed.
 
@@ -324,6 +349,11 @@ reading its label and hint.
 - **FR-016**: In the double size, and in the single size where it fits, the
   window SHOULD show secondary information: stall and overspeed speeds on
   the dial or as labels, and current speed in the center of the dial.
+- **FR-016a**: When correction is on, stall and landing-speed marks on the
+  dial MUST be placed at their true-airspeed equivalents (setting × correction
+  factor). The needle then crosses a mark at the moment its warning or
+  callout change happens. Any numeric label for these speeds shows the
+  setting as entered.
 - **FR-017**: Users MUST be able to choose the current-speed and max-speed
   colors from a preset list of at least 6 distinct colors. The defaults MUST be
   clearly distinguishable from each other and readable on the transmitter's
@@ -390,6 +420,10 @@ reading its label and hint.
 - **SC-003**: With 100 mph sensor speed, the density correction gives 100 mph
   (0 ft, standard temperature), 108 mph (5,000 ft, standard temperature) and
   113 mph (5,000 ft, 35 °C), each ±1 mph.
+- **SC-003a**: With correction on at 5,000 ft (standard temperature) and the
+  stall warning set to 40 mph, the stall warning fires at a sensor speed of
+  40 mph (±1). The gauge then reads 43 mph (±1), and the needle is at the
+  dial's stall mark.
 - **SC-004**: The gauge is readable at a glance in both single and double
   window sizes. A pilot can read current speed within 5% from the dial alone,
   and read both numbers without overlap, on the DS-24 screen.
@@ -411,6 +445,14 @@ reading its label and hint.
 - **Existing audio.** The existing WAV files (stall warning, overspeed,
   airspeed alive, "stall speed warning at", cal factor) are reused. New voice
   files are out of scope for v1.
+- **Pitot sensors report indicated airspeed.** They convert pressure to speed
+  using fixed sea-level air density. This holds for the sensors the original
+  was tested with (Jeti MSpeed, Digitech, ASSI, Xicoy). A sensor that already
+  corrects for density would be double-corrected if correction is on, so the
+  in-app help MUST tell the user to leave correction off for such sensors.
+- **GPS warnings use ground speed.** With a GPS source, stall and landing
+  checks compare ground speed to the settings. Wind makes these approximate;
+  the help text says so.
 - **Density correction scope.** Correction uses field elevation plus
   temperature, assuming standard sea-level pressure at that elevation. Using a
   live pressure/temperature sensor from the model is out of scope for v1.
@@ -426,10 +468,3 @@ reading its label and hint.
 - **New app, new settings.** The new app has its own filename, so it installs
   next to DFM-SpdA. Settings are not imported from the original.
 
-## Open Question
-
-- **Q1 - What density correction applies to.** [NEEDS CLARIFICATION:
-  should density correction apply to the displayed/spoken speed and session
-  max (while stall and landing-speed warnings keep using sensor speed, as in
-  FR-011), or to everything including the warnings, or only to the display
-  with callouts left uncorrected?]

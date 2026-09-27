@@ -13,7 +13,7 @@
 
 ## Requirement Completeness
 
-- [ ] No [NEEDS CLARIFICATION] markers remain
+- [x] No [NEEDS CLARIFICATION] markers remain
 - [x] Requirements are testable and unambiguous
 - [x] Success criteria are measurable
 - [x] Success criteria are technology-agnostic (no implementation details)
@@ -31,8 +31,10 @@
 
 ## Notes
 
-- One clarification is open (Q1: what density correction applies to). It is
-  resolved in the spec once the user answers.
+- Q1 (scope of density correction) resolved 2026-09-27: option A, see the
+  spec's Clarifications section. Stall and landing checks use sensor speed so
+  they fire at the same pressure at any elevation, and the dial marks shift to
+  their true-airspeed equivalents (FR-016a).
 - **Allowed domain terms.** The spec names transmitter concepts (telemetry
   window, stick vibration, sensor, emulator) because they are the user's
   vocabulary, not implementation choices. No code-level APIs are named.
