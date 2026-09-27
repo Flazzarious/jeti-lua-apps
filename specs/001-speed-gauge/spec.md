@@ -152,13 +152,14 @@ moves, the max marker stays at the peak, and both numbers match.
 **Acceptance Scenarios**:
 
 1. **Given** the window is placed in the normal (single) size, **Then** it
-   shows a round gauge with the current-speed indicator and max-speed marker,
-   the current speed as a number, and the session max as a number, all
-   readable without overlap.
+   shows the compact arc gauge. The value arc and max marker are visible, and
+   the current speed and session max appear as numbers, all readable without
+   overlap.
 2. **Given** the window is placed in the double size, **Then** it shows the
-   same content larger. As room permits it also shows secondary information:
-   the stall and overspeed speeds, marked on the gauge dial and/or as labeled
-   numbers, and the current speed as a number in the center of the dial.
+   full dial from the visual design reference below. That means a dark face,
+   rim scale, colored value arc, overspeed zone, max marker, and the current
+   speed as a large center number with its unit. Max, stall and overspeed
+   appear as small labeled rows as room permits.
 3. **Given** speed rises to a new peak and then falls, **Then** the max-speed
    marker stays at the peak in its own color while the current-speed indicator
    follows the current speed in front of it.
@@ -172,6 +173,47 @@ moves, the max marker stays at the peak, and both numbers match.
    clears and the marker restarts from the current speed.
 7. **Given** speed is above the gauge's full scale, **Then** the indicator
    stops at full scale and the numeric value still shows the actual speed.
+
+**Visual design reference** (provided by the user, 2026-09-27): a car
+head-up-display speedometer. The photo is not stored in the repo because it is
+a third-party product image. The elements to carry over:
+
+- **Dark round face.** A dark, circular dial background inside the window,
+  independent of the transmitter's screen theme. This gives the colored arc
+  its contrast.
+- **About 270° sweep.** The dial runs clockwise from lower-left (zero) over the
+  top to lower-right (full scale), leaving the bottom open.
+- **Rim scale.** Major ticks with numbers around the outside, and lighter minor
+  ticks between them.
+- **Glowing value arc.** Current speed is shown mainly as a thick colored arc
+  that fills the rim from zero up to the current speed, like the blue sweep in
+  the reference. A thin needle or bright tip at the arc's end is optional.
+- **Warning zone.** A red/orange band on the rim from the overspeed warning
+  speed to full scale, like the reference's red zone near the top. The stall
+  and landing marks sit on the rim as small ticks (FR-016a).
+- **Big center number.** Current speed as a large number in the middle of the
+  dial, with the unit in smaller text underneath. This is the primary numeric
+  readout.
+- **Session max, kept subtle.** A thin tick or small dot on the rim in the max
+  color. It stays at the peak while the value arc moves beneath it, and the
+  max also appears as a small labeled number.
+- **Secondary data as small rows.** "Max", "Stall" and "Overspeed", each a
+  short label with a value. They go beside or below the dial wherever room
+  allows, like the reference's side panel.
+
+**Layout by window size.** The DS-24 screen is 320 × 240 px. The single window
+is wide and short (roughly 2:1) and the double window is about twice as tall.
+The planning phase MUST confirm the exact sizes in the emulator, for example
+with the official demo `10_telemw.lua`, which prints them. The layout adapts
+to each size:
+
+- **Double window.** The full dial described above, with the max, stall and
+  overspeed rows below it.
+- **Single window.** A shorter window cannot fit a full round dial at a
+  readable size. It MAY use a compact version: a wider, shallower arc (for
+  example about 180°) with the center number. Max speed appears as a small
+  number beside it. All other elements are dropped before the dial becomes
+  unreadable.
 
 ---
 
@@ -344,24 +386,32 @@ reading its label and hint.
 
 - **FR-013**: The app MUST offer a main-screen telemetry window that works in
   both single and double sizes.
-- **FR-014**: The window MUST show a round, speedometer-style gauge. It shows
-  current speed as the dominant indicator and session max speed as a less
-  prominent marker, in a different color, drawn behind the current-speed
-  indicator.
+- **FR-014**: The window MUST show a round, speedometer-style gauge following
+  the visual design reference in User Story 3:
+  - a dark dial face;
+  - a rim scale with ticks and numbers;
+  - current speed as a filled colored arc from zero to the current speed (the
+    dominant indicator);
+  - session max as a thin marker in a different color, which the value arc
+    passes beneath;
+  - an overspeed zone from the overspeed warning speed to full scale.
+- **FR-014a**: Current speed MUST also be shown as a large number with its unit
+  at the center of the dial (double size) or next to the arc (single size).
 - **FR-015**: The window MUST show current speed and session max speed as
   numbers, with units.
 - **FR-016**: In the double size, and in the single size where it fits, the
-  window SHOULD show secondary information: stall and overspeed speeds on
-  the dial or as labels, and current speed in the center of the dial.
+  window SHOULD show secondary information: stall and overspeed speeds as rim
+  marks and as small labeled rows (Max / Stall / Overspeed).
 - **FR-016a**: When correction is on, stall and landing-speed marks on the
   dial MUST be placed at their true-airspeed equivalents (setting × correction
   factor). The needle then crosses a mark at the moment its warning or
   callout change happens. Any numeric label for these speeds shows the
   setting as entered.
 - **FR-017**: Users MUST be able to choose the current-speed and max-speed
-  colors from a preset list of at least 6 distinct colors. The defaults MUST be
-  clearly distinguishable from each other and readable on the transmitter's
-  default display theme.
+  colors from a preset list of at least 6 distinct colors. The defaults are a
+  blue/cyan value arc (as in the reference) and a white max marker, which is
+  visible on the dark face but less prominent than the arc. Neither color
+  choice may be the same as the red/orange overspeed zone.
 - **FR-018**: Gauge full scale MUST be user-settable. The default is derived
   from the overspeed warning speed, so overspeed sits near the top of the
   dial.
