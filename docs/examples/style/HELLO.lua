@@ -1,12 +1,13 @@
--- HELLO.lua — starter app for the JETI DS-24 (Lua 5.3).
+-- HELLO.lua — style reference app for the JETI DS-24 (Lua 5.3).
 --
 -- A switch-driven flight timer that shows in a small desktop telemetry window
 -- and announces elapsed minutes. It exercises the app lifecycle, a settings
 -- form, persistence, a telemetry window and audio, without touching anything
 -- that affects flight (constitution principle I).
 --
--- Deploy: copy this file to /Apps on the transmitter's SD card, then add it in
--- Applications > User Applications on a test model.
+-- Not deployed: it lives in docs/examples/style/ as the pattern real apps
+-- follow. To try it, copy it to the emulator's Apps folder (a real app would
+-- be named AG-xxxxx.lua) and add it in Applications > User Applications.
 
 local APP_NAME = "Hello Timer"
 local APP_VERSION = "0.1.0"

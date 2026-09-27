@@ -1,10 +1,16 @@
 #!/usr/bin/env python3
 """Pre-emulator checks for Jeti Lua apps (constitution: Verification step 2).
 
-1. Syntax-checks every .lua file under src/ with a Lua 5.3 compiler, if one is
-   on PATH (luac5.3 or luac). Skipped with a warning otherwise.
+1. Syntax-checks every .lua file under src/ and docs/examples/style/ with a
+   Lua 5.3 compiler, if one is on PATH (luac5.3 or luac). Skipped with a
+   warning otherwise.
 2. Scans for APIs the constitution forbids or that don't exist on the radio.
-3. Checks app filenames are 8.3 and files are UTF-8 without BOM.
+3. Checks files are UTF-8 without BOM, with LF line endings.
+4. Checks names in src/Apps (Principle V):
+     src/Apps/AG-xxxxx.lua      app script: "AG-" + 1-5 chars (8.3)
+     src/Apps/AG-xxxxx/         that app's assets (same name, no .lua)
+     src/Apps/lib/ag_xxxxx.lua  shared module: "ag_" + 1-5 chars
+   Nothing else may sit at the top of src/Apps.
 
 Exit code is non-zero if anything fails. Run from anywhere:
     python tools/check.py
@@ -20,6 +26,10 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 SRC = ROOT / "src"
+APPS = SRC / "Apps"
+LIB = APPS / "lib"
+# Checked like app code but not deployed (style reference).
+EXTRA = [ROOT / "docs" / "examples" / "style"]
 
 # (pattern, reason). Matched against code with comments and strings stripped.
 FORBIDDEN = [
@@ -38,7 +48,36 @@ CAUTION = [
     (r"\bserial\s*\.\s*write\b", "Principle I: serial output needs a scoped spec"),
 ]
 
-EIGHT_THREE = re.compile(r"^[A-Za-z0-9_\-]{1,8}\.lua$")
+APP_NAME = re.compile(r"^AG-[A-Za-z0-9]{1,5}$")        # stem of app script / asset folder
+LIB_NAME = re.compile(r"^ag_[a-z0-9]{1,5}\.lua$")      # shared module file
+IGNORED = {".gitkeep", ".DS_Store", "Thumbs.db"}
+
+
+def check_layout(errors: list[str]) -> None:
+    """Enforce the AG- naming convention for everything under src/Apps."""
+    if not APPS.is_dir():
+        return
+    for entry in sorted(APPS.iterdir()):
+        rel = entry.relative_to(ROOT).as_posix()
+        if entry.name in IGNORED or entry == LIB:
+            continue
+        if entry.is_dir():
+            if not APP_NAME.match(entry.name):
+                errors.append(f"{rel}/: asset folder must be named AG-xxxxx (Principle V)")
+            elif not (APPS / f"{entry.name}.lua").exists():
+                errors.append(f"{rel}/: asset folder has no matching {entry.name}.lua")
+        elif entry.suffix == ".lua":
+            if not APP_NAME.match(entry.stem):
+                errors.append(f"{rel}: app file must be AG-xxxxx.lua, 8.3 (Principle V)")
+        else:
+            errors.append(f"{rel}: only AG-xxxxx.lua apps, their folders and lib/ belong here")
+    if LIB.is_dir():
+        for entry in sorted(LIB.rglob("*")):
+            rel = entry.relative_to(ROOT).as_posix()
+            if entry.name in IGNORED:
+                continue
+            if entry.is_dir() or entry.parent != LIB or not LIB_NAME.match(entry.name):
+                errors.append(f"{rel}: lib modules must be flat files named ag_xxxxx.lua (Principle V)")
 
 
 def strip_comments_and_strings(code: str) -> str:
@@ -80,16 +119,15 @@ def strip_comments_and_strings(code: str) -> str:
 def main() -> int:
     errors: list[str] = []
     warnings: list[str] = []
+    check_layout(errors)
     files = sorted(SRC.rglob("*.lua"))
-    if not files:
-        print("No .lua files under src/")
-        return 0
+    for extra in EXTRA:
+        files += sorted(extra.rglob("*.lua"))
 
     luac = shutil.which("luac5.3") or shutil.which("luac")
     if luac is None:
         warnings.append("luac not found on PATH; syntax check skipped")
 
-    apps_dir = SRC / "Apps"
     for path in files:
         rel = path.relative_to(ROOT).as_posix()
         raw = path.read_bytes()
@@ -102,9 +140,6 @@ def main() -> int:
             continue
         if b"\r\n" in raw:
             errors.append(f"{rel}: CRLF line endings (Principle V)")
-
-        if path.parent == apps_dir and not EIGHT_THREE.match(path.name):
-            errors.append(f"{rel}: app filename is not 8.3 (Principle V)")
 
         if luac:
             result = subprocess.run(

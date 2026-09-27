@@ -1,8 +1,17 @@
 # Reference examples
 
 Code for the agent (and you) to learn idioms from. Nothing in this folder is
-deployed, and LuaLS skips it (`workspace.ignoreDir` in `.luarc.json`), so
-examples written before these conventions don't flood the Problems panel.
+deployed.
+
+## `style/`
+
+`HELLO.lua`, the style reference for apps in this repo: a small switch-driven
+flight timer. Unlike the folders below, it follows every rule in the
+constitution, and LuaLS and `tools/check.py` check it.
+
+LuaLS skips `jeti-demos/` and `dfm-speed-announce/`
+(`workspace.ignoreDir` in `.luarc.json`), so third-party code written before
+these conventions doesn't flood the Problems panel.
 
 ## `jeti-demos/`
 
@@ -27,7 +36,7 @@ Each demo isolates one API area:
 **Caveat for the agent:** these demos show API usage, not this repo's
 performance rules. For example, `05_avgtm.lua` formats strings inside a print
 function every frame, which principle VI forbids. Copy the API calls, not the
-structure. `src/Apps/HELLO.lua` is the style reference.
+structure. `style/HELLO.lua` is the style reference.
 
 The full official repo has more: complete apps (Battery Monitor, Sensor Chart,
 Artificial Horizon) and demos for images, drawing, and the renderer. Its

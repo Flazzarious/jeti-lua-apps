@@ -466,6 +466,9 @@ reading its label and hint.
 - **English only.** Labels and callouts are English for v1. Spoken numbers and
   units follow the transmitter's voice language.
 - **New app, new settings.** The app is named "Speed Gauge" (shown in the
-  transmitter's app list and menu). It has its own filename, so it installs
-  next to DFM-SpdA. Settings are not imported from the original.
+  transmitter's app list and menu). Its script is `AG-SpdGa.lua`, with assets
+  in `AG-SpdGa/`, following the repo's naming convention. Because the filename
+  differs, it installs next to DFM-SpdA. Settings are not imported from the
+  original. Density math and gauge drawing are candidates for shared `lib`
+  modules, since other apps may reuse them; the plan decides.
 

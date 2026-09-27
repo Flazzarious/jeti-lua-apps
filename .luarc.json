@@ -1,6 +1,7 @@
 {
   "$schema": "https://raw.githubusercontent.com/LuaLS/vscode-lua/master/setting/schema.json",
   "runtime.version": "Lua 5.3",
+  "runtime.path": ["src/Apps/lib/?.lua", "src/Apps/?.lua"],
   "runtime.builtin": {
     "coroutine": "disable",
     "debug": "disable",
@@ -10,7 +11,13 @@
     "utf8": "enable"
   },
   "workspace.library": ["types"],
-  "workspace.ignoreDir": [".specify", "docs/examples", "dist"],
+  "workspace.ignoreDir": [
+    ".specify",
+    ".claude",
+    "dist",
+    "docs/examples/jeti-demos",
+    "docs/examples/dfm-speed-announce"
+  ],
   "workspace.checkThirdParty": false,
   "diagnostics.severity": {
     "lowercase-global": "Error",

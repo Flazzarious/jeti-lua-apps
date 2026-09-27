@@ -29,8 +29,9 @@ behaves.
 ### II. Everything Local
 
 All apps share one global Lua environment on the transmitter. Every variable
-and function MUST be declared `local`, including helpers inside functions. The
-only permitted top-level `return` is the app interface table. LuaLS enforces
+and function MUST be declared `local`, including helpers inside functions. A
+file's only exports are its final `return`: the app interface table for an
+app, or the module table for a `lib` module (Principle VII). LuaLS enforces
 this with `lowercase-global` set to Error; a diagnostic here is a build
 failure, not a warning.
 
@@ -63,11 +64,25 @@ The Lua context is destroyed and recreated whenever the model changes, and
 
 ### V. Stable Names and UTF-8
 
-- App filenames MUST follow 8.3 format (e.g. `BATTMON.lua`). The transmitter
-  keys each app's model configuration to its filename; renaming an app silently
-  discards its telemetry windows and settings on every model that uses it.
-- `.lua` apps and `.jsn` language files MUST be UTF-8 without BOM, LF line
-  endings. Only characters in the API's supported-charset table render.
+This repository holds many apps. They share the transmitter's `/Apps` folder
+with other authors' apps (e.g. `DFM-*`, `RCT-*`), so every name carries the
+`AG-` prefix.
+
+- **App scripts** MUST be named `AG-xxxxx.lua`: the prefix plus 1–5 letters or
+  digits, which keeps them 8.3 (e.g. `AG-SpdGa.lua`). The name shown in menus
+  is set separately by the app and can be anything (e.g. "Speed Gauge").
+- **Names are permanent once released.** The transmitter keys each app's model
+  configuration to its filename. Renaming an app silently discards its
+  telemetry windows and settings on every model that uses it.
+- **Asset folders:** an app's sounds, images and `.jsn` language files MUST
+  live in a folder named exactly like its script without `.lua`
+  (`src/Apps/AG-SpdGa/`). Code refers to them by absolute path
+  (`/Apps/AG-SpdGa/...`).
+- **Nothing else** may sit at the top of `src/Apps/` except those apps, their
+  folders and `lib/`. `tools/check.py` enforces this.
+- **Encoding:** `.lua` apps and `.jsn` language files MUST be UTF-8 without
+  BOM, with LF line endings (`.gitattributes` enforces LF on every OS). Only
+  characters in the API's supported-charset table render.
 
 ### VI. Keep loop() Light
 
@@ -85,13 +100,35 @@ up to 9 other apps.
 - `lcd` calls belong only in registered print functions; `init()` and `loop()`
   cannot use `lcd`, and `form` calls only work while the app's form is open.
 
+### VII. Shared Code Lives in lib, Holds No State
+
+Code useful to more than one app (e.g. density-altitude math, gauge drawing)
+goes in a shared module rather than being copied between apps.
+
+- **Naming and location:** modules MUST be flat files named `ag_xxxxx.lua`
+  (`ag_` plus 1–5 lowercase letters or digits) in `src/Apps/lib/`. They are
+  deployed to `/Apps/lib/` and loaded with `require("ag_xxxxx")`. No
+  subfolders: the transmitter's `require` search is documented only for
+  `/Apps/lib/<name>.lua`.
+- **No shared state:** `require` loads a module once per Lua context and hands
+  the same table to every app that asks. A module MUST therefore return
+  functions (or constructors) and hold no mutable module-level state; each app
+  keeps its own state in its own locals.
+- **Principles II–VI apply to modules exactly as to apps.** A module MUST
+  NOT register forms, telemetry windows or anything else on the app's behalf.
+  The app does that and passes in what the module needs.
+- **Change carefully:** changing a module's behavior affects every app that
+  uses it. The plan for such a change MUST list the affected apps, and each
+  of them MUST be re-verified.
+
 ## Verification
 
 Every feature MUST pass, in order:
 
 1. LuaLS diagnostics clean (no errors) against `types/jeti.lua`.
-2. `tools/check.sh` (syntax check with Lua 5.3, plus the forbidden-API scan).
-3. JETI Studio DC-24 emulator run, with telemetry supplied by LeonAirRC's
+2. `python tools/check.py` (Lua 5.3 syntax check, forbidden-API scan, naming
+   and encoding rules).
+3. JETI Studio DS-24 II emulator run, with telemetry supplied by LeonAirRC's
    Emulator Telemetry app where sensors are needed. Watch the app's CPU figure
    in Applications → User Applications and memory via `collectgarbage("count")`.
 4. First real run on a dedicated test model on the transmitter, never on a
@@ -108,4 +145,11 @@ Principle I cannot be relaxed for convenience; an amendment to it must name
 the specific API, the specific app, and why failure of that app cannot affect
 flight.
 
-**Version**: 1.0.0 | **Ratified**: 2026-09-26 | **Last Amended**: 2026-09-26
+**Version**: 1.1.0 | **Ratified**: 2026-09-26 | **Last Amended**: 2026-09-27
+
+### Amendment history
+
+- **1.1.0 (2026-09-27):** the repository holds multiple apps. Principle V
+  gains the `AG-` naming convention for apps and asset folders; Principle VII
+  (new) covers shared `lib` modules. Verification now names `tools/check.py`
+  and the DS-24 II emulator.

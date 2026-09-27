@@ -1,7 +1,13 @@
 # Jeti Lua Apps
 
-Lua apps for the JETI DS-24 v2 transmitter, built with a spec-driven workflow
-(GitHub Spec Kit + an AI coding agent) in VS Code.
+A collection of Lua apps for the JETI DS-24 II transmitter, built with a
+spec-driven workflow (GitHub Spec Kit + Claude Code) in VS Code.
+
+## Apps
+
+| App | Script | Status | Spec |
+| --- | --- | --- | --- |
+| Speed Gauge | `AG-SpdGa.lua` | Spec written | [001](specs/001-speed-gauge/spec.md) |
 
 Apps here are for telemetry, timers, announcements and displays only. Nothing
 in this repo may control surfaces, throttle or any flight function. See the
@@ -15,14 +21,31 @@ constitution: [`.specify/memory/constitution.md`](.specify/memory/constitution.m
 .vscode/                          Editor settings, recommended extensions
 types/jeti.lua                    LuaLS stubs for the Jeti API (v1.5 + notes)
 docs/jeti-api-notes.md            The API facts that shape how apps are written
-docs/examples/                    Reference code, incl. official Jeti demos
+docs/examples/style/HELLO.lua     Style reference app (not deployed)
+docs/examples/                    Other reference code, incl. official Jeti demos
 docs/vendor/                      Generated full API text (gitignored)
-specs/<feature>/                  spec.md, plan.md, tasks.md per feature
+specs/NNN-<feature>/              spec.md, plan.md, tasks.md per feature
 src/Apps/                         Mirrors /Apps on the transmitter SD card
-  HELLO.lua                       Starter app: switch-driven flight timer
-tools/check.py                    Syntax + forbidden-API + filename checks
+  AG-xxxxx.lua                    One script per app
+  AG-xxxxx/                       That app's sounds, images, language files
+  lib/ag_xxxxx.lua                Shared modules, require("ag_xxxxx")
+tools/check.py                    Syntax, forbidden-API, naming, encoding checks
 tools/pdf2md.py                   Converts Jeti's API PDF for local reference
 ```
+
+### Multiple apps, one repo
+
+- **Names.** Every app script is `AG-` plus up to 5 letters or digits, so it
+  fits the transmitter's 8.3 limit and stays grouped apart from other
+  authors' apps (`DFM-*`, `RCT-*`). The menu name is separate and can be
+  anything. A released filename is never changed, because the transmitter
+  ties each model's settings for an app to its filename.
+- **Shared code** goes in `src/Apps/lib/` as `ag_xxxxx.lua`. One copy is loaded
+  and shared by every app, so modules hold no state of their own.
+- **Specs are per feature, not per app.** A new app and a later change to an
+  existing app each get the next number in `specs/`.
+- **Deploying.** Copy the app's script, its `AG-xxxxx/` folder, and any `lib/`
+  modules it uses.
 
 ## First-time setup
 
@@ -33,7 +56,7 @@ tools/pdf2md.py                   Converts Jeti's API PDF for local reference
    initializing, because `--force` may replace managed files:
    ```bash
    uv tool install specify-cli
-   specify init --here --force --integration <your-agent>
+   specify init --here --force --integration claude --script ps
    git diff .specify/memory/constitution.md   # restore with git checkout if replaced
    ```
 3. **Full API reference (optional, recommended for agents).**
@@ -48,27 +71,26 @@ tools/pdf2md.py                   Converts Jeti's API PDF for local reference
 
 ## Workflow
 
-1. `/speckit.specify`, `/speckit.plan`, `/speckit.tasks` for each feature under
-   `specs/`.
-2. Implement in `src/Apps/`. App filenames must be 8.3 (`BATTMON.lua`), and must
-   never be renamed once in use: the transmitter keys each app's per-model
-   settings to its filename.
+1. `/speckit-specify`, `/speckit-plan`, `/speckit-tasks`, `/speckit-implement`
+   for each feature under `specs/`.
+2. Implement in `src/Apps/` following the naming rules above.
 3. `python tools/check.py` must pass. LuaLS must show no errors.
-4. Run in the JETI Studio DC-24 emulator. For sensors, use LeonAirRC's
+4. Run in the JETI Studio DS-24 II emulator: copy the app into
+   `%LOCALAPPDATA%\JETI-Studio\Emulator\Apps`. For sensors, use LeonAirRC's
    [Emulator Telemetry](https://github.com/LeonAirRC/Jeti-Lua-Apps) app.
    Remember the emulator has `os`, `debug` and `coroutine`; the radio does not.
-5. Copy `src/Apps/*` to `/Apps` on the transmitter's SD card (it mounts as USB
-   mass storage). Optionally ship `.lc` bytecode compiled by the matching
+5. Copy the app to `/Apps` on the transmitter's SD card (it mounts as USB mass
+   storage). Optionally ship `.lc` bytecode compiled by the matching
    firmware/emulator version; `.lc` files are never committed.
 6. First real run on a dedicated test model.
 
-## Starter app: HELLO.lua
+## Style reference: HELLO.lua
 
-A flight timer started by a user-assigned switch. It shows elapsed time in a
-small desktop telemetry window and announces every N minutes. Settings live in
-Applications → Hello Timer (start switch, announce interval; F1 resets). It
-demonstrates the lifecycle, a settings form, `pSave`/`pLoad`, a telemetry
-window, rate-limited `loop()` and cached display strings.
+`docs/examples/style/HELLO.lua` is a small flight timer started by a
+user-assigned switch. It is not deployed, but `check.py` and LuaLS still check
+it. It demonstrates the conventions every app follows: lifecycle, a settings
+form, `pSave`/`pLoad`, a telemetry window, rate-limited `loop()` and cached
+display strings.
 
 ## API coverage
 
