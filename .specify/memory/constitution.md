@@ -121,6 +121,24 @@ goes in a shared module rather than being copied between apps.
   uses it. The plan for such a change MUST list the affected apps, and each
   of them MUST be re-verified.
 
+### VIII. Credit What We Build On
+
+Apps here are often derived from other authors' published work. That work is
+credited, and its license terms are honored.
+
+- **Where the credit goes:** an app derived from another app MUST credit the
+  original author and app in four places:
+  - its source file header, together with the original's copyright and
+    license notice as the license requires;
+  - its settings screen;
+  - the README apps table;
+  - `CREDITS.md`, which carries full license texts.
+- **Reused assets** (sounds, images) keep their original credit.
+- **Existing credits and license notices** MUST NOT be removed or shortened.
+- **Unclear or restrictive licenses:** code is not copied from a source whose
+  license is unclear or doesn't allow it. Such work may be studied for ideas
+  only, and the spec says so.
+
 ## Verification
 
 Every feature MUST pass, in order:
@@ -145,10 +163,13 @@ Principle I cannot be relaxed for convenience; an amendment to it must name
 the specific API, the specific app, and why failure of that app cannot affect
 flight.
 
-**Version**: 1.1.0 | **Ratified**: 2026-09-26 | **Last Amended**: 2026-09-27
+**Version**: 1.2.0 | **Ratified**: 2026-09-26 | **Last Amended**: 2026-09-27
 
 ### Amendment history
 
+- **1.2.0 (2026-09-27):** new Principle VIII requires crediting and honoring
+  the licenses of work apps are derived from. Prompted by Speed Gauge being
+  based on DFM Speed Announcer.
 - **1.1.0 (2026-09-27):** the repository holds multiple apps. Principle V
   gains the `AG-` naming convention for apps and asset folders; Principle VII
   (new) covers shared `lib` modules. Verification now names `tools/check.py`

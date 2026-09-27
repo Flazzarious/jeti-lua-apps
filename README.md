@@ -5,9 +5,9 @@ spec-driven workflow (GitHub Spec Kit + Claude Code) in VS Code.
 
 ## Apps
 
-| App | Script | Status | Spec |
-| --- | --- | --- | --- |
-| Speed Gauge | `AG-SpdGa.lua` | Spec written | [001](specs/001-speed-gauge/spec.md) |
+| App | Script | Status | Spec | Based on |
+| --- | --- | --- | --- | --- |
+| Speed Gauge | `AG-SpdGa.lua` | Spec written | [001](specs/001-speed-gauge/spec.md) | DFM Speed Announcer by Dave McQueeney (MIT) |
 
 Apps here are for telemetry, timers, announcements and displays only. Nothing
 in this repo may control surfaces, throttle or any flight function. See the
@@ -98,6 +98,14 @@ display strings.
 firmware may add functions that aren't in it. Entries marked `UNVERIFIED` were
 inferred where the PDF is silent. When a newer API document turns up, update
 the stubs and `docs/jeti-api-notes.md` together.
+
+## Credits
+
+Speed Gauge is based on **DFM Speed Announcer** by DFM (Dave McQueeney),
+[github.com/davidmcq137/JetiLuaDFM](https://github.com/davidmcq137/JetiLuaDFM).
+Much of its behavior comes from that app, and this rewrite wouldn't exist
+without it. See [CREDITS.md](CREDITS.md) for all credits and license notices,
+including JETI's demos.
 
 ## References
 

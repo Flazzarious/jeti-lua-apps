@@ -45,7 +45,10 @@ Automatic Trainer Switch app and `28_ctrl.lua` demo use `setProperty` /
 
 ## `dfm-speed-announce/`
 
-DFM's Speed Announcer (`DFM-SpdA.lua`, version 2.1), copied unmodified from
+DFM Speed Announcer by DFM, Dave McQueeney
+([davidmcq137/JetiLuaDFM](https://github.com/davidmcq137/JetiLuaDFM)). It is
+the basis of this repo's Speed Gauge app (see `CREDITS.md`). This is
+`DFM-SpdA.lua`, version 2.1, copied unmodified from
 `/Apps` on Aaron's DS-24 on 2026-09-27. It is MIT-licensed; see the header of
 `DFM-SpdA.lua`. The layout mirrors the transmitter: the script sits in `/Apps`,
 and its WAV files and README sit in `/Apps/DFM-SpdA/`.

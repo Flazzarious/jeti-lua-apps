@@ -10,11 +10,15 @@
 
 ## Overview
 
-**Speed Gauge** is a transmitter app that speaks the model's airspeed during flight, warns about
-stall and overspeed, and shows speed on a round gauge on the transmitter's main
-screen. It replaces DFM's Speed Announcer (v2.1, kept unmodified in
-`docs/examples/dfm-speed-announce/` as the behavioral baseline). It keeps that
-app's core behavior and adds four things:
+**Speed Gauge** is a transmitter app that speaks the model's airspeed during
+flight, warns about stall and overspeed, and shows speed on a round gauge on
+the transmitter's main screen.
+
+It is based on **DFM Speed Announcer** by DFM (Dave McQueeney), MIT-licensed.
+The original v2.1 is kept unmodified in `docs/examples/dfm-speed-announce/` as
+the behavioral baseline. Much of Speed Gauge's behavior comes from that app,
+and it is credited as the basis of this one (FR-029, `CREDITS.md`). Speed Gauge
+keeps the original's core behavior and adds four things:
 
 1. clearer settings;
 2. an air-density correction based on field elevation and temperature;
@@ -394,6 +398,16 @@ reading its label and hint.
 - **FR-028**: At startup the app SHOULD announce the stall warning speed, as
   the original did, so the pilot knows the app is running and configured.
   This can be turned off in settings.
+- **FR-029**: The app MUST credit DFM Speed Announcer by DFM (Dave McQueeney)
+  as its basis in all of these places:
+  - **Source file header:** a credit line and the original's MIT copyright
+    notice ("Copyright (c) 2018, 2019 DFM (Dave McQueeney)"), with a pointer
+    to `CREDITS.md` for the full license text.
+  - **Settings screen:** a line at the bottom, e.g. "Based on DFM Speed
+    Announcer by Dave McQueeney", next to the app version.
+  - **Repository documentation:** the README and `CREDITS.md`.
+  - **Asset folder:** reused WAV files keep their credit, via a short credits
+    note placed with them.
 
 ### Key Entities
 

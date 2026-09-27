@@ -7,11 +7,18 @@ built spec-first with GitHub Spec Kit (`/speckit-specify`, `/speckit-plan`,
 
 ## Apps in this repo
 
-| App (menu name) | Script | Spec |
-| --- | --- | --- |
-| Speed Gauge | `src/Apps/AG-SpdGa.lua` (planned) | `specs/001-speed-gauge/` |
+| App (menu name) | Script | Spec | Based on |
+| --- | --- | --- | --- |
+| Speed Gauge | `src/Apps/AG-SpdGa.lua` (planned) | `specs/001-speed-gauge/` | DFM Speed Announcer (Dave McQueeney, MIT) |
 
 Keep this table current when an app is added.
+
+## Credit what you build on
+
+When an app is derived from someone else's work, credit it everywhere
+constitution VIII requires: the source header (with the original license
+notice), the app's settings screen, the README, and `CREDITS.md`. Never remove
+or shorten an existing credit or license notice.
 
 ## Read before writing any code
 
