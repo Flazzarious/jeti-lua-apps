@@ -84,6 +84,24 @@ tools/pdf2md.py                   Converts Jeti's API PDF for local reference
    firmware/emulator version; `.lc` files are never committed.
 6. First real run on a dedicated test model.
 
+## Branching (Gitflow)
+
+| Branch | From | Merges into | Holds |
+| --- | --- | --- | --- |
+| `main` | | | Released versions only. Every commit is a release, tagged |
+| `develop` | `main` | `main` via a release branch | Finished features waiting for a release |
+| `feature/NNN-name` | `develop` | `develop` | One spec's work, e.g. `feature/001-speed-gauge` |
+| `release/x.y.z` | `develop` | `main` and `develop` | Version bumps and last fixes before a release |
+| `hotfix/x.y.z` | `main` | `main` and `develop` | Urgent fixes to a released app |
+
+- A feature branch uses the same `NNN-name` as its `specs/` folder, and
+  carries that spec from `/speckit-specify` through `/speckit-implement`.
+- Merge a feature into `develop` only after `tools/check.py` passes and the
+  quickstart's emulator scenarios have been run.
+- Tag releases on `main` as `<script>-v<version>`, e.g. `AG-SpdGa-v1.0.0`,
+  matching the app's `version` field. Each app has its own version.
+- Never commit directly to `main` or `develop`.
+
 ## Style reference: HELLO.lua
 
 `docs/examples/style/HELLO.lua` is a small flight timer started by a

@@ -76,6 +76,17 @@ src/Apps/lib/ag_xxxxx.lua  shared module, loaded with require("ag_xxxxx")
 - `loop()` runs every 20-30 ms: rate-limit with `system.getTimeCounter()`, and
   don't format strings or build tables per call.
 
+## Branching (Gitflow)
+
+- Work on `feature/NNN-name`, branched from `develop`, with the same `NNN-name`
+  as the spec folder. Never commit directly to `main` or `develop`.
+- Features merge into `develop`. Releases go `develop` → `release/x.y.z` →
+  `main`, tagged `<script>-v<version>` (e.g. `AG-SpdGa-v1.0.0`). Hotfixes branch
+  from `main` and merge into both.
+- Spec Kit finds the feature via `.specify/feature.json`, not the branch name,
+  so the `feature/` prefix is fine.
+- Ask before pushing, merging into `develop`/`main`, or tagging.
+
 ## Checking work
 
 - `python tools/check.py` must pass (syntax, forbidden APIs, AG- naming, UTF-8,
