@@ -201,18 +201,23 @@ a third-party product image. The elements to carry over:
   short label with a value. They go beside or below the dial wherever room
   allows, like the reference's side panel.
 
-**Layout by window size.** The DS-24 screen is 320 × 240 px. The single window
-is wide and short (roughly 2:1) and the double window is about twice as tall.
-The planning phase MUST confirm the exact sizes in the emulator, for example
-with the official demo `10_telemw.lua`, which prints them. The layout adapts
-to each size:
+**Target screen: DS-24 II only.** The gauge is designed for the DS-24 II
+(and the DC-24 II, which shares its display): a 4" color screen that JETI
+lists as 480 × 480 px, running the JUi2 interface. Earlier transmitters (the
+original DC/DS-24, DC/DS-16/14, DS-12) have smaller screens and are **not
+supported for the gauge** (see FR-013a).
+
+The exact pixel size of each telemetry window on the DS-24 II MUST be measured
+before the layout is designed. The measurement uses `tools/probe/PROBE.lua`
+in the JETI Studio emulator set to DS-24 II, firmware 6.04, and its numbers
+are recorded in `plan.md`. The layout adapts to each size:
 
 - **Double window.** The full dial described above, with the max, stall and
-  overspeed rows below it.
-- **Single window.** A shorter window cannot fit a full round dial at a
-  readable size. It MAY use a compact version: a wider, shallower arc (for
+  overspeed rows below or beside it.
+- **Single window.** If the measured single window can't fit a full round dial
+  at a readable size, it uses a compact version: a wider, shallower arc (for
   example about 180°) with the center number. Max speed appears as a small
-  number beside it. All other elements are dropped before the dial becomes
+  number beside it. Other elements are dropped before the dial becomes
   unreadable.
 
 ---
@@ -385,7 +390,11 @@ reading its label and hint.
 **Gauge**
 
 - **FR-013**: The app MUST offer a main-screen telemetry window that works in
-  both single and double sizes.
+  both single and double sizes on the DS-24 II (and DC-24 II).
+- **FR-013a**: The gauge is not supported on other transmitters. If the app
+  runs on one, the telemetry window MUST show a short notice (e.g. "Speed
+  Gauge needs DS-24 II") instead of a mis-drawn gauge. Callouts and warnings
+  MUST still work, because they don't depend on the screen.
 - **FR-014**: The window MUST show a round, speedometer-style gauge following
   the visual design reference in User Story 3:
   - a dark dial face;
@@ -492,7 +501,7 @@ reading its label and hint.
   dial's stall mark.
 - **SC-004**: The gauge is readable at a glance in both single and double
   window sizes. A pilot can read current speed within 5% from the dial alone,
-  and read both numbers without overlap, on the DS-24 screen.
+  and read both numbers without overlap, on the DS-24 II screen.
 - **SC-005**: The gauge reflects a speed change within 0.5 s.
 - **SC-006**: A pilot new to the app configures sensor, switch, landing speed
   and stall warning in under 3 minutes without referring to documentation.
@@ -505,8 +514,9 @@ reading its label and hint.
 
 ## Assumptions
 
-- **Target and baseline.** The target is the DS-24 II transmitter only (color
-  screen); the original app was also only tested on the DS-24. The original's
+- **Target and baseline.** The gauge targets the DS-24 II / DC-24 II
+  (480 × 480 px per JETI, firmware 6.x) only. The original app was tested
+  only on the original DS-24. The original's
   behavior (v2.1) is the baseline; where this spec is silent, match it.
 - **Existing audio.** The existing WAV files (stall warning, overspeed,
   airspeed alive, "stall speed warning at", cal factor) are reused. New voice
