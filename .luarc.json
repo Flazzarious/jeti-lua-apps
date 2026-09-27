@@ -1,0 +1,21 @@
+{
+  "$schema": "https://raw.githubusercontent.com/LuaLS/vscode-lua/master/setting/schema.json",
+  "runtime.version": "Lua 5.3",
+  "runtime.builtin": {
+    "coroutine": "disable",
+    "debug": "disable",
+    "os": "disable",
+    "io": "disable",
+    "bit32": "disable",
+    "utf8": "enable"
+  },
+  "workspace.library": ["types"],
+  "workspace.ignoreDir": [".specify", "docs/examples", "dist"],
+  "workspace.checkThirdParty": false,
+  "diagnostics.severity": {
+    "lowercase-global": "Error",
+    "undefined-global": "Error",
+    "undefined-field": "Error",
+    "deprecated": "Warning"
+  }
+}

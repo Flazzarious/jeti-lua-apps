@@ -1,0 +1,11 @@
+# Compiled Lua bytecode is a build output, never the source of truth
+*.lc
+dist/
+
+# Jeti's API PDF and its local conversion (copyrighted; regenerate with tools/pdf2md.sh)
+docs/vendor/
+
+# OS / editor noise
+.DS_Store
+Thumbs.db
+*.swp

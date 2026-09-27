@@ -1,0 +1,111 @@
+# Jeti Lua Apps Constitution
+
+Apps in this repository run on a JETI DS-24 v2 transmitter (DC/DS-24 family,
+Lua 5.3.1). A transmitter is flight equipment: a misbehaving app must never be
+able to cause a crash. Every spec, plan and task inherits these principles.
+Where a principle cites the API, the source is the JETI DC/DS Lua API v1.5
+(see `docs/jeti-api-notes.md`).
+
+## Core Principles
+
+### I. Nothing Flight-Critical (NON-NEGOTIABLE)
+
+Apps are for telemetry, timers, announcements, logging and displays. They MUST
+NOT influence anything that can move the model or change how the radio link
+behaves.
+
+- MUST NOT call `system.registerControl` or `system.setControl`. A registered
+  Lua control can be assigned by the pilot to any model function, including
+  throttle and surfaces, and it stops updating if the app stops. If a future
+  feature genuinely needs one, it requires an explicit amendment to this
+  constitution, a non-critical-use justification in the spec, and a
+  control label that says so.
+- MUST NOT call `system.setProperty` (it can switch wireless trainer mode).
+- MUST NOT drive `gpio` outputs or write to `serial` ports unless a spec
+  explicitly scopes that hardware and states why failure is harmless.
+- An app that crashes, stalls or is removed MUST leave the model flying
+  exactly as it would without the app.
+
+### II. Everything Local
+
+All apps share one global Lua environment on the transmitter. Every variable
+and function MUST be declared `local`, including helpers inside functions. The
+only permitted top-level `return` is the app interface table. LuaLS enforces
+this with `lowercase-global` set to Error; a diagnostic here is a build
+failure, not a warning.
+
+### III. Transmitter APIs Only
+
+Only libraries present on the transmitter may be used: `system`, `lcd`, `form`,
+`dir`, `json`, `gps`, `gpio`, `serial`, plus the Lua standard `string`,
+`table`, `math`, `utf8`, `package` (`require`) and Jeti's limited `io`.
+
+- `os`, `debug`, `coroutine` and `bit32` do not exist on the transmitter. They
+  DO exist in the JETI Studio emulator, so code that uses them can pass
+  emulator testing and fail on the radio. Use `system.getTime()` or
+  `system.getTimeCounter()` instead of `os.time()`/`os.clock()`.
+- Jeti's `io` is function-style (`io.read(f, n)`, `io.close(f)`), not the
+  standard method-style `f:read()`.
+- If `types/jeti.lua` does not declare a function, do not call it. Check the
+  API PDF, add the stub with a source note, then use it.
+
+### IV. State Resets on Model Switch
+
+The Lua context is destroyed and recreated whenever the model changes, and
+`init(code)` runs again. In-memory state MUST be treated as disposable.
+
+- Persist settings with `system.pSave` / `system.pLoad` only.
+- `pSave` stores integers (32-bit), strings under 64 bytes, SwitchItems, and
+  arrays of up to 32 integers/strings. It does NOT store floats or keyed
+  tables: scale floats to integers (e.g. 12.5 V → 125, 1 decimal).
+- Keep persisted parameters to 30 or fewer per app.
+- Saves are committed on model switch or power-off, not immediately.
+
+### V. Stable Names and UTF-8
+
+- App filenames MUST follow 8.3 format (e.g. `BATTMON.lua`). The transmitter
+  keys each app's model configuration to its filename; renaming an app silently
+  discards its telemetry windows and settings on every model that uses it.
+- `.lua` apps and `.jsn` language files MUST be UTF-8 without BOM, LF line
+  endings. Only characters in the API's supported-charset table render.
+
+### VI. Keep loop() Light
+
+`loop()` runs every 20–30 ms with no timing guarantee and shares the CPU with
+up to 9 other apps.
+
+- No allocation-heavy work in `loop()` or in telemetry print functions:
+  avoid `string.format`, string concatenation, and table creation per call.
+  Cache formatted strings and rebuild them only when the underlying value
+  changes.
+- Rate-limit work with `system.getTimeCounter()` rather than doing it every
+  loop.
+- Read sensors with `system.getSensorValueByID` (lighter) unless labels or
+  units are needed.
+- `lcd` calls belong only in registered print functions; `init()` and `loop()`
+  cannot use `lcd`, and `form` calls only work while the app's form is open.
+
+## Verification
+
+Every feature MUST pass, in order:
+
+1. LuaLS diagnostics clean (no errors) against `types/jeti.lua`.
+2. `tools/check.sh` (syntax check with Lua 5.3, plus the forbidden-API scan).
+3. JETI Studio DC-24 emulator run, with telemetry supplied by LeonAirRC's
+   Emulator Telemetry app where sensors are needed. Watch the app's CPU figure
+   in Applications → User Applications and memory via `collectgarbage("count")`.
+4. First real run on a dedicated test model on the transmitter, never on a
+   model that will fly the same day.
+
+Compiled `.lc` files are build output: produce them from the matching
+firmware/emulator version, never commit them, and keep `.lua` as the source.
+
+## Governance
+
+This constitution overrides specs, plans and agent suggestions. Amendments
+require a written rationale in the commit message and a version bump below.
+Principle I cannot be relaxed for convenience; an amendment to it must name
+the specific API, the specific app, and why failure of that app cannot affect
+flight.
+
+**Version**: 1.0.0 | **Ratified**: 2026-09-26 | **Last Amended**: 2026-09-26
