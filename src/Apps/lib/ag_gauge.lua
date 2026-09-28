@@ -72,17 +72,24 @@ function M.scaleStep(fullScale)
   return STEPS[#STEPS]
 end
 
--- Filled polygon of the unit circle scaled to radius.
-function M.face(r, circle, cx, cy, radius)
+-- Filled polygon of the unit circle scaled to radius. If maxY is given, the
+-- circle is cut flat there: the renderer does not clip to the window, so a
+-- face reaching past the visible area would draw over the window border.
+function M.face(r, circle, cx, cy, radius, maxY)
   r:reset()
   for k = 1, circle.n + 1 do
-    r:addPoint(cx + circle.cx[k] * radius, cy + circle.sy[k] * radius)
+    local y = cy + circle.sy[k] * radius
+    if maxY and y > maxY then
+      y = maxY
+    end
+    r:addPoint(cx + circle.cx[k] * radius, y)
   end
   r:renderPolygon()
 end
 
 -- Arc from fraction f0 to f1 at radius, drawn as one anti-aliased polyline.
-function M.arc(r, dial, cx, cy, radius, f0, f1, width)
+-- alpha (0..1, default 1) makes it translucent, e.g. for glow bands.
+function M.arc(r, dial, cx, cy, radius, f0, f1, width, alpha)
   f0 = clamp01(f0)
   f1 = clamp01(f1)
   if f1 <= f0 then
@@ -98,7 +105,7 @@ function M.arc(r, dial, cx, cy, radius, f0, f1, width)
   end
   c, s = point(dial, f1)
   r:addPoint(cx + c * radius, cy + s * radius)
-  r:renderPolyline(width)
+  r:renderPolyline(width, alpha or 1)
 end
 
 -- Anti-aliased radial line at fraction f between radii r1 and r2.

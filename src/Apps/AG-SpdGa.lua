@@ -21,6 +21,10 @@ local APP_NAME = "Speed Gauge"
 local APP_VERSION = "0.1.0"
 local AUDIO_DIR = "/Apps/AG-SpdGa/"
 local TICK_MS = 100         -- loop logic runs at most 10x per second (R9)
+-- The DS-24 II desktop draws each window's title bar inside the reported
+-- canvas and clips the bottom: about 25 px of h is never visible (measured
+-- in the emulator, 2026-09-27: 60 -> ~34, 127 -> ~101, 260 -> ~236).
+local TITLE_H = 26
 local HOLD_MS = 1000        -- a reading held this long counts as real for the max (R5)
 
 local SND_STALL = AUDIO_DIR .. "stall_warning.wav"
@@ -36,10 +40,12 @@ local UNITS_MULT = { 2.23694, 3.6, 1.94384, 1.0, 3.28084 }
 local UNITS_IMPERIAL = { true, false, true, false, true }
 
 -- Color presets for a dark dial face; none red, orange or yellow (R8).
-local COLOR_NAMES = { "Cyan", "Blue", "White", "Green", "Lime", "Magenta", "Purple", "Grey" }
+-- Yellow was added last so earlier saved indices keep their color.
+local COLOR_NAMES = { "Cyan", "Blue", "White", "Green", "Lime", "Magenta", "Purple", "Grey", "Yellow" }
 local COLORS = {
   { 0, 190, 255 }, { 40, 110, 255 }, { 255, 255, 255 }, { 0, 210, 100 },
   { 170, 240, 0 }, { 230, 60, 230 }, { 150, 100, 255 }, { 170, 170, 170 },
+  { 255, 225, 0 },
 }
 -- Fixed dial colors (R6).
 local C_BG = { 8, 10, 14 }       -- window background behind the dial face
@@ -49,6 +55,9 @@ local C_ZONE = { 255, 80, 0 }
 local C_SCALE = { 200, 200, 200 }
 local C_MINOR = { 110, 118, 130 }
 local C_TEXT = { 255, 255, 255 }
+-- Glow inside the value arc: bands fading toward the dial center (reference
+-- image). Alpha per band, outermost first.
+local GLOW_ALPHA = { 0.42, 0.30, 0.21, 0.14, 0.09, 0.055, 0.03, 0.015 }
 
 local TXT_NOTICE = "Speed Gauge needs DS-24 II"
 local TXT_MAX = "MAX"
@@ -72,7 +81,7 @@ local KEYS = {
 local DEFAULTS = {
   sId = 0, sPar = 0, sLbl = "", sType = 1, tMin = 2, tMax = 40, sens = 10,
   vLand = 60, vStall = 45, vOver = 200, cal = 100, units = 1, numOnly = 0,
-  startAnn = 1, densOn = 0, elev = 0, tStd = 1, colCur = 1, colMax = 3,
+  startAnn = 1, densOn = 0, elev = 0, tStd = 1, colCur = 1, colMax = 9,
   fScale = 0, cfgV = 1,
 }  -- swOn / swCont default to nil; temp depends on units
 
@@ -186,7 +195,7 @@ local aliveSaid = false
 local stallArmed = true
 local overArmed = true
 local lastSpokenSpd = 0
-local lastSpokenAt = 0
+local lastSpokenAt = nil    -- nil = nothing spoken yet this session
 local lastTick = 0
 local curRounded, maxRounded, sensRounded = nil, 0, nil
 local curText, maxText, sensText = TXT_NO_DATA, "0", ""
@@ -197,7 +206,7 @@ local function resetSession()
   maxSpd, prevDistinct, distinctSince = 0, nil, 0
   everAboveHalf, everAboveLanding, belowLanding, aliveSaid = false, false, false, false
   stallArmed, overArmed = true, true
-  lastSpokenSpd, lastSpokenAt = 0, 0
+  lastSpokenSpd, lastSpokenAt = 0, nil
   lastTick = system.getTimeCounter()
   curRounded, maxRounded, sensRounded = nil, 0, nil
   curText, maxText, sensText = TXT_NO_DATA, "0", ""
@@ -300,7 +309,10 @@ local function checkCallout(now, onSw, contSw)
     d = clamp(d, 0.5, 10)
     interval = math.min(cfg.tMin * 10000 / d, cfg.tMax * 1000)
   end
-  if now < lastSpokenAt + interval or system.isPlayback() then
+  -- Compare time differences only: the ms counter is a 32-bit integer that
+  -- wraps and can be negative (seen in the emulator), so now - then is safe
+  -- where now < then + interval is not.
+  if (lastSpokenAt ~= nil and now - lastSpokenAt < interval) or system.isPlayback() then
     return
   end
   local n = math.floor(shownSpd + 0.5)
@@ -618,7 +630,8 @@ local function buildScale(L, dial, minorPer, withLabels)
   local mx1, my1, mx2, my2 = {}, {}, {}, {}
   local nx1, ny1, nx2, ny2 = {}, {}, {}, {}
   local lx, ly = {}, {}
-  local hMini = lcd.getTextHeight(FONT_MINI)
+  local font = L.labelFont
+  local hLabel = lcd.getTextHeight(font)
   local rOut, rMaj, rMin = L.tickOut, L.tickOut - L.majorLen, L.tickOut - L.minorLen
   for i = 1, #scaleLabels do
     local v = (i - 1) * scaleStep
@@ -626,9 +639,9 @@ local function buildScale(L, dial, minorPer, withLabels)
     mx1[i], my1[i] = round(L.cx + c * rOut), round(L.cy + s * rOut)
     mx2[i], my2[i] = round(L.cx + c * rMaj), round(L.cy + s * rMaj)
     if withLabels then
-      local tw = lcd.getTextWidth(FONT_MINI, scaleLabels[i])
+      local tw = lcd.getTextWidth(font, scaleLabels[i])
       lx[i] = round(L.cx + c * L.labelR - tw / 2)
-      ly[i] = round(L.cy + s * L.labelR - hMini / 2)
+      ly[i] = round(L.cy + s * L.labelR - hLabel / 2)
     end
     for m = 1, minorPer do
       local f = (v + scaleStep * m / (minorPer + 1)) / fullScale
@@ -650,9 +663,11 @@ local function buildRound(L, w, h)
   local R = math.floor(math.min((h - 6) / 1.707, w / 2 - 20))
   L.R, L.cx = R, w // 2
   L.cy = math.floor((h - R * 1.707) / 2 + R)
-  L.arcR, L.arcW = R - 4, 6
+  L.arcR, L.arcW, L.markW = R - 4, 6, 4
+  L.glowStep, L.glowN = 3, 6
   L.tickOut, L.majorLen, L.minorLen = R - 9, 6, 3
   L.labelR = R - 22
+  L.labelFont, L.unitFont = FONT_MINI, FONT_MINI
   buildScale(L, roundDial, 1, true)
   L.numFont = fitFont(NUM_FONTS, "888", R, R // 2)
   L.hNum, L.hMini = lcd.getTextHeight(L.numFont), lcd.getTextHeight(FONT_MINI)
@@ -663,9 +678,11 @@ local function buildFull(L, w, h)
   local R = math.floor(math.min((h - 8) / 1.707, (w - 100) / 2 - 4))
   L.R, L.cx = R, 4 + R
   L.cy = math.floor((h - R * 1.707) / 2 + R)
-  L.arcR, L.arcW = R - 5, 8
+  L.arcR, L.arcW, L.markW = R - 5, 8, 5
+  L.glowStep, L.glowN = 4, 8
   L.tickOut, L.majorLen, L.minorLen = R - 12, 10, 5
-  L.labelR = R - 32
+  L.labelR = R - 36
+  L.labelFont, L.unitFont = FONT_NORMAL, FONT_NORMAL   -- larger text on the big dial
   buildScale(L, roundDial, 4, true)
   L.numFont = fitFont(NUM_FONTS, "888", R, R // 2)
   L.hNum, L.hMini = lcd.getTextHeight(L.numFont), lcd.getTextHeight(FONT_MINI)
@@ -674,14 +691,21 @@ local function buildFull(L, w, h)
   L.rowH = L.hMini + L.hBig + 4
 end
 
+-- Single window: only about 157 x 34 is visible. Half-circle arc on the left
+-- with the unit inside it, current speed in the middle, MAX column on the right.
 local function buildCompact(L, w, h)
-  local R = math.min(h - 12, (w - 70) // 2)
-  L.R, L.cx, L.cy = R, 4 + R, h - 6
-  L.arcR, L.arcW = R - 3, 5
+  local R = math.min(h - 3, (w - 90) // 2)
+  L.R, L.cx, L.cy = R, 2 + R, h - 2
+  L.arcR, L.arcW, L.markW = R - 3, 5, 3
+  L.glowStep, L.glowN = 2, 5
   L.hMini = lcd.getTextHeight(FONT_MINI)
-  L.numX = 2 * R + 12
-  L.numFont = fitFont(NUM_FONTS, "888", w - L.numX - 2, h - L.hMini - 2)
+  L.maxW = math.max(lcd.getTextWidth(FONT_MINI, TXT_MAX), lcd.getTextWidth(FONT_MINI, "888"))
+  L.maxX = w - L.maxW - 2
+  L.numX = 2 * R + 8
+  L.numFont = fitFont(NUM_FONTS, "888", L.maxX - L.numX - 4, h)
   L.hNum = lcd.getTextHeight(L.numFont)
+  L.numY = (h - L.hNum) // 2
+  L.maxY = (h - 2 * L.hMini) // 2
 end
 
 local function layoutFor(L, w, h, build)
@@ -701,8 +725,18 @@ local function drawScale(L)
   for i = 1, #L.mx1 do
     lcd.drawLine(L.mx1[i], L.my1[i], L.mx2[i], L.my2[i])
     if L.labels then
-      lcd.drawText(L.lx[i], L.ly[i], scaleLabels[i], FONT_MINI)
+      lcd.drawText(L.lx[i], L.ly[i], scaleLabels[i], L.labelFont)
     end
+  end
+end
+
+-- Glow inside an arc from f0 to f1 in the current color: bands fading toward
+-- the dial center, as in the reference image.
+local function drawGlow(L, dial, f0, f1)
+  local step = L.glowStep
+  local r0 = L.arcR - L.arcW // 2 - step // 2
+  for i = 1, L.glowN do
+    gauge.arc(rend, dial, L.cx, L.cy, r0 - (i - 1) * step, f0, f1, step + 1, GLOW_ALPHA[i])
   end
 end
 
@@ -712,6 +746,7 @@ local function drawArcs(L, dial, showMarks)
   setColor(C_TRACK)
   gauge.arc(rend, dial, cx, cy, arcR, 0, 1, 3)
   setColor(C_ZONE)
+  drawGlow(L, dial, fOver, 1)
   gauge.arc(rend, dial, cx, cy, arcR, fOver, 1, 4)
   if showMarks then
     setColor(C_SCALE)
@@ -720,14 +755,25 @@ local function drawArcs(L, dial, showMarks)
   end
   if shownSpd ~= nil then
     local f = shownSpd / fullScale
+    -- Up to the overspeed mark in the current-speed color; past it the arc
+    -- (and its glow) switch to the overspeed color. Glow first, so the solid
+    -- arc sits on top of its brightest band.
+    local fBelow = math.min(f, fOver)
     setColor(COLORS[cfg.colCur])
-    gauge.arc(rend, dial, cx, cy, arcR, 0, f, L.arcW)
+    drawGlow(L, dial, 0, fBelow)
+    gauge.arc(rend, dial, cx, cy, arcR, 0, fBelow, L.arcW)
+    if f > fOver then
+      setColor(C_ZONE)
+      drawGlow(L, dial, fOver, f)
+      gauge.arc(rend, dial, cx, cy, arcR, fOver, f, L.arcW)
+    end
     setColor(C_TEXT)
     gauge.mark(rend, dial, cx, cy, arcR - L.arcW, arcR + 2, f, 2)
   end
   if maxSpd > 0 then
     setColor(COLORS[cfg.colMax])
-    gauge.mark(rend, dial, cx, cy, arcR - L.arcW - 1, L.R - 1, maxSpd / fullScale, 2)
+    -- Thick and long enough to stand out: from inside the value arc to the rim.
+    gauge.mark(rend, dial, cx, cy, arcR - L.arcW - 4, L.R, maxSpd / fullScale, L.markW)
   end
 end
 
@@ -750,8 +796,8 @@ local function drawCenter(L)
   local tw = lcd.getTextWidth(L.numFont, curText)
   lcd.drawText(L.cx - tw // 2, L.cy - L.hNum // 2 - 2, curText, L.numFont)
   setColor(C_SCALE)
-  tw = lcd.getTextWidth(FONT_MINI, unitText)
-  lcd.drawText(L.cx - tw // 2, L.cy + L.hNum // 2, unitText, FONT_MINI)
+  tw = lcd.getTextWidth(L.unitFont, unitText)
+  lcd.drawText(L.cx - tw // 2, L.cy + L.hNum // 2, unitText, L.unitFont)
 end
 
 local function drawRound(w, h)
@@ -759,7 +805,7 @@ local function drawRound(w, h)
   setColor(C_BG)
   lcd.drawFilledRectangle(0, 0, w, h)
   setColor(C_FACE)
-  gauge.face(rend, faceCircle, L.cx, L.cy, L.R)
+  gauge.face(rend, faceCircle, L.cx, L.cy, L.R, h - 1)
   drawArcs(L, roundDial, true)
   drawScale(L)
   drawCenter(L)
@@ -777,7 +823,7 @@ local function drawFull(w, h)
   setColor(C_BG)
   lcd.drawFilledRectangle(0, 0, w, h)
   setColor(C_FACE)
-  gauge.face(rend, faceCircle, L.cx, L.cy, L.R)
+  gauge.face(rend, faceCircle, L.cx, L.cy, L.R, h - 1)
   drawArcs(L, roundDial, true)
   drawScale(L)
   drawCenter(L)
@@ -797,17 +843,15 @@ local function drawCompact(w, h)
   setColor(C_FACE)
   lcd.drawFilledRectangle(0, 0, w, h)
   drawArcs(L, compactDial, L.R >= 30)
-  -- Current speed to the right of the arc, unit inside it, max at the bottom.
   setColor(C_TEXT)
-  lcd.drawText(L.numX, 0, curText, L.numFont)
+  lcd.drawText(L.numX, L.numY, curText, L.numFont)
   setColor(C_SCALE)
   local tw = lcd.getTextWidth(FONT_MINI, unitText)
   lcd.drawText(L.cx - tw // 2, L.cy - L.hMini, unitText, FONT_MINI)
-  local y = h - L.hMini - 1
   setColor(C_MINOR)
-  lcd.drawText(L.numX, y, TXT_MAX, FONT_MINI)
+  lcd.drawText(L.maxX, L.maxY, TXT_MAX, FONT_MINI)
   setColor(COLORS[cfg.colMax])
-  lcd.drawText(L.numX + lcd.getTextWidth(FONT_MINI, TXT_MAX) + 4, y, maxText, FONT_MINI)
+  lcd.drawText(L.maxX, L.maxY + L.hMini, maxText, FONT_MINI)
 end
 
 local function printGauge(w, h)
@@ -822,12 +866,14 @@ local function printGauge(w, h)
   if not rend then
     rend = lcd.renderer()
   end
+  -- Pick the layout from the reported size, draw into the visible part.
+  local vh = h - TITLE_H
   if h < 100 then
-    drawCompact(w, h)
+    drawCompact(w, vh)
   elseif w < 250 then
-    drawRound(w, h)
+    drawRound(w, vh)
   else
-    drawFull(w, h)
+    drawFull(w, vh)
   end
 end
 
@@ -847,7 +893,9 @@ local function init()
 
   system.registerForm(1, MENU_APPS, APP_NAME, initForm, keyForm)
   system.registerTelemetry(1, APP_NAME, 0, printGauge)
-  system.registerTelemetry(2, APP_NAME .. " (full screen)", 3, printGauge)
+  -- Size 4 (no status bar), as DFM-InsP uses: size 3 is covered by the desktop's
+  -- model tile on the DS-24 II (emulator, 2026-09-27).
+  system.registerTelemetry(2, APP_NAME, 4, printGauge)
 
   -- FR-028: tell the pilot the app is running and configured.
   if cfg.startAnn == 1 then

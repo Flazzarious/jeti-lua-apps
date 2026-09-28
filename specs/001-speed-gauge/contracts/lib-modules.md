@@ -32,8 +32,8 @@ registered print function.
 | `newCircle(points)` | Same table shape for a closed unit circle (default 72 points), for the face polygon. Call once in `init()` |
 | `point(dial, f)` | `cos, sin` at fraction `f` (clamped 0..1), interpolated. Pure; also used by the app's layout cache for label positions |
 | `scaleStep(fullScale)` | Major tick step: the smallest of 10, 20, 25, 50, 100, 200, 250, 500 giving at most 8 intervals up to `fullScale` (research R6). Pure |
-| `face(r, circle, cx, cy, radius)` | Filled polygon of the unit circle scaled to `radius`, via `r:renderPolygon()` |
-| `arc(r, dial, cx, cy, radius, f0, f1, width)` | Arc from fraction `f0` to `f1` (both clamped 0..1) with renderer `r` (reset first): the interpolated start point, the table points between, the interpolated end point, then `r:renderPolyline(width)`. Nothing drawn if `f1 <= f0` |
+| `face(r, circle, cx, cy, radius, maxY)` | Filled polygon of the unit circle scaled to `radius`, via `r:renderPolygon()`. Optional `maxY` cuts the circle flat at that y: the renderer does not clip to the window (seen on the DS-24 II emulator) |
+| `arc(r, dial, cx, cy, radius, f0, f1, width, alpha)` | Arc from fraction `f0` to `f1` (both clamped 0..1) with renderer `r` (reset first): the interpolated start point, the table points between, the interpolated end point, then `r:renderPolyline(width, alpha)`. `alpha` 0..1, default 1. Nothing drawn if `f1 <= f0` |
 | `mark(r, dial, cx, cy, r1, r2, f, width)` | Anti-aliased radial line at `f` between radii `r1` and `r2`, via the renderer. For the max marker and the value-arc tip |
 | `tick(dial, cx, cy, r1, r2, f)` | Radial `lcd.drawLine` at `f`. Cheaper than `mark`; for scale ticks and stall/landing marks |
 

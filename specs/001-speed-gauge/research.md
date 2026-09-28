@@ -164,8 +164,15 @@ speedometer; local copy at `docs/vendor/gauge-reference.jpg`).
   5. Stall and landing marks: short light-grey ticks at `fStall` and `fLand`,
      the true-airspeed equivalents (FR-016a).
   6. Value arc: 0 → `fCur` in `colCur`, width 6 (round) or 5 (compact), with a
-     bright 2-px tip line at the end.
-  7. Max marker: a tick across the rim at `fMax` in `colMax`, width 2. It is
+     bright 2-px tip line at the end. Under it, a glow like the reference:
+     concentric arcs in `colCur` just inside the value arc, each fainter
+     toward the center (alpha 0.42 down to 0.015). There are 5, 6 or 8 bands,
+     2, 3 or 4 px apart, for compact, round and full screen (added after
+     emulator review, 2026-09-27). The overspeed zone gets the same glow in its
+     own color. Above `fOver` the value arc and its glow are split: `colCur`
+     up to `fOver`, the overspeed color from `fOver` to `fCur` (spec FR-014).
+  7. Max marker: a tick at `fMax` in `colMax`, from inside the value arc out
+     to the rim, width 3 (compact), 4 (round) or 5 (full screen). It is
      drawn after the value arc, so it stays visible while the arc passes
      under it (FR-014).
   8. Text: center number, unit and labeled rows.
@@ -198,8 +205,12 @@ speedometer; local copy at `docs/vendor/gauge-reference.jpg`).
 - **Decision:** FR-013 asks for two windows, the most an app may register:
   - Window 1, "Speed Gauge", registered with **size 0**, so the pilot can
     place it at single or double size.
-  - Window 2, "Speed Gauge (full screen)", registered with **size 3**, which
-    keeps the status bar.
+  - Window 2, full screen, registered with **size 4** (no status bar). Its
+    title is also "Speed Gauge".
+  - **Changed from size 3 after emulator testing (2026-09-27):** on the
+    DS-24 II the desktop's model tile is drawn over a size-3 window's
+    lower-left quarter. Size 4 has no overlay. DFM-InsP (MIT, studied only)
+    also uses size 4.
 
   One print function serves both. It picks the layout from `(w, h)` on every
   call, so a window moved between sizes adapts on the next draw.
@@ -221,8 +232,8 @@ speedometer; local copy at `docs/vendor/gauge-reference.jpg`).
 
 - **Decision:** The dial face is always dark (spec US3), so the colors are
   chosen for a dark background, not for the transmitter's theme. There are
-  eight presets. None is red, orange or yellow, so none can be confused with
-  the overspeed zone (FR-017):
+  nine presets. None is red or orange, so none can be confused with the
+  overspeed zone (FR-017):
 
   | # | Name | RGB |
   | --- | --- | --- |
@@ -234,11 +245,16 @@ speedometer; local copy at `docs/vendor/gauge-reference.jpg`).
   | 6 | Magenta | 230, 60, 230 |
   | 7 | Purple | 150, 100, 255 |
   | 8 | Grey | 170, 170, 170 |
+  | 9 | Yellow | 255, 225, 0 |
 
-  Defaults: current speed = Cyan, max = White. Numbers on the face are white;
+  Defaults: current speed = Cyan, max = Yellow. Yellow was added last so the
+  saved index of every earlier color stays the same. Numbers on the face are white;
   labels are light grey.
 - **Rationale:** FR-017 asks for at least 6 colors, a blue/cyan arc and a
-  white max marker by default, and no clash with the red/orange zone. Black is
+  bright yellow max marker by default, and no clash with the red/orange zone.
+  In emulator testing a thin white marker was too subtle, so the default
+  became yellow and the marker thicker (2026-09-27). Yellow is clearly
+  lighter than the orange-red zone. Black is
   dropped because it would vanish on the dark face.
 - **Unsupported transmitters:** the notice (R12) uses the theme's foreground
   color, since no face is drawn there.

@@ -36,8 +36,8 @@ px as in v2.1; hints are `FONT_MINI` rows.
 | 24 | *hint* | label | "Leave correction off if your sensor already corrects for air density" |
 | | **Gauge** | | |
 | 25 | Gauge full scale (*unit*, 0 = auto) | intbox 0–2000 | hint shows "Auto: 230" |
-| 26 | Current speed color | selectbox | R8 presets (no red, orange or yellow); default Cyan |
-| 27 | Max speed color | selectbox | R8 presets; default White |
+| 26 | Current speed color | selectbox | R8 presets (no red or orange); default Cyan |
+| 27 | Max speed color | selectbox | R8 presets; default Yellow |
 | 28 | Reset max speed | link | clears session max (FR-019, US3 #6) |
 | 28a | Gauge window size | selectbox Single / Double | **Only if size 0 fails** (research R7): saves `winSz`, re-registers window 1 |
 | | *footer* | label `FONT_MINI`, right-aligned | "Speed Gauge 0.1.0 - Based on DFM Speed Announcer by Dave McQueeney" (FR-029) |

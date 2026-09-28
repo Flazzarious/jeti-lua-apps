@@ -38,6 +38,8 @@ Official PDF: https://github.com/JETImodel/Lua-Apps/tree/master/Doc
   its larger display. Design with these numbers, not with 480 × 480.
 - **Firmware:** the emulator in use runs 6.04; the transmitter runs 6.03 or
   newer.
+- **Device string:** `system.getDeviceType()` returns "JETI DS-24 II" in the
+  emulator (firmware 6.04, 2026-09-27). Not yet checked on the transmitter.
 
 | Area | Size on DS-24 II (px) |
 | --- | --- |
@@ -45,7 +47,42 @@ Official PDF: https://github.com/JETImodel/Lua-Apps/tree/master/Doc
 | Large telemetry window | 157 × 127 (measured) |
 | Full screen, status bar kept (size 3) | 320 × 260 (measured) |
 | Full screen (size 4+) | 320 × 260 (measured, same as size 3) |
+| Size 0 ("auto") | pilot chooses: 157 × 60 or 157 × 127 (measured 2026-09-27, PROBE MODE 3) |
 | App form canvas | *not yet measured* |
+
+**What is actually visible** (emulator screenshots with the probe's ruler,
+2026-09-27). On the II the desktop draws each window's title bar inside the
+reported canvas, and the bottom of the canvas is clipped, so about 25 px of
+the reported height never shows. Lua coordinates are scaled about 1.44x to
+fill the 480-px panel (320 × 1.44 ≈ 460 px plus the frame).
+
+| Window | Reported | Visible |
+| --- | --- | --- |
+| Small | 157 × 60 | 157 × ~34 |
+| Large | 157 × 127 | 157 × ~101 |
+| Full screen (size 3) | 320 × 260 | 320 × ~236 |
+
+- **Font heights:** `FONT_NORMAL` 18, `FONT_BIG` 22, `FONT_MINI` 13,
+  `FONT_MAXI` 40 (probe, emulator 6.04).
+- **Model tile:** the desktop's model tile (model name, image, page "n/3")
+  stays in the bottom-left slot on every desktop page and is drawn **over** a
+  full-screen Lua window, covering its lower-left 157 × ~110. No Lua API hides
+  it; whether a desktop setting or size 4 avoids it is still being checked.
+
+## Emulator telemetry (LeonAirRC's Emulated Telemetry)
+
+- Installed in the emulator's Apps folder as `emutelem.lua` with its config in
+  `Apps/EmulatedTelemetry/sensors.json` (this repo's copy:
+  `tools/emulator/sensors.json`). Add "Emulated Telemetry" in Applications →
+  User Applications alongside the app under test.
+- It replaces `system.getSensors`, `getSensorByID` and `getSensorValueByID`,
+  so apps must call them through `system` each time, never a saved copy.
+- Each sensor's value follows its control (`input`), mapped from −1..1 to
+  `lowerBound..upperBound`. **The control fully down (exactly −1) makes the
+  sensor invalid**, i.e. "sensor lost".
+- It also replaces `system.playFile`, `playNumber`, `playBeep`,
+  `playSystemSound` and `vibration` with `print`: in the emulator, audio and
+  vibration appear as lines in the Lua console instead of sound.
 
 ## Files and names
 

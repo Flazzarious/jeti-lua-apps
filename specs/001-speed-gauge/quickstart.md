@@ -84,10 +84,10 @@ Gauge (run each in the single, double and full-screen windows; compare with
 
 | # | Do | Expect | Spec |
 | --- | --- | --- | --- |
-| 13a | Place "Speed Gauge" single, then double; place "Speed Gauge (full screen)" | Compact arc, round dial with corner rows, big dial with side panel | US3 #1, #2, #2a, FR-013 |
+| 13a | Place "Speed Gauge" single, then double; place the full-screen "Speed Gauge" (listed second) | Compact arc, round dial with corner rows, big dial with side panel | US3 #1, #2, #2a, FR-013 |
 | 13b | Look at the double and full-screen dials | Dark face, numbered scale, red/orange zone from 200 to full scale, cyan arc, big center number with unit | FR-014, FR-014a |
 | 13c | Density on at 5,000 ft, full screen | Side panel shows "+8%" and the sensor speed | contracts/telemetry-window.md |
-| 14 | Speed 150, then 90 | White max marker stays at 150; the cyan arc shrinks below it | US3 #3, FR-017 |
+| 14 | Speed 150, then 90 | Yellow max marker stays at 150; the cyan arc shrinks below it | US3 #3, FR-017 |
 | 15 | Single sample spike to 400 (if the telemetry app can) | Max unchanged | Edge Cases, R5 |
 | 16 | Speed 260 (full scale auto 230) | Arc stops at full scale; number shows 260 | US3 #7 |
 | 17 | Move P5 fully down (sensor lost) | "---", max kept, no callouts or warnings | US3 #5 |

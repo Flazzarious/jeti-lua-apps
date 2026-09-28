@@ -1,13 +1,20 @@
 # Contract: Telemetry windows
 
 ```lua
-system.registerTelemetry(1, "Speed Gauge", 0, printGauge)               -- pilot places it single or double
-system.registerTelemetry(2, "Speed Gauge (full screen)", 3, printGauge) -- keeps the status bar
+system.registerTelemetry(1, "Speed Gauge", 0, printGauge)  -- pilot places it single or double
+system.registerTelemetry(2, "Speed Gauge", 4, printGauge)  -- full screen, no status bar (R7)
 ```
 
-Size 0 is **UNVERIFIED** (research R7). If the pilot can't choose the size,
-window 1 is registered at the `winSz` setting's size instead (Single = 1,
-Double = 2) and re-registered when the setting changes.
+Size 0 lets the pilot place window 1 at single or double size (verified in
+the emulator, 2026-09-27), so no window-size setting is needed. Size 4 is
+used for full screen because the desktop's model tile covers a size-3 window
+(research R7).
+
+**Visible area.** On the DS-24 II each window's title bar sits inside the
+reported canvas, and about 25 px at the bottom is never visible. The print
+function draws into `h - TITLE_H` (`TITLE_H = 26`) and chooses the layout
+from the reported `h`. The renderer doesn't clip to the window, so the dial
+face is cut flat at the visible bottom (`ag_gauge.face` with `maxY`).
 
 One print function serves both windows. It reads only cached state (numbers,
 cached strings, dial fractions, the layout cache) and never formats strings,
@@ -20,12 +27,12 @@ and R8.
 
 ## Choosing a layout
 
-| Condition | Layout | Measured size |
-| --- | --- | --- |
-| not `gaugeOk` (R12) | notice | any |
-| `h < 100` | compact | 157 × 60 |
-| `w < 250` | round | 157 × 127 |
-| otherwise | full screen | 320 × 260 |
+| Condition | Layout | Reported size | Visible (drawn) |
+| --- | --- | --- | --- |
+| not `gaugeOk` (R12) | notice | any | |
+| `h < 100` | compact | 157 × 60 | 157 × 34 |
+| `w < 250` | round | 157 × 127 | 157 × 101 |
+| otherwise | full screen | 320 × 260 | 320 × 234 |
 
 The layout cache is rebuilt when `w`, `h` or the scale (full scale, units,
 thresholds, `kDens`) changes, and holds: dial center and radii, tick end
@@ -33,24 +40,24 @@ points, label positions, face polygon points, and text positions. The
 positions below are proportions. The implementation fits them to the fonts'
 real heights (`lcd.getTextHeight`) and widths (`lcd.getTextWidth`).
 
-## Compact (single window, 157 × 60)
+## Compact (single window, 157 × 34 visible)
 
 ```text
 +---------------------------------------------+
-|     .--'''--.          123                  |  current: largest font that fits, white
-|   /           \        mph                  |  unit: FONT_MINI, light grey
-|  |      ---    |      MAX 141               |  FONT_MINI, max in colMax
-+---------------------------------------------+
-  180° arc, radius about h - 12, left side;       whole window filled dark
+|   .--'''--.                         MAX      |  current: largest font that fits,
+|  /         \        123             141      |  white, vertically centered
+| |    mph    |                                |  unit inside the arc, FONT_MINI
++---------------------------------------------+  MAX label and value: FONT_MINI
+  180° arc, radius about h - 3, left side;       whole window filled dark
 ```
 
 - The whole window is filled dark; there is no separate face polygon.
-- A 180° track, overspeed zone, value arc and max tick. No numbered scale.
-- Stall mark only if the arc radius is at least 30 px.
-- Drop order when text doesn't fit: unit, then the "MAX" label. The current
-  and max numbers always stay (FR-015).
+- A 180° track, overspeed zone, value arc and max marker. No numbered scale.
+- Stall and landing marks only if the arc radius is at least 30 px.
+- The current and max numbers always stay (FR-015); the max value is in
+  `colMax`.
 
-## Round (double window, 157 × 127)
+## Round (double window, 157 × 101 visible)
 
 ```text
 +---------------------------------------------+
@@ -73,7 +80,7 @@ real heights (`lcd.getTextHeight`) and widths (`lcd.getTextWidth`).
 - Drop order when space is short: minor ticks, scale labels, corner rows
   (Overspeed, then Stall). Max and the center number always stay.
 
-## Full screen (320 × 260)
+## Full screen (320 × 234 visible)
 
 ```text
 +----------------------------------------------------------------+
@@ -90,7 +97,8 @@ real heights (`lcd.getTextHeight`) and widths (`lcd.getTextWidth`).
 ```
 
 - The same dial as the round layout, larger, with four minor ticks between
-  majors.
+  majors. The scale numbers and the unit use `FONT_NORMAL` here (`FONT_MINI`
+  on the round dial), because `FONT_MINI` was too small at this size.
 - Side panel rows, each a `FONT_MINI` grey label over a `FONT_BIG` white value:
   Max (in `colMax`), Stall, Overspeed, and Air density. The last shows the
   correction ("+8%") and the uncorrected sensor speed while correction is on,
@@ -108,4 +116,9 @@ color, centered, no face. Nothing else is drawn (FR-013a).
 | Valid reading | value arc and tip to `fCur`, max marker | current, max |
 | No data (no sensor, invalid, lost) | face, scale, zone and max marker only; no value arc | current "---", max kept (US3 #5) |
 | Max = 0 (just reset, or not flown yet) | no max marker | max "0" |
+
+**Max marker:** `colMax` (default Yellow), from inside the value arc out to
+the rim, width 3 / 4 / 5 (compact / round / full screen). It is drawn after
+the value arc so it stays visible on top of it (research R6, FR-017).
+| Above overspeed | value arc in `colCur` up to the overspeed mark, overspeed color (and glow) beyond it | current, max |
 | Above full scale | value arc stops at full scale | real value shown (US3 #7) |

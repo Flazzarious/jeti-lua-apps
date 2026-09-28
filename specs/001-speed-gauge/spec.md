@@ -410,7 +410,8 @@ reading its label and hint.
 - **FR-013**: The app MUST offer two main-screen telemetry windows on the
   DS-24 II (and DC-24 II), the maximum an app may register:
   - "Speed Gauge": the pilot places it at single or double size;
-  - "Speed Gauge (full screen)".
+  - a full-screen window, also titled "Speed Gauge" (the user chose not to
+    add "(full screen)" to the title, 2026-09-27).
 - **FR-013a**: The gauge is not supported on other transmitters. If the app
   runs on one, the telemetry window MUST show a short notice (e.g. "Speed
   Gauge needs DS-24 II") instead of a mis-drawn gauge. Callouts and warnings
@@ -423,7 +424,10 @@ reading its label and hint.
     dominant indicator);
   - session max as a thin marker in a different color, which the value arc
     passes beneath;
-  - an overspeed zone from the overspeed warning speed to full scale.
+  - an overspeed zone from the overspeed warning speed to full scale;
+  - past the overspeed warning speed, the part of the value arc beyond that
+    mark is drawn in the overspeed color instead of the current-speed color
+    (added 2026-09-27).
 - **FR-014a**: Current speed MUST also be shown as a large number with its unit
   at the center of the dial (double size) or next to the arc (single size).
 - **FR-015**: The window MUST show current speed and session max speed as
@@ -438,9 +442,10 @@ reading its label and hint.
   setting as entered.
 - **FR-017**: Users MUST be able to choose the current-speed and max-speed
   colors from a preset list of at least 6 distinct colors. The defaults are a
-  blue/cyan value arc (as in the reference) and a white max marker, which is
-  visible on the dark face but less prominent than the arc. Neither color
-  choice may be the same as the red/orange overspeed zone.
+  blue/cyan value arc (as in the reference) and a bright yellow max marker,
+  drawn thick enough to stand out from the arc (changed from white after
+  emulator testing, 2026-09-27: white was too subtle). Neither color choice
+  may be the same as the red/orange overspeed zone.
 - **FR-018**: Gauge full scale MUST be user-settable. The default is derived
   from the overspeed warning speed, so overspeed sits near the top of the
   dial.
