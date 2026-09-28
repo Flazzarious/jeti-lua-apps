@@ -65,7 +65,10 @@ local TXT_STALL = "STALL"
 local TXT_OVR = "OVR"
 local TXT_OVERSPEED = "OVERSPEED"
 local TXT_DENSITY = "AIR DENSITY"
-local TXT_SENSOR = "SENSOR"
+local TXT_SENSOR = "RAW SENSOR"
+local TXT_ELEVATION = "ELEVATION"
+local TXT_OFF = "OFF"
+local TXT_GPS = "GPS"
 local TXT_NO_DATA = "---"
 
 ------------------------------------------------------------------------------
@@ -115,6 +118,9 @@ local scaleVer = 0          -- bumped whenever the dial scale changes
 local unitText = "mph"
 local unitSpoken = "mph"
 local densPctText = "+0%"
+local densActive = false    -- correction on and an airspeed sensor
+local densRowText = "OFF"   -- full-screen AIR DENSITY row: "+8%", "OFF" or "GPS"
+local elevText, elevUnitText = "0", "ft"
 local stallText, overText = "45", "200"
 
 local function clamp(v, lo, hi)
@@ -131,8 +137,9 @@ local function recomputeSensor()
 end
 
 local function recomputeDensity()
-  if cfg.densOn == 1 and cfg.sType == 1 then
-    local imperial = UNITS_IMPERIAL[cfg.units]
+  local imperial = UNITS_IMPERIAL[cfg.units]
+  densActive = cfg.densOn == 1 and cfg.sType == 1
+  if densActive then
     local elevM = imperial and dens.ftToM(cfg.elev) or cfg.elev
     local tempC = nil
     if cfg.tStd ~= 1 then
@@ -144,6 +151,15 @@ local function recomputeDensity()
   end
   local pct = math.floor((kDens - 1) * 100 + 0.5)
   densPctText = (pct >= 0 and "+" or "") .. pct .. "%"
+  if cfg.sType == 2 then
+    densRowText = TXT_GPS
+  elseif densActive then
+    densRowText = densPctText
+  else
+    densRowText = TXT_OFF
+  end
+  elevText = tostring(cfg.elev)
+  elevUnitText = imperial and "ft" or "m"
 end
 
 local function recomputeScale()
@@ -688,7 +704,12 @@ local function buildFull(L, w, h)
   L.hNum, L.hMini = lcd.getTextHeight(L.numFont), lcd.getTextHeight(FONT_MINI)
   L.panelX = 2 * R + 16
   L.hBig = lcd.getTextHeight(FONT_BIG)
-  L.rowH = L.hMini + L.hBig + 4
+  -- Five panel rows spread over the visible height, capped so they don't
+  -- drift too far apart.
+  L.rowH = math.min((h - 8) // 5, L.hMini + L.hBig + 14)
+  -- MAX sits in the open bottom of the dial, centered under the speed.
+  L.maxValY = h - L.hBig - 4
+  L.maxLabelY = L.maxValY - L.hMini
 end
 
 -- Single window: only about 157 x 34 is visible. Half-circle arc on the left
@@ -777,17 +798,18 @@ local function drawArcs(L, dial, showMarks)
   end
 end
 
--- Label (small, grey) over value (white or colored) with the unit after it.
-local function drawRow(x, y, label, value, valueFont, valueColor, hLabel, withUnit)
+-- Label (small, grey) over value (white or colored), with an optional small
+-- unit after the value.
+local function drawRow(x, y, label, value, valueFont, valueColor, hLabel, unit)
   setColor(C_MINOR)
   lcd.drawText(x, y, label, FONT_MINI)
   setColor(valueColor)
   lcd.drawText(x, y + hLabel, value, valueFont)
-  if withUnit then
+  if unit then
     setColor(C_MINOR)
     -- Bottom-align the small unit with the value (the label is FONT_MINI too).
     local vx = x + lcd.getTextWidth(valueFont, value) + 2
-    lcd.drawText(vx, y + lcd.getTextHeight(valueFont), unitText, FONT_MINI)
+    lcd.drawText(vx, y + lcd.getTextHeight(valueFont), unit, FONT_MINI)
   end
 end
 
@@ -811,11 +833,11 @@ local function drawRound(w, h)
   drawCenter(L)
   -- Corner rows (FR-016): MAX top-left, STALL top-right, OVR bottom-right.
   local hM, hN = L.hMini, L.hNorm
-  drawRow(1, 0, TXT_MAX, maxText, FONT_NORMAL, COLORS[cfg.colMax], hM, false)
+  drawRow(1, 0, TXT_MAX, maxText, FONT_NORMAL, COLORS[cfg.colMax], hM, nil)
   local sw = math.max(lcd.getTextWidth(FONT_MINI, TXT_STALL), lcd.getTextWidth(FONT_NORMAL, stallText))
-  drawRow(w - sw - 1, 0, TXT_STALL, stallText, FONT_NORMAL, C_TEXT, hM, false)
+  drawRow(w - sw - 1, 0, TXT_STALL, stallText, FONT_NORMAL, C_TEXT, hM, nil)
   local ow = math.max(lcd.getTextWidth(FONT_MINI, TXT_OVR), lcd.getTextWidth(FONT_NORMAL, overText))
-  drawRow(w - ow - 1, h - hM - hN, TXT_OVR, overText, FONT_NORMAL, C_TEXT, hM, false)
+  drawRow(w - ow - 1, h - hM - hN, TXT_OVR, overText, FONT_NORMAL, C_TEXT, hM, nil)
 end
 
 local function drawFull(w, h)
@@ -827,14 +849,23 @@ local function drawFull(w, h)
   drawArcs(L, roundDial, true)
   drawScale(L)
   drawCenter(L)
-  -- Side panel (spec US3 #2a).
-  local x, y, rowH, hM = L.panelX, 6, L.rowH, L.hMini
-  drawRow(x, y, TXT_MAX, maxText, FONT_BIG, COLORS[cfg.colMax], hM, true)
-  drawRow(x, y + rowH, TXT_STALL, stallText, FONT_BIG, C_TEXT, hM, true)
-  drawRow(x, y + 2 * rowH, TXT_OVERSPEED, overText, FONT_BIG, C_TEXT, hM, true)
-  if kDens ~= 1 then
-    drawRow(x, y + 3 * rowH, TXT_DENSITY, densPctText, FONT_BIG, C_TEXT, hM, false)
-    drawRow(x, y + 4 * rowH, TXT_SENSOR, sensText, FONT_BIG, C_TEXT, hM, true)
+  -- MAX in the open bottom of the dial: small label over the value, both
+  -- centered under the center number (no unit; it's shown under the speed).
+  setColor(C_MINOR)
+  local tw = lcd.getTextWidth(FONT_MINI, TXT_MAX)
+  lcd.drawText(L.cx - tw // 2, L.maxLabelY, TXT_MAX, FONT_MINI)
+  setColor(COLORS[cfg.colMax])
+  tw = lcd.getTextWidth(FONT_BIG, maxText)
+  lcd.drawText(L.cx - tw // 2, L.maxValY, maxText, FONT_BIG)
+  -- Side panel (spec US3 #2a). AIR DENSITY is always shown; ELEVATION and
+  -- the uncorrected SENSOR speed only while correction is active.
+  local x, y, rowH, hM = L.panelX, 4, L.rowH, L.hMini
+  drawRow(x, y, TXT_STALL, stallText, FONT_BIG, C_TEXT, hM, unitText)
+  drawRow(x, y + rowH, TXT_OVERSPEED, overText, FONT_BIG, C_TEXT, hM, unitText)
+  drawRow(x, y + 2 * rowH, TXT_DENSITY, densRowText, FONT_BIG, C_TEXT, hM, nil)
+  if densActive then
+    drawRow(x, y + 3 * rowH, TXT_ELEVATION, elevText, FONT_BIG, C_TEXT, hM, elevUnitText)
+    drawRow(x, y + 4 * rowH, TXT_SENSOR, sensText, FONT_BIG, C_TEXT, hM, unitText)
   end
 end
 
@@ -924,6 +955,7 @@ local function loop()
     if sensorSpd ~= nil then
       sensorSpd, shownSpd = nil, nil
       curRounded, curText = nil, TXT_NO_DATA
+      sensRounded, sensText = nil, TXT_NO_DATA
     end
     return                  -- no data: no flags, max, warnings or callouts
   end

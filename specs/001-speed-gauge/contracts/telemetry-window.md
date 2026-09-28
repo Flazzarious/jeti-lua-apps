@@ -84,14 +84,18 @@ real heights (`lcd.getTextHeight`) and widths (`lcd.getTextWidth`).
 
 ```text
 +----------------------------------------------------------------+
-|             .-''''''''''-.            |  MAX                   |
-|         /  50    100   150  \         |  141 mph               |
-|       | 0                  200 |      |  STALL                 |
-|       |        123             |      |  45 mph                |
-|        \       mph            /       |  OVERSPEED             |
-|          '-.             .-'         |  200 mph               |
-|                                       |  AIR DENSITY           |
-|                                       |  +8%   (sensor 100)    |
+|             .-''''''''''-.            |  STALL                 |
+|         /  50    100   150  \         |  45 mph                |
+|       | 0                  200 |      |                        |
+|       |        123             |      |  OVERSPEED             |
+|       |        mph             |      |  200 mph               |
+|        \                      /       |                        |
+|          '-.     MAX     .-'         |  AIR DENSITY           |
+|                  141                 |  +8%                   |
+|                                       |  ELEVATION             |
+|                                       |  5000 ft               |
+|                                       |  RAW SENSOR            |
+|                                       |  100 mph               |
 +----------------------------------------------------------------+
   270° dial, about 200-220 px across, left     side panel about 100 px
 ```
@@ -99,10 +103,19 @@ real heights (`lcd.getTextHeight`) and widths (`lcd.getTextWidth`).
 - The same dial as the round layout, larger, with four minor ticks between
   majors. The scale numbers and the unit use `FONT_NORMAL` here (`FONT_MINI`
   on the round dial), because `FONT_MINI` was too small at this size.
-- Side panel rows, each a `FONT_MINI` grey label over a `FONT_BIG` white value:
-  Max (in `colMax`), Stall, Overspeed, and Air density. The last shows the
-  correction ("+8%") and the uncorrected sensor speed while correction is on,
-  and is hidden otherwise.
+- MAX sits in the open bottom of the dial, centered under the speed: a
+  `FONT_MINI` grey label over the value in `FONT_BIG`, `colMax`, without a
+  unit (the unit is shown under the speed). Moved from the side panel at the
+  user's request, 2026-09-27.
+- Side panel rows, each a `FONT_MINI` grey label over a `FONT_BIG` white value
+  with a small unit. Rows are spread over the visible height, about 10 px
+  apart:
+  - STALL, OVERSPEED: always.
+  - AIR DENSITY: always. "+8%" while correction is active, "OFF" when it is
+    off, "GPS" when the sensor type is GPS (added 2026-09-27).
+  - ELEVATION: the field elevation as set, in ft or m. Only while correction
+    is active (added 2026-09-27).
+  - RAW SENSOR: the uncorrected sensor speed. Only while correction is active.
 
 ## Notice (not DS-24 II)
 

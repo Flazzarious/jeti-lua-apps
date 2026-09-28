@@ -114,7 +114,7 @@ and checked on its own.
 
 **Goal**: The speedometer from the visual design reference, in a pilot-sized window (compact or round) and a full-screen window, with a sticky session max, and a notice on other transmitters (FR-013–FR-019)
 
-**Independent Test**: Place "Speed Gauge" single and double, and "Speed Gauge (full screen)"; move P5. The value arc moves, the max marker stays at the peak, both numbers match, and each layout matches the reference (quickstart scenarios 13a–21b).
+**Independent Test**: Place "Speed Gauge" single and double, and the full-screen "Speed Gauge"; move P5. The value arc moves, the max marker stays at the peak, both numbers match, and each layout matches the reference (quickstart scenarios 13a–21b).
 
 **Depends on**: T005 (size-0 behavior, device string, font heights)
 

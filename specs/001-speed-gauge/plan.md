@@ -55,13 +55,13 @@ Approach:
 **Scale/Scope**: One app (~800–1,000 lines estimated), two modules (~60 and ~120 lines), 5 reused WAV files
 
 All former unknowns are resolved in [research.md](research.md). The window
-sizes are now measured. Four API assumptions remain **UNVERIFIED** and are
-checked in the emulator before gauge work
-([quickstart.md step 1](quickstart.md#step-1-confirm-unverified-api-assumptions-before-gauge-layout-work)):
-whether a size-0 window lets the pilot choose single or double (R7, with a
-fallback setting), the DS-24 II's `getDeviceType()` string (R12), renderer
-reuse across frames (R6), and whether `°` renders. Font heights are also
-measured there so the layouts can fit text.
+sizes are now measured. Four API assumptions were checked in the emulator
+([quickstart.md step 1](quickstart.md#step-1-confirm-unverified-api-assumptions-before-gauge-layout-work)).
+**Update 2026-09-27:** a size-0 window lets the pilot choose single or double
+(R7), the emulator reports "JETI DS-24 II" (R12), and the reused renderer
+draws correctly; font heights and the visible window sizes are recorded in
+`docs/jeti-api-notes.md`. Still open: whether `°` renders (T039), the
+device string on a real transmitter, and the CPU figure (T029).
 
 ## Constitution Check
 
