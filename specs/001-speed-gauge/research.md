@@ -183,10 +183,18 @@ speedometer; local copy at `docs/vendor/gauge-reference.jpg`).
   goes into a layout cache. It is computed the first time a `(w, h)` is drawn,
   and again only when `w`, `h` or the scale changes. Per frame, the print
   function only walks cached arrays.
-  - **Fallback** if the CPU figure is still over 20% with the full-screen
-    dial: draw the static parts (face, track, zone, ticks) once into an
-    off-screen image (`lcd.createImage` and `lcd.renderer(image)`, V5.00+),
-    `lcd.drawImage` it each frame, and draw the labels and moving parts live.
+  - **Planned fallback, tried and dropped (2026-09-27):** draw the static
+    parts once into an off-screen image (`lcd.createImage` and
+    `lcd.renderer(image)`) and copy it each frame. On the II emulator the
+    image showed nothing and the CPU figure did not drop, so the code was
+    removed and everything is drawn live.
+  - **What the CPU figure is:** the app list shows the highest per-call
+    budget use (`system.getCPU()`), not an average. Measured: start-up 24%,
+    loop 0–1%, small/double draw up to 18%, full-screen draw up to 43%. The
+    cost is mostly the semi-transparent glow; fills cost almost nothing.
+    Fewer points (10° steps for the glow only) and fewer, wider glow bands
+    brought full screen from 66% to 43%. SC-007 was revised to "worst call
+    below 50%" and the user accepted the current look.
 - **Renderer reuse (UNVERIFIED):** Create one renderer lazily inside the print
   function and call `:reset()` between shapes, to avoid allocating per frame.
   If the emulator shows it can't be reused across frames, create one per frame

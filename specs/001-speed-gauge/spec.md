@@ -544,9 +544,15 @@ reading its label and hint.
 - **SC-005**: The gauge reflects a speed change within 0.5 s.
 - **SC-006**: A pilot new to the app configures sensor, switch, landing speed
   and stall warning in under 3 minutes without referring to documentation.
-- **SC-007**: Running the app does not noticeably slow the transmitter. Its
-  CPU figure in the transmitter's app overview stays below 20% during flight
-  with the gauge displayed.
+- **SC-007**: Running the app does not noticeably slow the transmitter, and no
+  single call comes close to the transmitter's per-call limit. The CPU figure
+  in the app overview is the highest share of a single call's budget seen
+  since the app started (the transmitter kills a script at 100%). It stays
+  below 50% with every window shown, full screen included, leaving at least 2x
+  headroom. (Revised 2026-09-27: the original "below 20% during flight"
+  assumed the figure was an overall load. Measured in the emulator: start-up
+  24%, loop 0–1%, single/double draw up to 18%, full-screen draw up to 43%;
+  the user accepted this with the full-screen glow as designed.)
 - **SC-008**: Every behavior of the original app is either kept or listed in
   this spec as deliberately changed. No setting disappears without
   explanation.

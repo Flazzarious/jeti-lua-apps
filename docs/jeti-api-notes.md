@@ -69,6 +69,25 @@ fill the 480-px panel (320 × 1.44 ≈ 460 px plus the frame).
   full-screen Lua window, covering its lower-left 157 × ~110. No Lua API hides
   it; whether a desktop setting or size 4 avoids it is still being checked.
 
+## CPU figure and off-screen images (emulator, 2026-09-27)
+
+- **The "CPU" figure in Applications → User Applications is the highest
+  per-call budget use seen, not a running average.** `system.getCPU()`
+  returns how much of the current call's instruction/time budget has been
+  used (0–100); at 100 the transmitter kills the script. The list keeps the
+  maximum, so it stays high after one heavy call (start-up, or a heavy
+  window draw) until the app restarts.
+- To see live per-call numbers, call `system.getCPU()` at the end of `loop()`
+  and of the print function and log them (Speed Gauge was measured this way:
+  init 24, loop 0–1, small/double draw 12–18, full-screen draw 27–43).
+- Cost follows semi-transparent anti-aliased drawing (renderer polylines with
+  alpha, e.g. glow bands) far more than plain fills: removing a full-window
+  `drawFilledRectangle` and the filled face polygon changed nothing, while
+  removing 16 alpha glow bands halved the figure.
+- **Off-screen images didn't work:** `lcd.createImage(w, h)` plus
+  `lcd.renderer(image.data)` and `lcd.drawImage` produced nothing visible,
+  and the figure did not drop. Don't rely on off-screen rendering.
+
 ## Emulator telemetry (LeonAirRC's Emulated Telemetry)
 
 - Installed in the emulator's Apps folder as `emutelem.lua` with its config in

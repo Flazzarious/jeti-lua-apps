@@ -56,8 +56,9 @@ local C_SCALE = { 200, 200, 200 }
 local C_MINOR = { 110, 118, 130 }
 local C_TEXT = { 255, 255, 255 }
 -- Glow inside the value arc: bands fading toward the dial center (reference
--- image). Alpha per band, outermost first.
-local GLOW_ALPHA = { 0.42, 0.30, 0.21, 0.14, 0.09, 0.055, 0.03, 0.015 }
+-- image). Alpha per band, outermost first. Few, wide bands: each band is a
+-- full arc of renderer points, and the glow dominated the CPU figure.
+local GLOW_ALPHA = { 0.40, 0.24, 0.13, 0.06, 0.025 }
 
 local TXT_NOTICE = "Speed Gauge needs DS-24 II"
 local TXT_MAX = "MAX"
@@ -613,6 +614,7 @@ end
 ------------------------------------------------------------------------------
 
 local roundDial, compactDial, faceCircle = nil, nil, nil
+local roundGlowDial, compactGlowDial = nil, nil  -- coarse copies for the soft glow
 local rend = nil            -- one renderer, created lazily and reused (R6)
 
 -- One layout cache per layout, rebuilt when the window size or scale changes.
@@ -680,10 +682,12 @@ local function buildRound(L, w, h)
   L.R, L.cx = R, w // 2
   L.cy = math.floor((h - R * 1.707) / 2 + R)
   L.arcR, L.arcW, L.markW = R - 4, 6, 4
-  L.glowStep, L.glowN = 3, 6
+  L.glowStep, L.glowN = 5, 4
+  L.glowDial = roundGlowDial
   L.tickOut, L.majorLen, L.minorLen = R - 9, 6, 3
   L.labelR = R - 22
   L.labelFont, L.unitFont = FONT_MINI, FONT_MINI
+  L.dial, L.face, L.showMarks = roundDial, true, true
   buildScale(L, roundDial, 1, true)
   L.numFont = fitFont(NUM_FONTS, "888", R, R // 2)
   L.hNum, L.hMini = lcd.getTextHeight(L.numFont), lcd.getTextHeight(FONT_MINI)
@@ -695,10 +699,12 @@ local function buildFull(L, w, h)
   L.R, L.cx = R, 4 + R
   L.cy = math.floor((h - R * 1.707) / 2 + R)
   L.arcR, L.arcW, L.markW = R - 5, 8, 5
-  L.glowStep, L.glowN = 4, 8
+  L.glowStep, L.glowN = 6, 5
+  L.glowDial = roundGlowDial
   L.tickOut, L.majorLen, L.minorLen = R - 12, 10, 5
   L.labelR = R - 36
   L.labelFont, L.unitFont = FONT_NORMAL, FONT_NORMAL   -- larger text on the big dial
+  L.dial, L.face, L.showMarks = roundDial, true, true
   buildScale(L, roundDial, 4, true)
   L.numFont = fitFont(NUM_FONTS, "888", R, R // 2)
   L.hNum, L.hMini = lcd.getTextHeight(L.numFont), lcd.getTextHeight(FONT_MINI)
@@ -718,7 +724,10 @@ local function buildCompact(L, w, h)
   local R = math.min(h - 3, (w - 90) // 2)
   L.R, L.cx, L.cy = R, 2 + R, h - 2
   L.arcR, L.arcW, L.markW = R - 3, 5, 3
-  L.glowStep, L.glowN = 2, 5
+  L.glowStep, L.glowN = 3, 3
+  L.glowDial = compactGlowDial
+  L.dial, L.face, L.showMarks = compactDial, false, R >= 30
+  L.mx1, L.nx1 = nil, nil   -- no scale on the compact arc
   L.hMini = lcd.getTextHeight(FONT_MINI)
   L.maxW = math.max(lcd.getTextWidth(FONT_MINI, TXT_MAX), lcd.getTextWidth(FONT_MINI, "888"))
   L.maxX = w - L.maxW - 2
@@ -729,6 +738,50 @@ local function buildCompact(L, w, h)
   L.maxY = (h - 2 * L.hMini) // 2
 end
 
+-- Glow inside an arc from f0 to f1 in the current color, drawn with renderer
+-- r: bands fading toward the dial center, as in the reference image.
+local function drawGlow(L, r, f0, f1)
+  local step = L.glowStep
+  local r0 = L.arcR - L.arcW // 2 - step // 2
+  for i = 1, L.glowN do
+    gauge.arc(r, L.glowDial, L.cx, L.cy, r0 - (i - 1) * step, f0, f1, step + 1, GLOW_ALPHA[i])
+  end
+end
+
+-- Fixed parts of the dial: background, face, track, overspeed zone and its
+-- glow, ticks, stall and landing marks. Drawn every frame: off-screen images
+-- did not work on the DS-24 II emulator (research R6).
+local function drawStatic(L, w, h)
+  local r = rend
+  local cx, cy, arcR, dial = L.cx, L.cy, L.arcR, L.dial
+  setColor(L.face and C_BG or C_FACE)
+  lcd.drawFilledRectangle(0, 0, w, h)
+  if L.face then
+    setColor(C_FACE)
+    gauge.face(r, faceCircle, cx, cy, L.R, h - 1)
+  end
+  setColor(C_TRACK)
+  gauge.arc(r, dial, cx, cy, arcR, 0, 1, 3)
+  setColor(C_ZONE)
+  drawGlow(L, r, fOver, 1)
+  gauge.arc(r, dial, cx, cy, arcR, fOver, 1, 4)
+  if L.mx1 then
+    setColor(C_MINOR)
+    for k = 1, #L.nx1 do
+      lcd.drawLine(L.nx1[k], L.ny1[k], L.nx2[k], L.ny2[k])
+    end
+    setColor(C_SCALE)
+    for k = 1, #L.mx1 do
+      lcd.drawLine(L.mx1[k], L.my1[k], L.mx2[k], L.my2[k])
+    end
+  end
+  if L.showMarks then
+    setColor(C_SCALE)
+    gauge.tick(dial, cx, cy, L.R - 1, arcR - 4, fStall)
+    gauge.tick(dial, cx, cy, L.R - 1, arcR - 4, fLand)
+  end
+end
+
 local function layoutFor(L, w, h, build)
   if L.w ~= w or L.h ~= h or L.ver ~= scaleVer then
     build(L, w, h)
@@ -737,43 +790,9 @@ local function layoutFor(L, w, h, build)
   return L
 end
 
-local function drawScale(L)
-  setColor(C_MINOR)
-  for k = 1, #L.nx1 do
-    lcd.drawLine(L.nx1[k], L.ny1[k], L.nx2[k], L.ny2[k])
-  end
-  setColor(C_SCALE)
-  for i = 1, #L.mx1 do
-    lcd.drawLine(L.mx1[i], L.my1[i], L.mx2[i], L.my2[i])
-    if L.labels then
-      lcd.drawText(L.lx[i], L.ly[i], scaleLabels[i], L.labelFont)
-    end
-  end
-end
-
--- Glow inside an arc from f0 to f1 in the current color: bands fading toward
--- the dial center, as in the reference image.
-local function drawGlow(L, dial, f0, f1)
-  local step = L.glowStep
-  local r0 = L.arcR - L.arcW // 2 - step // 2
-  for i = 1, L.glowN do
-    gauge.arc(rend, dial, L.cx, L.cy, r0 - (i - 1) * step, f0, f1, step + 1, GLOW_ALPHA[i])
-  end
-end
-
--- Track, overspeed zone, marks, value arc and max marker (R6 draw order).
-local function drawArcs(L, dial, showMarks)
-  local cx, cy, arcR = L.cx, L.cy, L.arcR
-  setColor(C_TRACK)
-  gauge.arc(rend, dial, cx, cy, arcR, 0, 1, 3)
-  setColor(C_ZONE)
-  drawGlow(L, dial, fOver, 1)
-  gauge.arc(rend, dial, cx, cy, arcR, fOver, 1, 4)
-  if showMarks then
-    setColor(C_SCALE)
-    gauge.tick(dial, cx, cy, L.R - 1, arcR - 4, fStall)
-    gauge.tick(dial, cx, cy, L.R - 1, arcR - 4, fLand)
-  end
+-- Everything that moves: value arc and its glow, tip, max marker.
+local function drawValue(L)
+  local cx, cy, arcR, dial = L.cx, L.cy, L.arcR, L.dial
   if shownSpd ~= nil then
     local f = shownSpd / fullScale
     -- Up to the overspeed mark in the current-speed color; past it the arc
@@ -781,11 +800,11 @@ local function drawArcs(L, dial, showMarks)
     -- arc sits on top of its brightest band.
     local fBelow = math.min(f, fOver)
     setColor(COLORS[cfg.colCur])
-    drawGlow(L, dial, 0, fBelow)
+    drawGlow(L, rend, 0, fBelow)
     gauge.arc(rend, dial, cx, cy, arcR, 0, fBelow, L.arcW)
     if f > fOver then
       setColor(C_ZONE)
-      drawGlow(L, dial, fOver, f)
+      drawGlow(L, rend, fOver, f)
       gauge.arc(rend, dial, cx, cy, arcR, fOver, f, L.arcW)
     end
     setColor(C_TEXT)
@@ -798,8 +817,18 @@ local function drawArcs(L, dial, showMarks)
   end
 end
 
--- Label (small, grey) over value (white or colored), with an optional small
--- unit after the value.
+-- The dial for one frame: fixed parts, moving parts, then the scale numbers.
+local function drawDial(L, w, h)
+  drawStatic(L, w, h)
+  drawValue(L)
+  if L.mx1 and L.labels then
+    setColor(C_SCALE)
+    for i = 1, #L.mx1 do
+      lcd.drawText(L.lx[i], L.ly[i], scaleLabels[i], L.labelFont)
+    end
+  end
+end
+
 local function drawRow(x, y, label, value, valueFont, valueColor, hLabel, unit)
   setColor(C_MINOR)
   lcd.drawText(x, y, label, FONT_MINI)
@@ -824,12 +853,7 @@ end
 
 local function drawRound(w, h)
   local L = layoutFor(layRound, w, h, buildRound)
-  setColor(C_BG)
-  lcd.drawFilledRectangle(0, 0, w, h)
-  setColor(C_FACE)
-  gauge.face(rend, faceCircle, L.cx, L.cy, L.R, h - 1)
-  drawArcs(L, roundDial, true)
-  drawScale(L)
+  drawDial(L, w, h)
   drawCenter(L)
   -- Corner rows (FR-016): MAX top-left, STALL top-right, OVR bottom-right.
   local hM, hN = L.hMini, L.hNorm
@@ -842,12 +866,7 @@ end
 
 local function drawFull(w, h)
   local L = layoutFor(layFull, w, h, buildFull)
-  setColor(C_BG)
-  lcd.drawFilledRectangle(0, 0, w, h)
-  setColor(C_FACE)
-  gauge.face(rend, faceCircle, L.cx, L.cy, L.R, h - 1)
-  drawArcs(L, roundDial, true)
-  drawScale(L)
+  drawDial(L, w, h)
   drawCenter(L)
   -- MAX in the open bottom of the dial: small label over the value, both
   -- centered under the center number (no unit; it's shown under the speed).
@@ -871,9 +890,7 @@ end
 
 local function drawCompact(w, h)
   local L = layoutFor(layCompact, w, h, buildCompact)
-  setColor(C_FACE)
-  lcd.drawFilledRectangle(0, 0, w, h)
-  drawArcs(L, compactDial, L.R >= 30)
+  drawDial(L, w, h)
   setColor(C_TEXT)
   lcd.drawText(L.numX, L.numY, curText, L.numFont)
   setColor(C_SCALE)
@@ -917,9 +934,14 @@ local function init()
   recomputeAll()
   resetSession()
 
+  -- 5-degree steps for visible edges (10-degree steps looked blocky on the
+  -- II's scaled screen); 10-degree steps for the translucent glow bands,
+  -- where they don't show and save renderer calls every frame.
   roundDial = gauge.newDial(54, 225, 270)
   compactDial = gauge.newDial(36, 180, 180)
   faceCircle = gauge.newCircle(72)
+  roundGlowDial = gauge.newDial(27, 225, 270)
+  compactGlowDial = gauge.newDial(18, 180, 180)
   gaugeOk = string.find(system.getDeviceType() or "", "24 II", 1, true) ~= nil
 
   system.registerForm(1, MENU_APPS, APP_NAME, initForm, keyForm)

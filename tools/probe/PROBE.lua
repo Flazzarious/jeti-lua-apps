@@ -20,7 +20,9 @@
 -- Open the app's form ("Screen Probe" in the Applications menu) to see the
 -- form canvas size.
 -- Every size is shown on screen and printed once to the Lua debug console.
--- It also prints system.isPlayback() at start and whenever it changes.
+-- It also prints system.isPlayback() at start and whenever it changes, and
+-- every 5 s the Lua memory in use (collectgarbage("count"), in KB). That is
+-- shared by all running apps: compare readings with and without an app added.
 
 local MODE = 2
 
@@ -62,12 +64,19 @@ local function printAuto(w, h) drawInfo("auto", w, h) end
 local function printForm(w, h) drawInfo("form", w, h) end
 
 local lastPlayback = "unset"
+local nextMemAt = nil
+local MEM_MS = 5000
 
 local function loop()
   local p = tostring(system.isPlayback())
   if p ~= lastPlayback then
     lastPlayback = p
     print("PROBE isPlayback: " .. p .. " at " .. system.getTimeCounter() .. " ms")
+  end
+  local now = system.getTimeCounter()
+  if nextMemAt == nil or now - nextMemAt >= 0 then
+    nextMemAt = now + MEM_MS
+    print(string.format("PROBE memory: %.1f KB", collectgarbage("count")))
   end
 end
 
@@ -91,4 +100,4 @@ local function init()
   system.registerForm(1, MENU_APPS, "Screen Probe", nil, nil, printForm)
 end
 
-return { init = init, loop = loop, author = "Aaron George", version = "1.4", name = "Screen Probe" }
+return { init = init, loop = loop, author = "Aaron George", version = "1.5", name = "Screen Probe" }

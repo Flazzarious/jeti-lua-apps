@@ -95,7 +95,7 @@ Gauge (run each in the single, double and full-screen windows; compare with
 | 19 | Reset max speed | Max clears, restarts from current | US3 #6 |
 | 20 | Read dial only at several speeds | Within 5% of the number | SC-004 |
 | 21 | Change speed, watch gauge | Updates within 0.5 s | SC-005 |
-| 21a | Full-screen gauge for 5 min | CPU < 20% in Applications → User Applications; otherwise apply the R6 off-screen image fallback | SC-007 |
+| 21a | Full-screen gauge for 5 min | CPU figure in Applications → User Applications below 50% (it's the worst single call; emulator 2026-09-27: 43%) | SC-007 |
 | 21b | Temporarily change the "24 II" match so it fails, reload | Window shows "Speed Gauge needs DS-24 II"; callouts and warnings still work | FR-013a |
 
 Density (steady sensor 100 mph):
@@ -122,8 +122,10 @@ Settings and lifecycle:
 | 34 | Settings footer | Version and DFM credit visible | FR-029 |
 | 35 | Hand the settings to someone new | Sets up sensor, switch, landing, stall in < 3 min | SC-006 |
 
-Resources: Applications → User Applications shows CPU < 20% with the gauge
-displayed (SC-007). Print `collectgarbage("count")` in the emulator console
+Resources: Applications → User Applications shows the worst single call's
+share of its budget; below 50% with every window shown (SC-007). For live
+per-call numbers, log `system.getCPU()` at the end of `loop()` and the print
+function (see `docs/jeti-api-notes.md`). Print `collectgarbage("count")` in the emulator console
 before and after 5 minutes of flight; it should level off, not climb.
 
 ## Step 4: transmitter

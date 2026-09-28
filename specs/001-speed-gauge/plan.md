@@ -48,7 +48,7 @@ Approach:
 
 **Project Type**: Embedded transmitter app (single Lua script, asset folder, shared lib modules)
 
-**Performance Goals**: Gauge reflects speed within 0.5 s (SC-005); logic tick 100 ms; app CPU < 20% with the gauge shown (SC-007)
+**Performance Goals**: Gauge reflects speed within 0.5 s (SC-005); logic tick 100 ms; worst single call below 50% of the per-call budget, full screen included (SC-007, revised)
 
 **Constraints**: No allocation in `loop()` or the print function; call `system.getSensor*` through `system` each time, never a cached local (research R3, Emulator Telemetry swaps them); `lcd` only in print functions; `form` only in form callbacks; ≤ 30 persisted keys; no `os`/`debug`/`coroutine`/`bit32`; never `registerControl`/`setControl`/`setProperty`
 
