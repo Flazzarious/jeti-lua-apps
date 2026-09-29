@@ -55,6 +55,14 @@ principle I).
 - Q: Does GPS get density correction? → A: No. GPS measures ground speed,
   which air density doesn't affect (confirmed by the user).
 
+### Session 2026-09-28
+
+- Q: Should callouts use a better voice than the transmitter's built-in one?
+  → A: Yes. After comparing three generated samples (Piper "Lessac", "Amy"
+  and "Ryan"), the user chose **Amy** as the clearest. All of Speed Gauge's
+  speech then uses that one voice: numbers, units, warnings and startup.
+  See User Story 6 and FR-030–FR-037.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Hear speed during flight (Priority: P1)
@@ -333,10 +341,54 @@ reading its label and hint.
 | *(new)* | Gauge full scale | Top of the dial |
 | *(new)* | Reset max speed | Clears the session max |
 | *(new)* | Announce stall speed at startup | Turns off the startup announcement (FR-028) |
+| *(new)* | Voice: Speed Gauge / Transmitter | Which voice speaks callouts (FR-032). Shows "voice files missing" if the Speed Gauge voice isn't installed |
+
+---
+
+### User Story 6 - One clear voice for every callout (Priority: P3)
+
+The pilot hears every callout in the same clear, natural voice, "Amy". That
+covers speed numbers, units, warnings and the startup announcement. It is
+easier to understand over wind and motor noise than the transmitter's
+built-in number voice mixed with older recorded warnings. If the voice files
+aren't installed, the app still works with the transmitter's voice.
+
+**Why this priority**: It makes callouts easier to understand, but everything
+works without it, so it comes after the core stories.
+
+**Independent Test**: With the voice files installed and "Voice: Speed Gauge"
+selected, vary the simulated speed in the emulator. Every callout, the three
+warnings and the startup announcement should be in the Amy voice, with no
+audible gap between number and unit. Then remove the voice folder and
+reload the app. Callouts must continue in the transmitter's voice, and the
+settings screen must say the voice files are missing.
+
+**Acceptance Scenarios**:
+
+1. **Given** the voice files are installed and Voice is "Speed Gauge",
+   **When** a callout of 85 mph with units is due, **Then** the pilot hears
+   "eighty-five miles per hour" in the Amy voice as one continuous phrase.
+2. **Given** the same setup, **When** a stall, overspeed or airspeed-alive
+   warning fires, **Then** it is spoken in the Amy voice.
+3. **Given** a callout value above the highest number in the voice set,
+   **Then** that callout uses the transmitter's voice. It is not skipped.
+4. **Given** the voice files are missing or incomplete, **Then** callouts use
+   the transmitter's voice and the warnings use DFM's original recordings.
+   The settings screen shows "voice files missing".
+5. **Given** Voice is set to "Transmitter", **Then** the app behaves as
+   without this story: the transmitter speaks numbers, and warnings use the
+   original recordings.
 
 ---
 
 ### Edge Cases
+
+- **Voice files partly installed** (e.g. the copy to the SD card was
+  interrupted). Any callout whose files aren't all present falls back for
+  that callout only; the app never plays half a phrase.
+- **Number and unit spoken back to back.** They are two files, and the
+  pause between them must not sound like two separate announcements
+  (SC-009).
 
 - **Receiver not yet connected at power-on.** Sensors that appear later must
   become selectable without restarting the app. The original built its sensor
@@ -408,8 +460,9 @@ reading its label and hint.
 **Warnings**
 
 - **FR-010**: The app MUST give the stall, overspeed and "airspeed alive"
-  warnings as described in User Story 2, each once per crossing, with the
-  existing warning sounds and stick vibration patterns.
+  warnings as described in User Story 2, each once per crossing, with stick
+  vibration patterns and spoken warnings. The warnings use the Speed Gauge
+  voice when available (FR-030), otherwise DFM's original recordings.
 - **FR-011**: Stall, landing-speed and "airspeed alive" checks MUST compare
   sensor speed (not density-corrected) against the user's settings. Those
   settings are the model's sea-level values, so the warnings fire at the same
@@ -509,6 +562,46 @@ reading its label and hint.
   - **Asset folder:** reused WAV files keep their credit, via a short credits
     note placed with them.
 
+**Voice**
+
+- **FR-030**: Speed Gauge MUST support a single app voice for all its speech:
+  - whole numbers **0–500**;
+  - the unit phrases "miles per hour", "kilometers per hour", "knots",
+    "meters per second", "feet per second" and "percent";
+  - the phrases "stall warning", "overspeed", "airspeed alive", "stall
+    warning at" and "airspeed calibration".
+  Each is a separate pre-generated audio file in the app's asset folder
+  (`/Apps/AG-SpdGa/voice/`). The default voice is Piper's US English
+  **"Amy"**, chosen by the user on 2026-09-28.
+- **FR-031**: A callout in the app voice MUST be a number file followed by a
+  unit file where units are spoken (FR-008). It is queued so the two play as
+  one phrase, and FR-007 applies to the phrase as a whole.
+- **FR-032**: The settings MUST offer **Voice: Speed Gauge / Transmitter**.
+  The default is Speed Gauge when the voice files are present, otherwise
+  Transmitter.
+- **FR-033**: At startup the app MUST check that the voice files are
+  installed. It uses the app voice only if they are. Any callout it can't
+  fully speak in the app voice falls back to the transmitter's voice: a
+  number above 500, or a missing file. Warnings fall back to DFM's
+  recordings. A fallback MUST never silence a warning.
+- **FR-034**: The voice files MUST be generated by a script in the repo
+  (`tools/voice/`) from one Piper voice model, so every file matches in
+  voice, loudness and pacing. Each file is:
+  - mono, 16-bit, at a sample rate the transmitter supports (16 or 22.05 kHz);
+  - trimmed of leading and trailing silence;
+  - normalized to a common loudness.
+  The script MUST be re-runnable to switch voice or regenerate the set.
+- **FR-035**: Generated voice files MUST NOT be committed to the repository;
+  `.gitignore` covers them. The Amy voice model is CC BY-SA 4.0, and the
+  license of the recordings it was trained on is undocumented. The repo holds
+  the generator and the instructions, and each developer generates the files
+  locally before deploying.
+- **FR-036**: `CREDITS.md` MUST credit Piper (MIT) and the Amy voice model
+  (CC BY-SA 4.0, Mycroft / Rhasspy). The generated voice folder MUST contain
+  a short credits note carrying that attribution.
+- **FR-037**: DFM's original warning recordings stay in the asset folder as
+  the fallback set, with their existing credit.
+
 ### Key Entities
 
 - **Model settings**: speed sensor and sensor type; on/off and continuous
@@ -556,6 +649,18 @@ reading its label and hint.
 - **SC-008**: Every behavior of the original app is either kept or listed in
   this spec as deliberately changed. No setting disappears without
   explanation.
+- **SC-009**: In the app voice, a number-plus-unit callout plays with no
+  audible gap: the pause between the number file and the unit file is under
+  0.15 s. A number-only callout (used below landing speed and in continuous
+  mode, FR-008) for any value up to 199 lasts at most 1.3 s, so it fits the
+  default 2-second interval. Measured with the Amy voice, "one hundred
+  twelve" is 1.14 s. Longer callouts with units ("eighty-five miles per
+  hour" is about 2.0 s) happen only at the slower automatic intervals, and
+  FR-007 stops them queueing up. The generator MAY speed up speech slightly
+  (Piper's length scale) if flight testing shows callouts lag.
+- **SC-010**: With the voice files removed, every callout and warning in
+  quickstart still sounds, in the transmitter voice or DFM's recordings. None
+  is silent.
 
 ## Assumptions
 
@@ -565,9 +670,13 @@ reading its label and hint.
   the window title), not the panel's 480 × 480. The original app was tested
   only on the original DS-24. The original's
   behavior (v2.1) is the baseline; where this spec is silent, match it.
-- **Existing audio.** The existing WAV files (stall warning, overspeed,
-  airspeed alive, "stall speed warning at", cal factor) are reused. New voice
-  files are out of scope for v1.
+- **Audio.** Speed Gauge's own voice set (Amy) is the primary audio when
+  installed. DFM's original WAV files (stall warning, overspeed, airspeed
+  alive, "stall speed warning at", cal factor) stay as the fallback
+  (FR-033, FR-037).
+- **Voice files are generated, not committed.** The full set is roughly 510
+  short files, about 10–15 MB, in `AG-SpdGa/voice/`. That is fine on the
+  SD card but not for git, and the voice's licensing is unclear (FR-035).
 - **Pitot sensors report indicated airspeed.** They convert pressure to speed
   using fixed sea-level air density. This holds for the sensors the original
   was tested with (Jeti MSpeed, Digitech, ASSI, Xicoy). A sensor that already
@@ -586,8 +695,9 @@ reading its label and hint.
   per model like everything else.
 - **Session max** is not logged to file or saved. Logging it to the
   transmitter's telemetry log is a possible later feature.
-- **English only.** Labels and callouts are English for v1. Spoken numbers and
-  units follow the transmitter's voice language.
+- **English only.** Labels and callouts are English for v1. The app voice is
+  US English. With Voice set to Transmitter, spoken numbers and units follow
+  the transmitter's language.
 - **New app, new settings.** The app is named "Speed Gauge" (shown in the
   transmitter's app list and menu). Its script is `AG-SpdGa.lua`, with assets
   in `AG-SpdGa/`, following the repo's naming convention. Because the filename
