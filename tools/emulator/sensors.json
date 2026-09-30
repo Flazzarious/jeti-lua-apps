@@ -21,6 +21,18 @@
         "input": "P5"
     },
     {
+        "id": 1,
+        "param": 2,
+        "decimals": 0,
+        "type": 1,
+        "label": "Temperature",
+        "unit": "°C",
+        "sensorName": "MSpeed 450",
+        "lowerBound": -29,
+        "upperBound": 54,
+        "input": "P7"
+    },
+    {
         "id": 2,
         "param": 0,
         "decimals": 0,

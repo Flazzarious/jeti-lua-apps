@@ -10,7 +10,7 @@ Two kinds of state: **model settings**, persisted per model with
 
 All values are integers, strings or SwitchItems (no floats). Speeds are stored
 in the selected units; elevation and temperature in the unit system the speed
-units imply (FR-023). 24 keys, or 25 with the `winSz` fallback, under the limit of 30.
+units imply (FR-023). 27 keys, or 28 with the `winSz` fallback, under the limit of 30.
 
 | Key | Type | Range | Default | Setting (label) |
 | --- | --- | --- | --- | --- |
@@ -32,8 +32,11 @@ units imply (FR-023). 24 keys, or 25 with the `winSz` fallback, under the limit 
 | `startAnn` | int 0/1 | | 1 | Announce stall speed at startup |
 | `densOn` | int 0/1 | | 0 | Correct for air density |
 | `elev` | int ft or m | −300–10000 ft / −90–3050 m (FR-020) | 0 | Field elevation |
-| `temp` | int °F or °C | −20–130 °F / −29–54 °C (FR-020) | 59 °F / 15 °C | Temperature |
-| `tStd` | int 0/1 | | 1 | Use standard temperature |
+| `temp` | int °F or °C | −20–130 °F / −29–54 °C (FR-020) | 59 °F / 15 °C | Temperature (manual) |
+| `tSrc` | int | 1 Standard, 2 Manual, 3 Sensor | 1 | Temperature source (FR-038); replaces `tStd` |
+| `tId` | int | sensor id, 0 = none | 0 | Temperature sensor |
+| `tPar` | int | param | 0 | Temperature sensor |
+| `tLbl` | string < 64 B | | "" | Temperature sensor (shown if not found) |
 | `colCur` | int | 1–9 (R8: Cyan, Blue, White, Green, Lime, Magenta, Purple, Grey, Yellow) | 1 Cyan | Current speed color |
 | `colMax` | int | 1–9 | 9 Yellow | Max speed color |
 | `fScale` | int unit | 0 = Auto, 10–2000 | 0 | Gauge full scale |
@@ -49,7 +52,12 @@ mph). Keys are new, so nothing is read from the original app's settings
 - Intbox ranges enforce every range above.
 - Threshold order is checked, not enforced (FR-026): flag if
   `vStall >= vLand`, `vLand >= vOver`, or `fScale ~= 0 and vOver > fScale`.
-- Temperature is ignored while `tStd = 1`.
+- `temp` is used only while `tSrc = 2`; `tId`/`tPar` only while `tSrc = 3`.
+- Migration (`cfgV` 1 → 2): `tStd = 1` becomes `tSrc = 1`, `tStd = 0` becomes
+  `tSrc = 2`; then `tStd` is deleted (`pSave("tStd", nil)`).
+- Sensor temperature is read as °C (the API's default unit; convert if a
+  sensor reports °F), accepted only within −29–54 °C, and applied with a
+  1 °C hysteresis (FR-040, FR-041).
 - Density settings are ignored while `sType = 2` (GPS).
 
 ### Units change
@@ -65,7 +73,7 @@ too. All are saved immediately.
 | Name | Formula | Recomputed when |
 | --- | --- | --- |
 | `kSensor` | `unitsMult[units] · cal / 100` (sensor value is m/s, R3) | `units`, `cal` |
-| `kDens` | `ag_dens.factor(elevM, tempC or nil)` if `densOn = 1` and `sType = 1`, else 1 | `densOn`, `sType`, `elev`, `temp`, `tStd`, `units` |
+| `kDens` | `ag_dens.factor(elevM, tempC or nil)` if `densOn = 1` and `sType = 1`, else 1. `tempC` is nil (standard) for `tSrc = 1`, the manual value for 2, and the accepted sensor value for 3 (nil while unavailable) | `densOn`, `sType`, `elev`, `temp`, `tSrc`, sensor temperature (≥ 1 °C change), `units` |
 | `fullScale` | `fScale`, or if 0: `ceil(vOver · 1.15 / 10) · 10` | `fScale`, `vOver` |
 | `fStall`, `fLand`, `fOver` | dial fractions of `vStall · kDens`, `vLand · kDens` and `vOver` over `fullScale` (FR-016a) | any of the above |
 | `scaleStep`, scale labels | `ag_gauge.scaleStep(fullScale)`; array of label strings "0", "50", ... | `fullScale`, `units` |

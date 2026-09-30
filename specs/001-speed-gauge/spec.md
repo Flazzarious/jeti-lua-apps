@@ -75,6 +75,12 @@ principle I).
   The user chose the recommended wider range. Temperature is **−20 to
   130 °F** (−29 to 54 °C). The user first proposed −10 to 120 °F, then chose
   the wider range for margin in extreme cold and desert heat.
+- Q: Should Speed Gauge use a temperature sensor, such as the MSpeed's? → A:
+  Yes. Temperature can come from a selectable telemetry sensor or be set
+  manually; standard temperature stays available (FR-038–FR-043). This
+  replaces the earlier assumption that live sensor temperature was out of
+  scope for v1. Live pressure stays out of scope: the MSpeed doesn't report
+  it.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -276,10 +282,13 @@ for the visible sizes and adapts to each window:
 
 ### User Story 4 - Correct for air density (Priority: P2)
 
-A pilot flying from a high or hot field enters the field elevation and,
-optionally, today's temperature. The spoken speed, gauge and max speed then
-show true airspeed. If no temperature is entered, the app assumes the standard
-temperature for that elevation.
+A pilot flying from a high or hot field enters the field elevation and
+chooses where the temperature comes from:
+- **Standard**: the standard temperature for that elevation;
+- **Manual**: today's temperature, typed in;
+- **Sensor**: read live from a telemetry sensor that reports temperature,
+  such as the MSpeed.
+The spoken speed, gauge and max speed then show true airspeed.
 
 **Why this priority**: Without it, speeds at high fields read noticeably low
 (about 8% low at 5,000 ft on a standard day, and more when it's hot). But the
@@ -305,6 +314,18 @@ when off.
    speed.
 6. **Given** correction is on, **Then** the settings screen shows the current
    correction factor (e.g. "+13%") so the pilot can see its effect.
+7. **Given** correction is on at 5,000 ft, Temperature source is Sensor, and
+   the selected sensor reads 35 °C, **Then** a 100 mph sensor speed displays
+   as 113 mph (±1), the same as entering 35 °C manually. The settings screen
+   shows the live reading and its source (e.g. "35 °C from MSpeed").
+8. **Given** Temperature source is Sensor, **When** the sensor reading is lost
+   or out of range, **Then** the correction uses standard temperature for the
+   field elevation. Callouts and warnings continue without interruption, and
+   the settings screen says the sensor isn't available.
+9. **Given** Temperature source is Sensor, **When** the reading drifts by a
+   fraction of a degree, **Then** the displayed speed doesn't jitter. The
+   correction updates only when the temperature changes by at least 1 °C
+   (or 2 °F).
 
 ---
 
@@ -348,7 +369,9 @@ reading its label and hint.
 | Select speed units | Units | mph, km/h, knots, m/s, ft/s |
 | Short Announcement | Speak number only (no units) | Say "85" instead of "speed 85 mph" |
 | *(new)* | Field elevation | For density correction |
-| *(new)* | Temperature, plus a "Use standard temperature" checkbox | For density correction. A number box can't be left blank, so the checkbox stands in for "blank = standard" (research R10) |
+| *(new)* | Temperature source: Standard / Manual / Sensor | Where density correction gets temperature (FR-038). Replaces the earlier "Use standard temperature" checkbox |
+| *(new)* | Temperature (manual) | Used when source is Manual. Limited to −20 to 130 °F (FR-020) |
+| *(new)* | Temperature sensor | Used when source is Sensor. Lists only telemetry values that report a temperature. Hint: "Sensors inside the model can read warmer than outside air" |
 | *(new)* | Correct for air density: on/off | Shows the resulting factor, e.g. "+13%" |
 | *(new)* | Current speed color / Max speed color | Gauge colors |
 | *(new)* | Gauge full scale | Top of the dial |
@@ -428,6 +451,13 @@ settings screen must say the voice files are missing.
   settings are per model.
 - **Very high temperature or elevation input.** Inputs are limited to
   plausible ranges (see FR-020).
+- **Temperature sensor inside a warm fuselage.** It may read well above the
+  outside air (sun, electronics); +10 °C shifts the correction by about
+  1.7%. The app can't detect this, so the help text warns about it, and
+  Manual stays available.
+- **Temperature sensor appears after startup or isn't found.** Handled the
+  same way as the speed sensor (FR-002, FR-003): it becomes selectable when it
+  appears, and a saved selection that isn't present shows as "not found".
 - **Saved value outside the range** (e.g. saved by an earlier version with
   wider limits, or converted between unit systems). It is clamped into the
   range when loaded, and the clamped value is what the settings show and the
@@ -560,6 +590,35 @@ settings screen must say the voice files are missing.
   a percentage while correction is on.
 - **FR-023**: Elevation and temperature MUST use feet/°F when speed units are
   mph, knots or ft/s, and meters/°C otherwise.
+
+**Temperature source**
+
+- **FR-038**: The settings MUST offer **Temperature source: Standard / Manual
+  / Sensor**. The default is Standard.
+  - **Standard** uses the standard-atmosphere temperature for the field
+    elevation.
+  - **Manual** uses the entered temperature (FR-020).
+  - **Sensor** reads a selected telemetry value live.
+- **FR-039**: In Sensor mode, the user MUST be able to pick the temperature
+  value from the telemetry sensors. The list shows only values that report a
+  temperature unit (°C or °F), such as the MSpeed's temperature. The
+  selection is remembered per model and identified by the sensor itself, as
+  for the speed sensor (FR-003).
+- **FR-040**: A sensor reading MUST be used only while it is valid and within
+  the temperature limits of FR-020. Otherwise the correction falls back to
+  standard temperature until a good reading returns. Losing the temperature
+  sensor MUST NOT affect callouts, warnings or the gauge beyond that
+  fallback.
+- **FR-041**: The sensor temperature MUST be read at most every 5 seconds. The
+  correction factor MUST update only when the temperature has moved at least
+  1 °C (2 °F) from the value in use, so the displayed speed doesn't jitter.
+  A change in the factor alone MUST NOT trigger a callout.
+- **FR-042**: While correction is on, the settings screen MUST show the
+  temperature in use and where it came from: "standard", "manual", "from
+  <sensor name>", or "sensor not available — using standard".
+- **FR-043**: Temperature source affects only density correction. Stall,
+  landing-speed and "airspeed alive" checks still use sensor speed (FR-011),
+  and GPS sources still get no correction (User Story 4, scenario 5).
 
 **Settings and lifecycle**
 
@@ -712,10 +771,14 @@ settings screen must say the voice files are missing.
   checks compare ground speed to the settings. Wind makes these approximate;
   the help text says so.
 - **Density correction scope.** Correction uses field elevation plus
-  temperature, assuming standard sea-level pressure at that elevation. Using a
-  live pressure/temperature sensor from the model is out of scope for v1.
-  Standard pressure is accurate enough for announcements (typically within a
-  few percent).
+  temperature, assuming standard sea-level pressure at that elevation.
+  Temperature can come from a sensor (FR-038). Live pressure from a sensor is
+  out of scope for v1: the MSpeed EX doesn't report it, and standard pressure
+  is accurate enough for announcements (typically within a few percent).
+- **MSpeed temperature.** Per its manual, the MSpeed EX reports temperature
+  alongside airspeed. The manual doesn't say whether this is outside-air or
+  housing temperature, hence the warm-fuselage caveat. It is unconfirmed
+  whether the MSpeed 450 EX reports temperature.
 - **Calibration file dropped.** The original's per-model calibration file
   (`DFM-<model>.jsn`) is not carried over; the calibration setting is saved
   per model like everything else.
