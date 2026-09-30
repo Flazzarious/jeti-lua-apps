@@ -31,8 +31,8 @@ units imply (FR-023). 24 keys, or 25 with the `winSz` fallback, under the limit 
 | `numOnly` | int 0/1 | | 0 | Speak number only |
 | `startAnn` | int 0/1 | | 1 | Announce stall speed at startup |
 | `densOn` | int 0/1 | | 0 | Correct for air density |
-| `elev` | int ft or m | −1000–15000 ft / −300–4600 m | 0 | Field elevation |
-| `temp` | int °F or °C | −22–122 °F / −30–50 °C | 59 °F / 15 °C | Temperature |
+| `elev` | int ft or m | −300–10000 ft / −90–3050 m (FR-020) | 0 | Field elevation |
+| `temp` | int °F or °C | −20–130 °F / −29–54 °C (FR-020) | 59 °F / 15 °C | Temperature |
 | `tStd` | int 0/1 | | 1 | Use standard temperature |
 | `colCur` | int | 1–9 (R8: Cyan, Blue, White, Green, Lime, Magenta, Purple, Grey, Yellow) | 1 Cyan | Current speed color |
 | `colMax` | int | 1–9 | 9 Yellow | Max speed color |

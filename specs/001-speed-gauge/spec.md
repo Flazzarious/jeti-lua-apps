@@ -63,6 +63,19 @@ principle I).
   speech then uses that one voice: numbers, units, warnings and startup.
   See User Story 6 and FR-030–FR-037.
 
+### Session 2026-09-30
+
+- Q: What limits apply to field elevation and temperature? → A: Elevation is
+  **−300 to 10,000 ft** (−90 to 3,050 m). The user proposed −10 to 8,000 ft.
+  Checking real airfields showed that range would exclude, among others:
+  - Leadville CO (9,934 ft, North America's highest) and Telluride CO
+    (9,078 ft);
+  - Death Valley's Furnace Creek (−208 ft), Thermal CA (−114 ft) and
+    Amsterdam Schiphol (−11 ft).
+  The user chose the recommended wider range. Temperature is **−20 to
+  130 °F** (−29 to 54 °C). The user first proposed −10 to 120 °F, then chose
+  the wider range for margin in extreme cold and desert heat.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Hear speed during flight (Priority: P1)
@@ -415,6 +428,10 @@ settings screen must say the voice files are missing.
   settings are per model.
 - **Very high temperature or elevation input.** Inputs are limited to
   plausible ranges (see FR-020).
+- **Saved value outside the range** (e.g. saved by an earlier version with
+  wider limits, or converted between unit systems). It is clamped into the
+  range when loaded, and the clamped value is what the settings show and the
+  correction uses.
 - **Telemetry window size changes** (user moves it between single and double).
   The layout adapts on the next draw.
 
@@ -521,10 +538,19 @@ settings screen must say the voice files are missing.
 
 **Air density**
 
-- **FR-020**: Users MUST be able to enter field elevation (−1,000 to 15,000 ft,
-  or the metric equivalent) and, optionally, the outside temperature
-  (−30 to 50 °C, or the Fahrenheit equivalent). If temperature is not set,
-  the standard-atmosphere temperature for the entered elevation is used.
+- **FR-020**: Users MUST be able to enter field elevation and, optionally,
+  the outside temperature, limited to these ranges:
+
+  | Setting | Imperial | Metric |
+  | --- | --- | --- |
+  | Field elevation | −300 to 10,000 ft | −90 to 3,050 m |
+  | Temperature | −20 to 130 °F | −29 to 54 °C |
+
+  The editor MUST not allow values outside these limits. If temperature is
+  not set, the standard-atmosphere temperature for the entered elevation is
+  used; across the elevation range it stays within the temperature limits
+  (about −5 °C at 10,000 ft). Values saved outside the limits are clamped
+  when loaded (Edge Cases).
 - **FR-021**: When correction is on and the sensor type is airspeed, displayed
   speed, spoken speed, session max and overspeed check MUST use true airspeed,
   computed from the standard atmosphere at the entered elevation and
