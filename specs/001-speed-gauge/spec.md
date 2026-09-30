@@ -81,6 +81,13 @@ principle I).
   replaces the earlier assumption that live sensor temperature was out of
   scope for v1. Live pressure stays out of scope: the MSpeed doesn't report
   it.
+- Q: What if the sensor reads outside the limits, e.g. heat-soaked in the sun
+  before a flight? → A: Use the default (standard temperature) while it's out
+  of range. Resume using the sensor automatically once it comes back into
+  range, e.g. after cooling to ambient in flight (FR-040).
+- Q: Is the sensor temperature shown on the full-screen gauge? → A: It
+  wasn't. The side panel now has a Temperature row showing the temperature
+  in use and its source (FR-044).
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -268,8 +275,10 @@ for the visible sizes and adapts to each window:
   the left with the session max centered in the open bottom of the dial, and
   on the right a side panel with well-spaced labeled rows: Stall,
   Overspeed, then Air density (the correction, e.g. "+8%", or OFF / GPS) and,
-  while correction is on, the field elevation and the uncorrected sensor
-  speed (added 2026-09-27). The dial is about 210 px across, with a side
+  while correction is on, the field elevation, the temperature in use with
+  its source (FR-044, added 2026-09-30) and the uncorrected sensor speed
+  (added 2026-09-27). That is six rows when correction is on, about 38 px
+  each in the visible height. The dial is about 210 px across, with a side
   panel roughly 90 px wide. Scale numbers and the unit use a larger font than
   in the double window. The full-screen window has no status bar: with one,
   the desktop's model tile covers its lower-left quarter.
@@ -322,6 +331,12 @@ when off.
    or out of range, **Then** the correction uses standard temperature for the
    field elevation. Callouts and warnings continue without interruption, and
    the settings screen says the sensor isn't available.
+8a. **Given** a hot day where the model sat in the sun and the sensor reads
+   140 °F at takeoff, **Then** the correction uses standard temperature, and
+   the full-screen panel shows that the sensor is out of range. **When** the
+   sensor cools in flight to 95 °F and stays in range for 10 seconds, **Then**
+   the correction switches back to the sensor reading without any action from
+   the pilot.
 9. **Given** Temperature source is Sensor, **When** the reading drifts by a
    fraction of a degree, **Then** the displayed speed doesn't jitter. The
    correction updates only when the temperature changes by at least 1 °C
@@ -605,10 +620,20 @@ settings screen must say the voice files are missing.
   selection is remembered per model and identified by the sensor itself, as
   for the speed sensor (FR-003).
 - **FR-040**: A sensor reading MUST be used only while it is valid and within
-  the temperature limits of FR-020. Otherwise the correction falls back to
-  standard temperature until a good reading returns. Losing the temperature
-  sensor MUST NOT affect callouts, warnings or the gauge beyond that
-  fallback.
+  the temperature limits of FR-020. A reading that is invalid or out of range
+  (e.g. a sensor heat-soaked in the sun before flight) makes the correction
+  use the default, standard temperature for the field elevation.
+  - **Resuming:** the app MUST switch back to the sensor automatically once
+    the reading has been valid and in range for at least 10 seconds (two
+    consecutive reads, FR-041). The pilot does nothing. The wait stops a
+    reading near a limit from flipping back and forth.
+  - **Callouts and warnings:** losing or rejecting the temperature reading
+    MUST NOT affect callouts, warnings or the gauge beyond this fallback. The
+    switch between sensor and standard temperature is itself a change in the
+    correction factor, so FR-041's no-callout rule applies.
+  - **What isn't caught:** a heat-soaked sensor reading below the upper limit
+    (e.g. 115 °F on a 95 °F day) can't be told apart from a hot day. The
+    warm-fuselage caveat and the Manual option cover it.
 - **FR-041**: The sensor temperature MUST be read at most every 5 seconds. The
   correction factor MUST update only when the temperature has moved at least
   1 °C (2 °F) from the value in use, so the displayed speed doesn't jitter.
@@ -619,6 +644,12 @@ settings screen must say the voice files are missing.
 - **FR-043**: Temperature source affects only density correction. Stall,
   landing-speed and "airspeed alive" checks still use sensor speed (FR-011),
   and GPS sources still get no correction (User Story 4, scenario 5).
+- **FR-044**: The full-screen side panel MUST show a **Temperature** row while
+  density correction is active. It shows the temperature in use, with its
+  unit (°F or °C per FR-023), and its source: standard, manual or sensor.
+  While the sensor reading is being rejected (FR-040), the row MUST make
+  that visible, e.g. "SENSOR OUT" with the standard temperature being used.
+  The single and double windows don't show temperature; there's no room.
 
 **Settings and lifecycle**
 
