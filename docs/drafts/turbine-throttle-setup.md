@@ -69,6 +69,11 @@ ECU expects, that phase can be skipped.
 - The app never drives any output. It never calls `system.registerControl`,
   `system.setControl` or `system.setProperty` (constitution I).
 - Nothing at flight time depends on the app.
+- The app installs standalone. It needs only `AG-TrbSt.lua` and, if it has
+  assets, its own `AG-TrbSt/` folder. It must not depend on any other app in
+  this repo, including Speed Gauge. If it uses a shared module from
+  `src/Apps/lib/`, the plan must list that module, and the install
+  instructions and any release package must include it.
 
 ---
 
@@ -130,6 +135,9 @@ emergency.
 - **SC-008.** The app never changes any transmitter output or setting. To
   check: servo outputs and the model file are unchanged after running the app
   with no user edits.
+- **SC-009.** On a transmitter with no other AG- apps installed, copying only
+  the app's files (plus any listed lib modules) to `/Apps` is enough for it
+  to load and complete a full setup and verify run.
 
 ## Edge cases
 
