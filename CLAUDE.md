@@ -76,6 +76,16 @@ src/Apps/lib/ag_xxxxx.lua  shared module, loaded with require("ag_xxxxx")
 - `loop()` runs every 20-30 ms: rate-limit with `system.getTimeCounter()`, and
   don't format strings or build tables per call.
 
+## Branches
+
+- `main` is updated **only** by a pull request from `develop`. Never commit
+  or push to `main` directly, and never open a PR into `main` from any other
+  branch. GitHub enforces this (a ruleset on `main` plus the
+  `PR source is develop` check in `.github/workflows/main-pr-source.yml`).
+- Feature work goes on `feature/NNN-name`, branched from `develop`, and is
+  merged back into `develop` by pull request.
+- When `develop` is ready to release, open a PR from `develop` into `main`.
+
 ## Checking work
 
 - `python tools/check.py` must pass (syntax, forbidden APIs, AG- naming, UTF-8,
