@@ -138,8 +138,11 @@ nothing else (Edge Cases): no callouts, no warnings, no max update.
 ```text
 Warnings (a crossing fires only while a switch is on; re-arming is always tracked):
 
- stall:     armed --[everAboveLanding and sensorSpd <= vStall]--> fired (sound, vibrate 4)
-            fired --[sensorSpd > vStall]--> armed
+ stall:     armed --[everAboveLanding and sensorSpd <= vStall]--> fired (sound, vibrate 4), stallCount += 1
+            fired --[sensorSpd > vStall and stallCount < 2]--> armed
+            any   --[sensorSpd > vLand]--> stallCount = 0 (then re-arms)
+            (at most 2 stall warnings per slowdown, FR-010, 2026-10-03)
+ continuous callouts: only while sensorSpd > vArm (FR-009a)
  overspeed: armed --[shownSpd > vOver]--> fired (sound, vibrate 3)
             fired --[shownSpd <= vOver]--> armed
  alive:     not said --[armed]--> said (once per session)

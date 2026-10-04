@@ -86,6 +86,8 @@ Defaults: mph, landing 60, stall 45, overspeed 200.
 | 5 | Drop to 55 | Short callouts every 2 s (±0.5) | US1 #3, SC-001 |
 | 6 | Drop to 44 | Stall warning once + vibration; no repeat while below | US2 #1 |
 | 7 | Up to 50, down to 44 again | Stall fires again (re-armed) | US2 #1 |
+| 7a | Up to 50, down to 44 a third time | Silent (two per slowdown); then above 60 and down to 44 again: fires | US2 #1, FR-010 |
+| 7b | Continuous switch on, slow from 100 to 25 | Numbers every 2 s down to 30, then silent | FR-009a |
 | 8 | Up to 205 | Overspeed once + vibration | US2 #3 |
 | 9 | Repeat crossings 10× each | Exactly one warning per crossing | SC-002 |
 | 10 | Restart app, speed 40 without ever > 60 | No stall warning | US2 #2 |

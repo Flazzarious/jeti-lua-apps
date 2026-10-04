@@ -72,11 +72,13 @@ engine, using the voice model **"Amy"** (`en_US-amy-medium`) by
   licensed Creative Commons Attribution-ShareAlike 4.0 International
   ([CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/)).
 
-The generated files are not in this repository (the training-data license
-of the voice is undocumented). Each user generates them with
-[`tools/voice/`](tools/voice/README.md), which also writes a `CREDITS.txt`
-carrying this attribution into the generated folder. A shared copy of the
-generated files is under CC BY-SA 4.0.
+The generated files are in this repository, in
+[`src/Apps/AG-SpdGa/voice/`](src/Apps/AG-SpdGa/voice/), and are licensed
+**CC BY-SA 4.0**, not MIT like the rest of the repository; that folder's
+`CREDITS.txt` carries the attribution. The license of the recordings the
+Amy model was trained on is undocumented. They were generated with
+[`tools/voice/`](tools/voice/README.md), which can regenerate them (the
+user chose to commit them, 2026-10-03; spec FR-035).
 
 ## JETI model official demos
 

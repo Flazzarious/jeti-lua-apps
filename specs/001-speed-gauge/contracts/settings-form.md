@@ -13,7 +13,7 @@ px as in v2.1; hints are `FONT_MINI` rows.
 | 4 | Units | selectbox | mph, km/h, kt, m/s, ft/s; converts settings (R10) |
 | 5 | Sensor calibration (%) | intbox 1–200 | hint "100 = unchanged" |
 | 6 | Callouts on/off switch | inputbox | proportional allowed. Hints (2026-10-03): "Speaks speed: more often as it changes, every" / "shortest time below landing speed" |
-| 7 | Continuous callouts switch | inputbox | Hints (2026-10-03): "Number only, every shortest time; works" / "without the on/off switch" / "Either switch also turns on the warnings" |
+| 7 | Continuous callouts switch | inputbox | Hints: "Number only, every shortest time, while above" / "'Callouts start above'; works without on/off" / "Either switch also turns on the warnings" (FR-009a, 2026-10-03) |
 | | **Callouts** | | |
 | 8 | Callout sensitivity (*unit*) | intbox 1–100 | |
 | 9 | *hint* | label | "Speak sooner when speed changes by this much" |
@@ -43,7 +43,7 @@ px as in v2.1; hints are `FONT_MINI` rows.
 | 24b | *temperature status* | label | FR-042, while correction is on: "Temp: 15 °C standard" / "Temp: 20 °C manual" / "Temp: 35 °C from MSpeed 450" / "Sensor not available - using standard". Updated live while the form is open (R17) |
 | 24c | *hint* | label | "Leave correction off if your sensor already corrects for air density" |
 | | **Gauge** | | |
-| 25 | Gauge max limit (*unit*, 0 = auto) | intbox 0–2000 | Renamed from "Gauge full scale" (2026-10-03). Hints: "Highest speed on the dial. To use your sensor's whole range, enter its top speed (MSpeed 450: 280 mph)" and "Auto (overspeed + 15%): 230" |
+| 25 | Gauge max limit (*unit*, 0 = auto) | intbox 0–2000 | Renamed from "Gauge full scale" (2026-10-03). Hints: "Highest speed on the dial. To use your sensor's whole range, enter its top speed:" / "MSpeed: 20-350 km/h (12-215 mph)" / "MSpeed 450 EX: 80-450 km/h (50-280 mph)" (sensor ranges from the user, 2026-10-03) and "Auto (overspeed + 15%): 230" |
 | 26 | Current speed color | selectbox | R8 presets (no red or orange); default Cyan |
 | 27 | Max speed color | selectbox | R8 presets; default Yellow |
 | 28 | Reset max speed | link | clears session max (FR-019, US3 #6) |

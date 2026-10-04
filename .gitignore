@@ -16,5 +16,3 @@ __pycache__/
 .venv/
 venv/
 
-# Generated voice files (tools/voice/; Amy voice is CC BY-SA, not committed per spec FR-035)
-src/Apps/AG-SpdGa/voice/

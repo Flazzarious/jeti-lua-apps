@@ -9,9 +9,10 @@ voice, Piper's US English "Amy" (spec 001, FR-030). The voice is a set of
 - `stall`, `over`, `alive`, `stallat`, `cal`: the warning and startup
   phrases.
 
-The files are **generated locally and never committed** (FR-035), so you
-must generate them before deploying. Without them the app still works,
-using the transmitter's voice and DFM's original recordings.
+The files are **committed** (FR-035, since 2026-10-03), so a normal deploy
+includes them. Re-run the generator only to change the voice or its speed.
+Without them the app still works, using the transmitter's voice and DFM's
+original recordings.
 
 ## Generate
 
@@ -70,9 +71,8 @@ Copy-Item src\Apps\AG-SpdGa $dst -Recurse -Force
 
 - **Voice model:** "Amy" (`en_US-amy-medium`) by Mycroft / Rhasspy is
   licensed CC BY-SA 4.0, and the license of the recordings it was trained on
-  is undocumented. That is why the generated files stay out of git. If you
-  share a generated set, it is under CC BY-SA 4.0; keep its `CREDITS.txt`
-  with it.
+  is undocumented. The committed set in `src/Apps/AG-SpdGa/voice/` is
+  therefore CC BY-SA 4.0, not MIT; keep its `CREDITS.txt` with it.
 - **Piper:** the `piper-tts` package is GPL-3.0-or-later
   ([OHF-Voice/piper1-gpl](https://github.com/OHF-Voice/piper1-gpl)),
   continuing the original MIT-licensed

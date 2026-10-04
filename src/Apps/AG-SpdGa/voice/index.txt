@@ -1,0 +1,4 @@
+voice=en_US-amy-medium
+rate=22050
+speed=1.5
+files=512

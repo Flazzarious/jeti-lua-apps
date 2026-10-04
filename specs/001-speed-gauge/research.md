@@ -404,9 +404,10 @@ Everything else matches v2.1.
   and on the transmitter. If it doesn't play, regenerate with
   `--rate 44100` and record the finding in `docs/jeti-api-notes.md`. FR-034
   names 16/22.05 kHz, so in that case the spec needs a one-line update.
-- **Not committed (FR-035):** `.gitignore` already lists
-  `src/Apps/AG-SpdGa/voice/`. Deploying needs a generator run first
-  (quickstart Prerequisites).
+- **Committed (FR-035, changed 2026-10-03):** first kept out of git
+  (`.gitignore`) because of the Amy model's CC BY-SA license and its
+  undocumented training data; the user then chose to commit the set. The
+  folder is CC BY-SA 4.0, labeled in `CREDITS.md` and the README.
 - **Alternatives considered:** Piper's command-line binary (one process per
   phrase, 512 launches, slower); ffmpeg/sox for trimming and normalizing (an
   extra install for two simple operations); one file per number+unit

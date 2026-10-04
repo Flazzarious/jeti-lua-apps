@@ -162,7 +162,10 @@ speed. Each warning should play exactly once per crossing.
 1. **Given** the model has been above landing speed this session, **When**
    sensor speed drops to or below the stall warning speed, **Then** the stall
    warning plays once and the right stick vibrates, and it re-arms when speed
-   rises back above the stall warning speed.
+   rises back above the stall warning speed. At most **two** stall warnings
+   play per slowdown: after the second, it stays silent until speed rises
+   above landing speed again (e.g. a go-around), so speed wobbling around
+   the stall setting on landing isn't distracting (changed 2026-10-03).
 2. **Given** the model has *not* yet been above landing speed this session,
    **When** sensor speed is below the stall warning speed, **Then** no stall
    warning plays (so it doesn't fire on the ground).
@@ -536,6 +539,10 @@ settings screen must say the voice files are missing.
   be spoken unless "speak number only" is set, or the speed is below landing
   speed (only while "Landing speed callouts" is on), or continuous mode is
   on (short callouts when timing matters, matching the original).
+- **FR-009a**: Continuous callouts MUST speak only while sensor speed is above
+  "Callouts start above": they stop when the model slows below it, e.g. on
+  landing (added 2026-10-03). Below it, the on/off switch's normal
+  callouts still apply.
 - **FR-009**: Callouts, normal and continuous, and "airspeed alive" MUST
   stay silent until sensor speed first exceeds the **"Callouts start
   above"** setting (0–1000 in the selected units, default 30 mph) in the
@@ -548,7 +555,8 @@ settings screen must say the voice files are missing.
 
 - **FR-010**: The app MUST give the stall, overspeed and "airspeed alive"
   warnings as described in User Story 2, each once per crossing, with stick
-  vibration patterns and spoken warnings. The warnings use the Speed Gauge
+  vibration patterns and spoken warnings. The stall warning plays at most
+  twice per slowdown and re-arms fully only above landing speed (US2 #1). The warnings use the Speed Gauge
   voice when available (FR-030), otherwise DFM's original recordings.
 - **FR-011**: Stall, landing-speed and "airspeed alive" checks MUST compare
   sensor speed (not density-corrected) against the user's settings. Those
@@ -738,11 +746,13 @@ settings screen must say the voice files are missing.
   - trimmed of leading and trailing silence;
   - normalized to a common loudness.
   The script MUST be re-runnable to switch voice or regenerate the set.
-- **FR-035**: Generated voice files MUST NOT be committed to the repository;
-  `.gitignore` covers them. The Amy voice model is CC BY-SA 4.0, and the
-  license of the recordings it was trained on is undocumented. The repo holds
-  the generator and the instructions, and each developer generates the files
-  locally before deploying.
+- **FR-035**: The generated voice files are committed to the repository in
+  `src/Apps/AG-SpdGa/voice/` (changed 2026-10-03 at the user's request;
+  previously they were kept out of git). They are licensed CC BY-SA 4.0,
+  like the Amy voice model, not MIT like the rest of the repository; the
+  license of the recordings the model was trained on is undocumented.
+  `CREDITS.md`, the README and the folder's `CREDITS.txt` MUST say so. The
+  generator stays in the repo to regenerate the set.
 - **FR-036**: `CREDITS.md` MUST credit Piper (MIT) and the Amy voice model
   (CC BY-SA 4.0, Mycroft / Rhasspy). The generated voice folder MUST contain
   a short credits note carrying that attribution.
@@ -821,9 +831,9 @@ settings screen must say the voice files are missing.
   installed. DFM's original WAV files (stall warning, overspeed, airspeed
   alive, "stall speed warning at", cal factor) stay as the fallback
   (FR-033, FR-037).
-- **Voice files are generated, not committed.** The full set is roughly 510
-  short files, about 10–15 MB, in `AG-SpdGa/voice/`. That is fine on the
-  SD card but not for git, and the voice's licensing is unclear (FR-035).
+- **Voice files are generated and committed.** The full set is 512 short
+  files plus `CREDITS.txt` and `index.txt`, about 23 MB, in
+  `AG-SpdGa/voice/`, under CC BY-SA 4.0 (FR-035).
 - **Pitot sensors report indicated airspeed.** They convert pressure to speed
   using fixed sea-level air density. This holds for the sensors the original
   was tested with (Jeti MSpeed, Digitech, ASSI, Xicoy). A sensor that already
