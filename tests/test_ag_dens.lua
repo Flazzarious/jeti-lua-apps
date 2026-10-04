@@ -17,6 +17,12 @@ local cases = {
   { "factor(1524, nil)", dens.factor(1524, nil), 1.0773 },
   { "factor(1524, 35)", dens.factor(1524, 35), 1.1337 },
   { "factor(4572, 50)", dens.factor(4572, 50), 1.4097 },
+  -- FR-020 range edges, -300 ft and 10,000 ft (research R1)
+  { "factor(-91.44, -29)", dens.factor(-91.44, -29), 0.9155 },
+  { "factor(-91.44, 54)", dens.factor(-91.44, 54), 1.0598 },
+  { "factor(3048, -29)", dens.factor(3048, -29), 1.1100 },
+  { "factor(3048, nil)", dens.factor(3048, nil), 1.1637 },
+  { "factor(3048, 54)", dens.factor(3048, 54), 1.2849 },
   { "stdTempC(0)", dens.stdTempC(0), 15 },
   { "mToFt(ftToM(5000))", dens.mToFt(dens.ftToM(5000)), 5000 },
   { "cToF(35)", dens.cToF(35), 95 },

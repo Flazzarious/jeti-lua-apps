@@ -2,19 +2,28 @@
 
 ```lua
 system.registerTelemetry(1, "Speed Gauge", 0, printGauge)  -- pilot places it single or double
-system.registerTelemetry(2, "Speed Gauge", 4, printGauge)  -- full screen, no status bar (R7)
+system.registerTelemetry(2, "Speed Gauge (full screen)", 4, printGauge)  -- no status bar (R7, FR-013)
 ```
 
-Size 0 lets the pilot place window 1 at single or double size (verified in
-the emulator, 2026-09-27), so no window-size setting is needed. Size 4 is
-used for full screen because the desktop's model tile covers a size-3 window
-(research R7).
+Size 0 lets the pilot place window 1 at single or double size. Size 4 is
+used for full screen because the desktop's model tile covers a size-3
+window's lower-left corner (research R7; the same on the transmitter).
 
-**Visible area.** On the DS-24 II each window's title bar sits inside the
-reported canvas, and about 25 px at the bottom is never visible. The print
-function draws into `h - TITLE_H` (`TITLE_H = 26`) and chooses the layout
-from the reported `h`. The renderer doesn't clip to the window, so the dial
-face is cut flat at the visible bottom (`ag_gauge.face` with `maxY`).
+**Sizes and the title bar.** Redesigned 2026-10-03 after the first
+transmitter run (see `docs/jeti-api-notes.md`). The transmitter reports only
+what is visible and draws the title above the window. The emulator reports
+a larger area that includes the title bar and a hidden bottom strip:
+
+| Window | Transmitter (design target) | Emulator: reported → visible |
+| --- | --- | --- |
+| Single | 150 × 23 | 157 × 60 → ~157 × 34 |
+| Double | 150 × 68 | 157 × 127 → ~157 × 101 |
+| Full screen | 316 × 159 | 320 × 260 → ~320 × 234 |
+
+The print function subtracts `TITLE_H = 26` from `h` only when `w` is 157 or
+320, the emulator's widths. It then chooses the layout from the visible
+size. The renderer doesn't clip to the window, so the dial face is cut flat
+at the bottom (`ag_gauge.face` with `maxY`).
 
 One print function serves both windows. It reads only cached state (numbers,
 cached strings, dial fractions, the layout cache) and never formats strings,
@@ -23,115 +32,113 @@ or in `ag_gauge` helpers called from here.
 
 Design source: the visual design reference in spec US3
 (`docs/vendor/gauge-reference.jpg`). Drawing order and colors: research R6
-and R8.
+and R8. Dial edges use 3° steps; the translucent glow keeps 10° steps.
 
-## Choosing a layout
+**Smooth dial images (2026-10-03).** The transmitter enlarges Lua lines
+about 1.45× without smoothing, so live curves step. For the transmitter's
+two dial sizes the face and track ring come from pre-drawn, anti-aliased
+PNGs, `/Apps/AG-SpdGa/dial-316x159.png` and `dial-150x68.png`, made by
+`tools/dial/make_dial.py` and committed. DFM-InsP's dials are PNGs for the
+same reason. The image is loaded once per window size in the print function
+and drawn at (0, 0). Without a matching file (the emulator's sizes, or a
+missing file) the face and track are drawn live, with a wider translucent
+pass under each arc to soften the steps. The overspeed zone, ticks, scale
+numbers, value arc and max marker are always live: they depend on settings
+or move.
 
-| Condition | Layout | Reported size | Visible (drawn) |
-| --- | --- | --- | --- |
-| not `gaugeOk` (R12) | notice | any | |
-| `h < 100` | compact | 157 × 60 | 157 × 34 |
-| `w < 250` | round | 157 × 127 | 157 × 101 |
-| otherwise | full screen | 320 × 260 | 320 × 234 |
+## Choosing a layout (visible size)
+
+| Condition | Layout | Transmitter size |
+| --- | --- | --- |
+| not `gaugeOk` (R12) | notice | any |
+| `h < 45` | strip | 150 × 23 |
+| `w < 250` | small dial | 150 × 68 |
+| otherwise | full screen | 316 × 159 |
 
 The layout cache is rebuilt when `w`, `h` or the scale (full scale, units,
-thresholds, `kDens`) changes, and holds: dial center and radii, tick end
-points, label positions, face polygon points, and text positions. The
-positions below are proportions. The implementation fits them to the fonts'
-real heights (`lcd.getTextHeight`) and widths (`lcd.getTextWidth`).
+thresholds, `kDens`) changes.
 
-## Compact (single window, 157 × 34 visible)
+## Strip (single window, 150 × 23)
 
 ```text
-+---------------------------------------------+
-|   .--'''--.                         MAX      |  current: largest font that fits,
-|  /         \        123             141      |  white, vertically centered
-| |    mph    |                                |  unit inside the arc, FONT_MINI
-+---------------------------------------------+  MAX label and value: FONT_MINI
-  180° arc, radius about h - 3, left side;       whole window filled dark
++--------------------------------------------+
+| 123 mph                          MAX 141   |  speed: largest font that fits
+| ████████████████▌······|·····▒▒▒▒▒▒▒       |  (FONT_NORMAL); unit, MAX: FONT_MINI
++--------------------------------------------+
 ```
 
-- The whole window is filled dark; there is no separate face polygon.
-- A 180° track, overspeed zone, value arc and max marker. No numbered scale.
-- Stall and landing marks only if the arc radius is at least 30 px.
-- The current and max numbers always stay (FR-015); the max value is in
+- Dark background over the whole window.
+- Bar along the bottom, 4 px: track, overspeed zone from `fOver` to the end,
+  value in `colCur` up to the overspeed mark and the zone color beyond it,
+  and a 2-px max tick in `colMax`, slightly taller than the bar.
+- The current and max numbers always stay (FR-015). The max value is in
   `colMax`.
 
-## Round (double window, 157 × 101 visible)
+## Small dial (double window, 150 × 68)
 
 ```text
-+---------------------------------------------+
-| MAX          .-''''''''-.            STALL  |  corner rows: FONT_MINI label,
-| 141        /  50    100   \           45    |  value in FONT_NORMAL
-|           | 0             150 |              |  scale labels: FONT_MINI
-|           |      123         |              |  center number: FONT_MAXI if it fits
-|            \     mph        /              |  unit: FONT_MINI
-| OVR          '-.       .-'                  |
-| 200                                          |
-+---------------------------------------------+
-  270° dial, about 115-120 px across, centered, dark face
++--------------------------------------------+
+|   .-''-.          123                      |  speed: FONT_BIG if it fits
+|  /      \         mph                      |  unit: FONT_MINI
+| |   ↗    |                                 |
+|  \      /         MAX                      |  MAX label FONT_MINI,
+|   '-  -'          141                      |  value FONT_NORMAL in colMax
++--------------------------------------------+
+  270° dial, about 74 px across, on the left
 ```
 
-- Face, track, overspeed zone, major ticks with labels and one minor tick
-  between majors, stall and landing marks, value arc with tip, max marker.
-- The center number is current speed with the unit underneath (FR-014a).
-- Corner rows: Max, Stall and Overspeed (FR-016). Stall and Overspeed show
-  the setting as entered (FR-016a); Max shows the session max.
-- Drop order when space is short: minor ticks, scale labels, corner rows
-  (Overspeed, then Stall). Max and the center number always stay.
+- Face, track, overspeed zone with glow, major ticks (no scale numbers, no
+  minor ticks), stall and landing marks, value arc with tip, max marker.
+- Stall and overspeed have no rows; there's no room (FR-016 is a SHOULD).
 
-## Full screen (320 × 234 visible)
+## Full screen (316 × 159)
 
 ```text
 +----------------------------------------------------------------+
-|             .-''''''''''-.            |  STALL                 |
-|         /  50    100   150  \         |  45 mph                |
-|       | 0                  200 |      |                        |
-|       |        123             |      |  OVERSPEED             |
-|       |        mph             |      |  200 mph               |
-|        \                      /       |                        |
-|          '-.     MAX     .-'         |  AIR DENSITY           |
-|                  141                 |  +8%                   |
-|                                       |  ELEVATION             |
-|                                       |  5000 ft               |
-|                                       |  RAW SENSOR            |
-|                                       |  100 mph               |
+|           .-''''''''-.             | STALL              45 mph |
+|        /  50    100   \            | OVER              200 mph |
+|      | 0      123     150 |        | DENSITY                +8% |
+|      |        mph         |        | ELEV              5000 ft |
+|       \       MAX        /         | TEMP SENS           95 °F |
+|               141                 | RAW               100 mph |
 +----------------------------------------------------------------+
-  270° dial, about 200-220 px across, left     side panel about 100 px
+  270° dial, about 180 px across        panel about 124 px
 ```
 
-- The same dial as the round layout, larger, with four minor ticks between
-  majors. The scale numbers and the unit use `FONT_NORMAL` here (`FONT_MINI`
-  on the round dial), because `FONT_MINI` was too small at this size.
-- MAX sits in the open bottom of the dial, centered under the speed: a
-  `FONT_MINI` grey label over the value in `FONT_BIG`, `colMax`, without a
-  unit (the unit is shown under the speed). Moved from the side panel at the
-  user's request, 2026-09-27.
-- Side panel rows, each a `FONT_MINI` grey label over a `FONT_BIG` white value
-  with a small unit. Rows are spread over the visible height, about 10 px
-  apart:
-  - STALL, OVERSPEED: always.
-  - AIR DENSITY: always. "+8%" while correction is active, "OFF" when it is
-    off, "GPS" when the sensor type is GPS (added 2026-09-27).
-  - ELEVATION: the field elevation as set, in ft or m. Only while correction
-    is active (added 2026-09-27).
-  - RAW SENSOR: the uncorrected sensor speed. Only while correction is active.
+- The same dial as the small one, larger, with numbered major ticks
+  (`FONT_MINI` at this size; `FONT_NORMAL` once the radius is 110 px or more,
+  i.e. in the emulator) and one minor tick between majors (four at the
+  larger size).
+- Current speed in the center in the largest font that fits, unit below.
+- MAX in the open bottom of the dial: `FONT_MINI` grey label over the value
+  in `FONT_BIG`, `colMax`, centered under the speed.
+- Side panel, six one-line rows of about 26 px: `FONT_MINI` grey label on
+  the left; value in `FONT_NORMAL` white, right-aligned, followed by its
+  unit in `FONT_MINI`:
+  - STALL, OVER: always, as entered (FR-016a).
+  - DENSITY: always. "+8%" while correction is active, "OFF" when it is off,
+    "GPS" when the sensor type is GPS.
+  - ELEV, the temperature row and RAW: only while correction is active.
+  - The temperature row (FR-044) shows the temperature in use. Its label
+    names the source: "TEMP STD", "TEMP MAN" or "TEMP SENS". While the
+    sensor reading is rejected (`tStat = 1`, or Sensor with no sensor
+    chosen), the label is "SENSOR OUT" in the overspeed color and the value
+    is the standard temperature being used.
 
 ## Notice (not DS-24 II)
 
 `FONT_MINI` text "Speed Gauge needs DS-24 II" in the theme's foreground
 color, centered, no face. Nothing else is drawn (FR-013a).
 
-## States (all gauge layouts)
+## States (all layouts)
 
-| State | Dial | Numbers |
+| State | Gauge | Numbers |
 | --- | --- | --- |
-| Valid reading | value arc and tip to `fCur`, max marker | current, max |
-| No data (no sensor, invalid, lost) | face, scale, zone and max marker only; no value arc | current "---", max kept (US3 #5) |
+| Valid reading | value arc (or bar) and tip to `fCur`, max marker | current, max |
+| No data (no sensor, invalid, lost) | face, scale, zone and max marker only; no value arc or bar | current "---", max kept (US3 #5) |
 | Max = 0 (just reset, or not flown yet) | no max marker | max "0" |
+| Above overspeed | value in `colCur` up to the overspeed mark, overspeed color (and glow) beyond it | current, max |
+| Above full scale | value stops at full scale | real value shown (US3 #7) |
 
-**Max marker:** `colMax` (default Yellow), from inside the value arc out to
-the rim, width 3 / 4 / 5 (compact / round / full screen). It is drawn after
-the value arc so it stays visible on top of it (research R6, FR-017).
-| Above overspeed | value arc in `colCur` up to the overspeed mark, overspeed color (and glow) beyond it | current, max |
-| Above full scale | value arc stops at full scale | real value shown (US3 #7) |
+**Max marker:** `colMax` (default Yellow), drawn after the value so it stays
+visible on top of it (research R6, FR-017).

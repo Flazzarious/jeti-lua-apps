@@ -10,8 +10,11 @@ docs/vendor/
 Thumbs.db
 *.swp
 
-# Python bytecode from tools/
+# Python bytecode and virtual environments from tools/
 __pycache__/
+*.pyc
+.venv/
+venv/
 
 # Generated voice files (tools/voice/; Amy voice is CC BY-SA, not committed per spec FR-035)
 src/Apps/AG-SpdGa/voice/

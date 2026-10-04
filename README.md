@@ -9,6 +9,10 @@ spec-driven workflow (GitHub Spec Kit + Claude Code) in VS Code.
 | --- | --- | --- | --- | --- |
 | Speed Gauge | [`AG-SpdGa.lua`](src/Apps/AG-SpdGa.lua) | In development | [001](specs/001-speed-gauge/spec.md) | DFM Speed Announcer by Dave McQueeney (MIT) |
 
+Speed Gauge speaks in its own voice (Piper "Amy"). The voice files aren't in
+the repo: generate them with [`tools/voice/`](tools/voice/README.md) before
+deploying. Without them the app works in the transmitter's voice.
+
 Apps here are for telemetry, timers, announcements and displays only. Nothing
 in this repo may control surfaces, throttle or any flight function. See the
 constitution: [`.specify/memory/constitution.md`](.specify/memory/constitution.md).

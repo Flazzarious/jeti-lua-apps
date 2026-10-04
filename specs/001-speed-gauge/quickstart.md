@@ -15,16 +15,27 @@ References: [data-model.md](data-model.md),
   app, to supply simulated speed sensors. Load
   [`tools/emulator/sensors.json`](../../tools/emulator/sensors.json): "MSpeed
   450 / Velocity" on P5 (0–125 m/s, about 0–280 mph) and "GPS / Speed" on P6
-  (0–83.3 m/s, about 0–186 mph). A control fully down means the sensor is
-  lost.
+  (0–83.3 m/s, about 0–186 mph), plus "MSpeed 450 / Temperature" on P7
+  (−29–54 °C). A control fully down means the sensor is lost.
 - Optional: a Lua 5.3 interpreter on PATH for the module tests in step 0.
+- The app voice, generated locally (it isn't committed, FR-035). Follow
+  `tools/voice/README.md` to install `piper-tts` and download
+  `en_US-amy-medium`, then:
+
+  ```powershell
+  python tools/voice/make_voice.py --model <path>\en_US-amy-medium.onnx
+  ```
+
+  It writes 512 WAVs, `CREDITS.txt` and `index.txt` to
+  `src/Apps/AG-SpdGa/voice/` and exits non-zero if a file is missing or a
+  number-only file up to 199 is longer than 1.3 s (SC-009).
 
 Deploy to the emulator (PowerShell, from the repo root):
 
 ```powershell
 $dst = "$env:LOCALAPPDATA\JETI-Studio\Emulator\Apps"
 Copy-Item src\Apps\AG-SpdGa.lua $dst
-Copy-Item src\Apps\AG-SpdGa $dst -Recurse -Force
+Copy-Item src\Apps\AG-SpdGa $dst -Recurse -Force   # includes voice\ if generated
 New-Item -ItemType Directory -Force "$dst\lib" | Out-Null
 Copy-Item src\Apps\lib\ag_dens.lua, src\Apps\lib\ag_gauge.lua "$dst\lib"
 ```
@@ -48,6 +59,9 @@ LuaLS: no errors in the Problems panel for `src/Apps/**`.
 | Font heights | Probe's "fonts N/B/M/Mx" line in the large and full-screen windows | Record them; the layouts fit text to these |
 | Renderer reuse (R6) | Gauge running 5 min | No drawing glitches with one reused renderer |
 | `°` renders | Open settings | Shown correctly, or switch to "deg" |
+| 22.05 kHz WAV plays (R13) | Transmitter only (the emulator plays no Lua audio), startup announcement on | Amy voice heard. If not, regenerate with `--rate 44100`, record it in `docs/jeti-api-notes.md`, and update FR-034 |
+| Temperature unit string (R15) | Probe or console: print `unit` and its byte length for the MSpeed temperature in the emulator and, when possible, on the transmitter | Ends in "C", 2–3 bytes; else adjust the filter and record it |
+| Start-up cost of the voice check (R14) | CPU figure after reload with the voice installed | Start-up figure still well below 100% (24% before the voice check) |
 
 ## Step 2: shared module values (SC-003)
 
@@ -109,6 +123,43 @@ Density (steady sensor 100 mph):
 | 26 | Sensor type GPS | 100, "Not used with GPS" | US4 #5 |
 | 27 | 5,000 ft std, stall 40, slow down | Warning at sensor 40; gauge reads 43; value arc tip at the stall mark | SC-003a, FR-016a |
 
+Temperature source (5,000 ft, correction on, steady sensor 100 mph; P7 is the
+MSpeed temperature):
+
+| # | Do | Expect | Spec |
+| --- | --- | --- | --- |
+| 36 | Temperature source list | Standard / Manual / Sensor; Standard by default; manual intbox enabled only for Manual, sensor list only for Sensor | FR-038 |
+| 37 | Sensor list | Only "MSpeed 450 / Temperature" (not Velocity or GPS Speed) | FR-039 |
+| 38 | Sensor, P7 at 35 °C (95 °F) | 113 (±1), same as Manual 95 °F; settings "Temp: 95 °F from MSpeed 450" (or °C) | US4 #7, FR-042 |
+| 39 | Full screen, each source in turn | TEMP STD / TEMP MANUAL / TEMP SENSOR row with the temperature in use; no row with correction off | FR-044 |
+| 40 | P7 fully down (lost) | Within 5 s: standard temperature, 108; "SENSOR OUT"; settings "Sensor not available - using standard"; callouts and warnings continue | US4 #8, FR-040 |
+| 41 | P7 back to 35 °C | Sensor used again 10 s (±5) after the last bad read, without touching settings | FR-040 |
+| 42 | Settings open during 40–41 | Status label changes live | FR-042, R17 |
+| 43 | P7 at max (54 °C), then set sensors.json upper bound to 60 and P7 to 60 °C (140 °F) | 54: used. 60: "SENSOR OUT", standard used; back to 35 → resumes after 10 s | US4 #8a |
+| 44 | Move P7 slowly by ±0.5 °C | Displayed speed doesn't change; it changes once the move reaches 1 °C | US4 #9, FR-041 |
+| 45 | Change source or temperature while speed is steady | No extra callout caused by the change | FR-041 |
+| 46 | Sensor type GPS with source Sensor | 100, no temperature read, no row | FR-043 |
+| 47 | Pick the sensor, remove it from sensors.json, reopen settings | "<label> (not found)" selected; status "Sensor not available" | Edge Cases |
+
+Voice (Emulator Telemetry prints each `playFile`/`playNumber` call, so the
+console shows which set was used):
+
+| # | Do | Expect | Spec |
+| --- | --- | --- | --- |
+| 48 | Voice installed, Voice "Speed Gauge"; run scenarios 1, 2, 3, 6, 8 | Console shows `.../voice/...` paths: "stallat", number, unit at startup; "alive"; number + unit callouts; "stall"; "over" | US6 #1, #2 |
+| 49 | Speed 520 (full scale 600) | That callout uses `playNumber`, the next one under 500 uses files again | US6 #3, FR-033 |
+| 50 | Delete `voice/85.wav`, hold 85 | Callout falls back to `playNumber` for 85 only; never "mph.wav" alone | Edge Cases |
+| 51 | Remove `voice/`, reload | Settings show "Voice files missing"; Voice shows Transmitter; callouts use `playNumber`, warnings DFM's files; nothing silent | US6 #4, SC-010 |
+| 52 | Voice "Transmitter" with files installed | Same as v2.1: `playNumber` and DFM's files | US6 #5 |
+
+Limits and upgrade:
+
+| # | Do | Expect | Spec |
+| --- | --- | --- | --- |
+| 53 | Elevation and manual temperature editors | Stop at −300 / 10,000 ft and −20 / 130 °F (−90 / 3,050 m, −29 / 54 °C) | FR-020 |
+| 54 | With 0.1.0 installed: set elevation 15,000 ft, temperature standard off, 100 °F; install this version | Elevation shows 10,000 (clamped); source Manual, 100 °F | R16, Edge Cases |
+| 55 | Change mph → km/h with manual 130 °F | Temperature converts to 54 °C | data-model.md |
+
 Settings and lifecycle:
 
 | # | Do | Expect | Spec |
@@ -134,3 +185,12 @@ On a dedicated test model, never one that flies the same day: repeat 1–12,
 14, 17 and 22–27 with a real pitot sensor on the bench (blow gently into
 the pitot). Check that stick vibration is felt on the right stick and that
 audio levels are clear over a running motor.
+
+With the app voice installed, also check by ear:
+
+- Number and unit sound like one phrase, no audible pause (SC-009, under
+  0.15 s); short callouts keep up with the 2-second interval.
+- A stall or overspeed warning during a callout: note whether it cuts the
+  callout off (R14) and that the warning is always heard.
+- If the MSpeed is fitted, whether it reports a temperature (unconfirmed for
+  the MSpeed 450 EX), and what it reads in the sun versus the shade.

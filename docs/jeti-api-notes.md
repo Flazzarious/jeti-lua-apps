@@ -23,6 +23,10 @@ Official PDF: https://github.com/JETImodel/Lua-Apps/tree/master/Doc
   `mobdebug`, so it will not catch use of those.
 - DC/DS-24 runs up to 10 apps per model. The hard 50 kB memory cap applies to
   DC/DS-14/16, not the 24 series, but memory is still shared by all apps.
+- Lua allows at most 200 local variables in one function, and the file's main
+  chunk counts as one: an app with ~200 file-level `local`s won't compile
+  ("too many local variables"; LuaLS reports `local-limit`). Group related
+  constants and state into tables. Speed Gauge 0.2.0 is at 181 of 200.
 
 ## Target hardware (DS-24 II)
 
@@ -64,6 +68,43 @@ fill the 480-px panel (320 × 1.44 ≈ 460 px plus the frame).
 
 - **Font heights:** `FONT_NORMAL` 18, `FONT_BIG` 22, `FONT_MINI` 13,
   `FONT_MAXI` 40 (probe, emulator 6.04).
+
+**The real transmitter differs from the emulator** (DS-24 II, PROBE MODE 1,
+transmitter screenshot `Screen001.png`, 2026-10-03). Design for these, not
+the emulator's numbers above:
+
+| Window | Emulator reports | Transmitter reports |
+| --- | --- | --- |
+| Small (size 1) | 157 × 60 (~34 visible) | **150 × 23**, all visible |
+| Large (size 2) | 157 × 127 (~101 visible) | **150 × 68**, all visible |
+| Full screen (size 3/4) | 320 × 260 (~236 visible) | **316 × 159**, all visible (PROBE MODE 2, `Screen004/005.png`) |
+
+- The window title is drawn **above** the reported area, not inside it, so
+  nothing is hidden: don't subtract a title height on the transmitter.
+- "Full screen" is not the whole panel on the transmitter: sizes 3 and 4
+  both get a titled 316 × 159 area across the top two thirds. With size 3
+  the desktop's model tile still covers its lower-left corner; size 4 has
+  no overlap.
+- Widths tell the two apart: the emulator reports 157 / 320, the
+  transmitter 150 / 316.
+- Font heights on the transmitter: `FONT_NORMAL` 17, `FONT_BIG` 20–21,
+  `FONT_MINI` 12, `FONT_MAXI` 38–39 (the two probes read 20/38 in the
+  small/large windows and 21/39 full screen).
+- Lua coordinates are enlarged about 1.45× on the 480 × 480 panel (the
+  316 × 159 window covers 454 × 228 screen pixels). Lines are drawn at Lua
+  resolution and then enlarged, so curves built from 5° segments look
+  stepped.
+- **Text is drawn at the panel's own resolution** (crisp, smooth), but
+  lines, polygons and renderer shapes are drawn at Lua resolution and
+  enlarged without smoothing: edges show hard stair-steps about 1.5 screen
+  px each. Adding points to a curve doesn't help. Renderer alpha does work
+  on the device (semi-transparent glow bands blend), so a wider translucent
+  pass under an edge can soften it.
+- No app gets more than this area: DFM-InsP (MIT; studied, not copied) also
+  registers size-4 windows, clears `0, 0, 319, 158`, and ships its panel
+  images at 318 × 159.
+- The transmitter can save screenshots to the SD card root
+  (`Screen001.png`, 480 × 480): the quickest way to check a layout.
 - **Model tile:** the desktop's model tile (model name, image, page "n/3")
   stays in the bottom-left slot on every desktop page and is drawn **over** a
   full-screen Lua window, covering its lower-left 157 × ~110. No Lua API hides
@@ -102,6 +143,10 @@ fill the 480-px panel (320 × 1.44 ≈ 460 px plus the frame).
 - It also replaces `system.playFile`, `playNumber`, `playBeep`,
   `playSystemSound` and `vibration` with `print`: in the emulator, audio and
   vibration appear as lines in the Lua console instead of sound.
+- **The emulator plays no Lua audio even without that app** (JETI Studio,
+  firmware 6.04, observed 2026-10-03: `playFile` with the telemetry app
+  removed was silent). Anything that must be heard, such as WAV formats and
+  the pause between queued files, can only be checked on the transmitter.
 
 ## Files and names
 

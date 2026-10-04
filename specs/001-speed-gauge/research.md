@@ -1,6 +1,8 @@
 # Research: Speed Gauge
 
-**Feature**: `specs/001-speed-gauge/` | **Date**: 2026-09-27
+**Feature**: `specs/001-speed-gauge/` | **Date**: 2026-09-27, updated 2026-10-03
+(R13–R17: app voice, temperature sensor and input limits from the spec
+sessions of 2026-09-28 and 2026-09-30)
 
 Each section resolves an open point from the plan's Technical Context or a
 decision the spec left to planning. Items marked **UNVERIFIED** rest on the
@@ -27,14 +29,21 @@ the JETI Studio emulator as an early implementation task (see
   | 0 | std | 1.0000 | 100 | SC-003 100 ±1 |
   | 5,000 ft (1,524 m) | std | 1.0773 | 108 | SC-003 108 ±1 |
   | 5,000 ft | 35 °C | 1.1337 | 113 | SC-003 113 ±1 |
-  | −1,000 ft | 50 °C | 1.0401 | 104 | range edge |
-  | 15,000 ft | −30 °C | 1.2228 | 122 | range edge |
-  | 15,000 ft | 50 °C | 1.4097 | 141 | range edge |
+  | −300 ft (−91 m) | −29 °C | 0.9155 | 92 | range edge (FR-020) |
+  | −300 ft | 54 °C | 1.0598 | 106 | range edge |
+  | 10,000 ft (3,048 m) | −29 °C | 1.1100 | 111 | range edge |
+  | 10,000 ft | std (−4.8 °C) | 1.1637 | 116 | range edge |
+  | 10,000 ft | 54 °C | 1.2849 | 128 | range edge |
+
+  Rows recomputed 2026-10-03 for the narrower limits of FR-020. The
+  standard temperature stays inside the temperature limits across the whole
+  elevation range (15.6 °C at −300 ft, −4.8 °C at 10,000 ft), as FR-020
+  requires.
 
   Stall at 40 mph, 5,000 ft, standard: 40 · 1.0773 = 43.09, so the gauge reads
   43 (SC-003a).
 - **Single precision:** The transmitter's floats are 32-bit (~7 digits). The
-  largest intermediate is `^ 5.25588` on a ratio in 0.89..1.02, well inside
+  largest intermediate is `^ 5.25588` on a ratio in 0.93..1.01, well inside
   float range; error is below 0.01%.
 - **Alternatives considered:** A lookup table by elevation (smaller code, but
   needs interpolation and a temperature term anyway); the "2% per 1,000 ft"
@@ -213,8 +222,9 @@ speedometer; local copy at `docs/vendor/gauge-reference.jpg`).
 - **Decision:** FR-013 asks for two windows, the most an app may register:
   - Window 1, "Speed Gauge", registered with **size 0**, so the pilot can
     place it at single or double size.
-  - Window 2, full screen, registered with **size 4** (no status bar). Its
-    title is also "Speed Gauge".
+  - Window 2, full screen, registered with **size 4** (no status bar), titled
+    "Speed Gauge (full screen)" (changed 2026-10-03, FR-013: two identical
+    names couldn't be told apart in Displayed telemetry).
   - **Changed from size 3 after emulator testing (2026-09-27):** on the
     DS-24 II the desktop's model tile is drawn over a size-3 window's
     lower-left quarter. Size 4 has no overlay. DFM-InsP (MIT, studied only)
@@ -282,11 +292,11 @@ speedometer; local copy at `docs/vendor/gauge-reference.jpg`).
 
 ## R10. Settings that the form API can't express directly
 
-- **"Temperature (blank = standard)":** An intbox can't be blank. Use a
-  checkbox row "Use standard temperature" directly under the temperature
-  intbox, which is disabled (`form.setProperties(..., {enabled=false})`) while
-  checked. The hint row reads "Standard = normal for this elevation". Same
-  intent as the spec's label.
+- **"Temperature (blank = standard)":** ~~A "Use standard temperature"
+  checkbox under the temperature intbox.~~ **Superseded 2026-09-30** by the
+  Temperature source selectbox (Standard / Manual / Sensor, FR-038; R15).
+  The manual intbox is enabled only for Manual, the sensor selectbox only for
+  Sensor. The old `tStd` key is migrated (data-model.md).
 - **Gauge full scale default:** intbox with 0 meaning "Auto". Auto = overspeed
   × 1.15 rounded up to the next 10. The row's hint shows the resolved value.
 - **Units change (Edge Cases):** Convert, don't warn. On a units change all
@@ -322,6 +332,8 @@ Everything else matches v2.1.
 | 11 | No density correction | Optional, airspeed sensors only | US4 |
 | 12 | Unused `V_ref_speed.wav`, `Spd_ann_act.wav` shipped | Not copied | cleanup |
 | 13 | Normal callouts need *current* speed > Vref/2 | Latched: once exceeded this session, stays open | FR-009, US1 #7 |
+| 14 | Transmitter voice for numbers, DFM recordings for warnings | One app voice (Amy) for all speech when installed; v2.1 audio as fallback, or by choice | US6, FR-030–FR-037 |
+| 15 | No temperature input | Temperature source Standard / Manual / Sensor for density correction | FR-038–FR-044 |
 
 ## R12. Unsupported transmitters (FR-013a)
 
@@ -341,3 +353,204 @@ Everything else matches v2.1.
 - **Alternatives considered:** Detect by window size (the original DS-24
   reports the same window sizes, so the two can't be told apart); detect by
   `lcd.renderer` being present (also true on the original DS-24).
+
+## R13. Generating the voice set (FR-030, FR-034–FR-036)
+
+- **Decision:** `tools/voice/make_voice.py` (Python 3.9+, the version
+  installed here) uses the `piper-tts` Python package with the voice model
+  `en_US-amy-medium` (Hugging Face `rhasspy/piper-voices`).
+  `tools/voice/README.md` says how to install the package and download the
+  model; neither is committed. The script:
+  1. Builds the phrase list. Numbers 0–500 are spelled as words by the
+     script itself, in US style without "and" ("one hundred twelve"), so
+     Piper never has to guess how to read digits. The phrases and units are
+     listed in the file table below.
+  2. Synthesizes each phrase to an in-memory WAV, with Piper's
+     `length_scale` as an option (`--speed`, default 1.0; SC-009 allows
+     speeding up later).
+  3. Trims leading and trailing silence (samples below about −45 dBFS),
+     keeping 20 ms at each end so words don't clip.
+  4. Normalizes every file to the same peak level (−1 dBFS). Peak, not
+     loudness, keeps the script to the standard library (`wave`, `array`);
+     with one voice and short phrases the two give near-identical results.
+  5. Writes mono 16-bit WAV at `--rate` (default 22050, Amy's native rate,
+     so no resampling). `--rate 44100` doubles each sample with linear
+     interpolation, for the case where the transmitter won't play 22.05 kHz.
+  6. Writes `voice/CREDITS.txt` (FR-036) and then `voice/index.txt`, listing
+     the voice, rate and file count. Writing the index last marks a complete
+     run.
+  7. Self-checks the result: all 512 files exist; reports the longest
+     number-only file for 0–199 and exits non-zero if it is over 1.3 s
+     (the half of SC-009 that can be checked offline).
+- **File names** (in `src/Apps/AG-SpdGa/voice/`, deployed as
+  `/Apps/AG-SpdGa/voice/`). Numbers are flat files so a path is one
+  concatenation. DFM's long WAV names already work on the card, so 8.3 isn't
+  needed for assets:
+
+  | Files | Spoken |
+  | --- | --- |
+  | `0.wav` … `500.wav` | "zero" … "five hundred" |
+  | `mph.wav`, `kmh.wav`, `kt.wav`, `ms.wav`, `fts.wav` | "miles per hour", "kilometers per hour", "knots", "meters per second", "feet per second" |
+  | `pct.wav` | "percent" |
+  | `stall.wav`, `over.wav`, `alive.wav` | "stall warning", "overspeed", "airspeed alive" |
+  | `stallat.wav`, `cal.wav` | "stall warning at", "airspeed calibration" |
+
+  512 files. At 22.05 kHz mono and about 0.9 s average they are about 20 MB,
+  somewhat over the spec's 10–15 MB estimate; 16 kHz would bring it to
+  about 14 MB. Either is fine on the SD card.
+- **Sample rate (UNVERIFIED):** DFM's recordings are 44.1 kHz (three of the
+  five stereo), so the transmitter plays 44.1 kHz. Neither 22.05 nor 16 kHz
+  is documented. Quickstart step 1 plays one 22.05 kHz file in the emulator
+  and on the transmitter. If it doesn't play, regenerate with
+  `--rate 44100` and record the finding in `docs/jeti-api-notes.md`. FR-034
+  names 16/22.05 kHz, so in that case the spec needs a one-line update.
+- **Not committed (FR-035):** `.gitignore` already lists
+  `src/Apps/AG-SpdGa/voice/`. Deploying needs a generator run first
+  (quickstart Prerequisites).
+- **Alternatives considered:** Piper's command-line binary (one process per
+  phrase, 512 launches, slower); ffmpeg/sox for trimming and normalizing (an
+  extra install for two simple operations); one file per number+unit
+  combination (2,505 files, about 100 MB, and only SC-009's gap would
+  improve); numbers as digits passed to Piper (its reading of "112" depends
+  on the version, e.g. "one hundred and twelve").
+
+## R14. Speaking with the app voice (FR-031–FR-033, FR-037)
+
+- **Decision: startup check.** `init()` sets `voiceOk` once. It is true when
+  `io.open(path, "r")` succeeds for all 11 phrase and unit files plus
+  `0.wav` and `500.wav` (each closed right away). That is 13 opens, once.
+  The cost is UNVERIFIED; the start-up CPU figure (24% today) is re-checked
+  in quickstart.
+- **Which voice:** `useAppVoice = voiceOk and cfg.voice ~= 2` (key `voice`:
+  0 = not chosen, 1 = Speed Gauge, 2 = Transmitter). An unset key therefore
+  means Speed Gauge when the files are present and Transmitter otherwise
+  (FR-032). The form shows that resolved choice.
+- **Callout:** when a callout is due (data-model.md) and `useAppVoice`:
+  - `n = round(shownSpd)`. If `n > 500`, use the transmitter's
+    `playNumber` for this callout (FR-033).
+  - Otherwise build the number path `VOICE .. n .. ".wav"` and check it
+    with `io.open`/`io.close`. Present: `playFile(numPath, AUDIO_QUEUE)`,
+    then, for a full callout, `playFile(unitPath, AUDIO_QUEUE)`. Missing:
+    `playNumber` for this callout only. A phrase is never half app voice
+    (Edge Cases).
+  - The concatenation and the open happen only when a callout is due (at
+    most every `tMin`, ≥ 1 s), not per loop. That fits constitution VI's
+    intent. Caching all 501 paths would cost about 20 KB of memory to save
+    one concatenation per callout.
+  - Unit files were checked at startup, so only the number is checked here.
+  - The full callout in the app voice is "eighty-five miles per hour", with
+    no "Speed" prefix (US6 #1). The transmitter fallback keeps v2.1's
+    `playNumber(n, 0, unitSpoken, "Speed")`.
+- **Warnings:** `playFile(VOICE .. "stall.wav", AUDIO_IMMEDIATE)` and so on
+  when `useAppVoice`, otherwise DFM's file (FR-037). Paths are constants
+  built once in `init()`. `voiceOk` already covers these files, so a warning
+  is never left silent (FR-033).
+- **Startup announcements:** "stall warning at" + number + unit, and
+  "airspeed calibration" + number + "percent", queued with `AUDIO_QUEUE`.
+  The whole announcement falls back to v2.1's file + `playNumber` if the
+  value is over 500 or its number file is missing.
+- **FR-007 unchanged:** a callout starts only while `system.isPlayback()` is
+  false, and the number and unit files are queued together, so FR-007 treats
+  the phrase as one.
+- **Gap between queued files (UNVERIFIED, SC-009):** whether the firmware
+  adds a pause between two `AUDIO_QUEUE` files is undocumented. The
+  generator trims silence, so any gap comes from the firmware. Check by ear
+  on the transmitter (quickstart step 4). The Emulator Telemetry app
+  replaces `playFile` with `print`, so with it loaded the emulator shows
+  which files were queued but plays nothing. The emulator plays no Lua audio
+  even without that app (observed 2026-10-03), so listen on the
+  transmitter. If the gap
+  is audible, the remedies are a faster `--speed` and "Speak number only";
+  a per-combination file set (R13 alternatives) stays rejected for size.
+- **Does `AUDIO_IMMEDIATE` cut a queued callout? (UNVERIFIED):** same
+  behavior as v2.1, which also queued numbers and played warnings
+  immediately. Observe it during quickstart scenarios 6 and 8.
+- **Alternatives considered:** check every number file at startup (501
+  opens in `init()`, likely over the start-up budget); trust `index.txt`
+  alone (an interrupted copy to the SD card can still leave holes, Edge
+  Cases); a lib module for "speak number + unit from files" (no second user
+  yet, R2's rule).
+
+## R15. Temperature from a sensor (FR-038–FR-044)
+
+- **Choosing the sensor (FR-039):** the temperature selectbox is built from
+  the same `system.getSensors()` pass as the speed sensor list, when the
+  form opens (R4). It keeps entries whose `unit` ends in "C" or "F" and is
+  2–3 bytes long: "°C" is 3 bytes in UTF-8 and 2 in Latin-1, and the
+  transmitter's encoding of `°` is UNVERIFIED. The emulator's
+  `tools/emulator/sensors.json` already has "MSpeed 450 / Temperature" (°C,
+  −29..54, control P7). Saved as `tId`, `tPar`, `tLbl`, with the same
+  "(not found)" handling as R4.
+- **Reading:** `loop()` reads the temperature sensor every 5 s
+  (`TEMP_MS = 5000`, FR-041), only while `densOn = 1`, `sType = 1` and
+  `tSrc = 3`. It calls `system.getSensorByID(tId, tPar)` (through `system`,
+  R3), not the lighter value call, because it needs `unit` to tell °C from
+  °F. Once every 5 s, that cost is negligible. A unit ending in "F" is
+  converted with `ag_dens.fToC`.
+- **Accept, reject, resume (FR-040):** the limits are checked in the unit
+  system the user sees (FR-023): −20..130 °F or −29..54 °C. A read is good
+  when the entry exists, `valid` is true and the value is within limits.
+  - Status `tStat`: 0 not in use (source isn't Sensor, or correction is off
+    or GPS); 1 waiting (rejected); 2 in use.
+  - In use → waiting on the first bad read. The correction falls back to
+    standard at once.
+  - Waiting → in use after **two consecutive good reads** (5 s apart), i.e.
+    10 s after the last rejected read, which is how FR-040 itself defines
+    the wait.
+  - **First read after start-up** (or after choosing Sensor): accepted on a
+    single good read. Nothing has been rejected yet, so there is nothing to
+    flip back from, and the pilot doesn't see "SENSOR OUT" for the first
+    10 s of every session.
+- **Hysteresis (FR-041):** while in use, `tUseC` (°C) changes only when a
+  good read differs from it by ≥ 1 °C. On acceptance `tUseC` is set to that
+  read. 1 °C is used for both unit systems; the spec's "(2 °F)" is the same
+  step rounded.
+- **Applying it:** a change of `tStat` or `tUseC` calls the same
+  `recomputeDensity()` the form callbacks use: `kDens`, the dial fractions,
+  the cached row texts and a layout-cache refresh. That builds a few
+  strings, at most every 5 s and only on change, which fits constitution VI.
+  A change in `kDens` alone never triggers a callout (FR-041): callout timing
+  reads only `shownSpd` and `lastSpokenSpd`, as now.
+- **Warnings unaffected (FR-043):** stall, landing and "airspeed alive"
+  compare `sensorSpd`, which doesn't include `kDens` (FR-011).
+- **Alternatives considered:** read the value every tick (FR-041 says at
+  most every 5 s, and it would cost a sensor call per tick); require 10 s
+  of good reads at start-up too (the pilot would see "SENSOR OUT" on every
+  power-on); compare limits in °C only (the user would see, for example,
+  130 °F rejected at 54.4 °C, which doesn't match the limit they were
+  shown).
+
+## R16. Input limits, clamping and migration (FR-020)
+
+- **Decision:** the intboxes use the FR-020 limits: elevation −300..10000 ft
+  or −90..3050 m (step 10), manual temperature −20..130 °F or −29..54 °C.
+  The default manual temperature stays 59 °F / 15 °C.
+- **Clamp on load (Edge Cases):** `loadSettings()` clamps every integer
+  setting to its range, not only elevation and temperature, and saves a
+  clamped value back so the form and the correction agree. It runs once in
+  `init()`. A units change across systems converts elevation and
+  temperature, then clamps them (data-model.md).
+- **Migration `cfgV` 1 → 2:** `tStd = 1` → `tSrc = 1` (Standard); `tStd = 0` →
+  `tSrc = 2` (Manual); then `system.pSave("tStd", nil)`. `cfgV` becomes 2.
+  Settings saved by 0.1.0 therefore keep their meaning.
+- **Rationale:** the clarification session of 2026-09-30 set the limits.
+  Clamping is the spec's stated rule for values saved by an earlier version
+  with wider limits.
+
+## R17. Live temperature status in the settings form (FR-042)
+
+- **Finding:** `system.registerForm` takes a `closeFunction`
+  (`types/jeti.lua`), so the app can tell when its form is open.
+- **Decision:** `initForm` sets `formOpen = true`; the close function clears
+  it. When `tStat` or `tUseC` changes while `formOpen`, `loop()` updates the
+  temperature status label with `form.setProperties(idxTStat, {label=...})`.
+  This is the only `form.*` call outside `initForm` and callbacks, and the
+  flag guarantees the form is open (constitution VI).
+- **Status texts** (ASCII except `°`, which T039 checks): "Temp: 15 °C
+  standard", "Temp: 20 °C manual", "Temp: 35 °C from MSpeed 450", "Sensor
+  not available - using standard". The spec's em dash becomes " - "
+  because `—` isn't in the supported charset.
+- **Alternatives considered:** update the label only when the form is
+  reopened (the pilot couldn't watch it change, and FR-042 asks for the
+  temperature in use); draw it in a form print function with `lcd` (form
+  layout and scrolling make the position unreliable).

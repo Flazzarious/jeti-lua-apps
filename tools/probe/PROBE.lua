@@ -14,6 +14,10 @@
 --             desktop lets you place "Probe auto" at single or double size.
 --   MODE = 4: like MODE 3, but window 1 has an empty title (""). Shows
 --             whether the DS-24 II desktop drops the title bar without one.
+--   MODE = 5: full screen (size 4) with an empty title (window 1) next to
+--             "Probe full" (size 4, titled). On the transmitter, shows
+--             whether an untitled full-screen window gets the title bar's
+--             height as well (316 x 159 with a title, 2026-10-03).
 -- A ruler down the right edge (tick every 10 px, number every 20 px) shows
 -- how much of the reported height is actually visible: the DS-24 II desktop
 -- draws a title bar inside each window and clips the bottom of the canvas.
@@ -23,6 +27,9 @@
 -- It also prints system.isPlayback() at start and whenever it changes, and
 -- every 5 s the Lua memory in use (collectgarbage("count"), in KB). That is
 -- shared by all running apps: compare readings with and without an app added.
+-- At start it prints every telemetry value's unit string and its length in
+-- bytes, to see how the transmitter encodes "°C" (Speed Gauge research R15).
+-- Sensors must already be connected: reload the app if they came later.
 
 local MODE = 2
 
@@ -83,6 +90,12 @@ end
 local function init()
   print("PROBE device: " .. tostring(system.getDeviceType())
     .. ", firmware " .. tostring(system.getVersion()))
+  for _, s in ipairs(system.getSensors()) do
+    if s.param ~= 0 then
+      local unit = s.unit or ""
+      print("PROBE sensor: " .. tostring(s.label) .. " unit=" .. unit .. " bytes=" .. #unit)
+    end
+  end
   if MODE == 1 then
     system.registerTelemetry(1, "Probe small", 1, printSmall)
     system.registerTelemetry(2, "Probe large", 2, printLarge)
@@ -93,6 +106,10 @@ local function init()
     print("PROBE empty-title register result: "
       .. tostring(system.registerTelemetry(1, "", 0, printAuto)))
     system.registerTelemetry(2, "Probe small", 1, printSmall)
+  elseif MODE == 5 then
+    print("PROBE empty-title full register result: "
+      .. tostring(system.registerTelemetry(1, "", 4, printAuto)))
+    system.registerTelemetry(2, "Probe full", 4, printFull)
   else
     system.registerTelemetry(1, "Probe full+bar", 3, printFullBar)
     system.registerTelemetry(2, "Probe full", 4, printFull)

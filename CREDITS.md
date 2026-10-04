@@ -56,6 +56,28 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
 
+## Speed Gauge voice — Piper and the "Amy" voice
+
+Speed Gauge's app voice (callouts, warnings and startup announcement) is a
+set of WAV files generated with **Piper**, a local neural text-to-speech
+engine, using the voice model **"Amy"** (`en_US-amy-medium`) by
+**Mycroft / Rhasspy**.
+
+- **Piper:** created as [rhasspy/piper](https://github.com/rhasspy/piper)
+  (MIT), now continued as the `piper-tts` package from
+  [OHF-Voice/piper1-gpl](https://github.com/OHF-Voice/piper1-gpl)
+  (GPL-3.0-or-later). It is only installed locally to run the generator;
+  no Piper code is part of this repository or of Speed Gauge.
+- **Amy voice model:** [rhasspy/piper-voices](https://huggingface.co/rhasspy/piper-voices),
+  licensed Creative Commons Attribution-ShareAlike 4.0 International
+  ([CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/)).
+
+The generated files are not in this repository (the training-data license
+of the voice is undocumented). Each user generates them with
+[`tools/voice/`](tools/voice/README.md), which also writes a `CREDITS.txt`
+carrying this attribution into the generated folder. A shared copy of the
+generated files is under CC BY-SA 4.0.
+
 ## JETI model official demos
 
 [`docs/examples/jeti-demos/`](docs/examples/jeti-demos/) holds unmodified demos

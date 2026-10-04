@@ -186,14 +186,15 @@ moves, the max marker stays at the peak, and both numbers match.
 **Acceptance Scenarios**:
 
 1. **Given** the window is placed in the normal (single) size, **Then** it
-   shows the compact arc gauge. The value arc and max marker are visible, and
-   the current speed and session max appear as numbers, all readable without
-   overlap.
-2. **Given** the window is placed in the double size, **Then** it shows the
-   full dial from the visual design reference below. That means a dark face,
-   rim scale, colored value arc, overspeed zone, max marker, and the current
-   speed as a large center number with its unit. Max, stall and overspeed
-   appear as small labeled rows as room permits.
+   shows the current speed and session max as numbers over a thin bar
+   gauge. The bar's value, overspeed zone and max tick are visible, all
+   readable without overlap (changed from a compact arc after transmitter
+   testing, 2026-10-03).
+2. **Given** the window is placed in the double size, **Then** it shows a
+   small dial in the style of the visual design reference below: dark
+   face, ticks, colored value arc, overspeed zone, stall and landing marks
+   and max marker. The current speed is a large number with its unit beside
+   the dial, with MAX below it.
 2a. **Given** the full-screen window is selected, **Then** it shows a large
    dial with a side panel of labeled values, as in the visual design
    reference.
@@ -252,40 +253,44 @@ lists as 480 × 480 px, running the JUi2 interface. Earlier transmitters (the
 original DC/DS-24, DC/DS-16/14, DS-12) have smaller screens and are **not
 supported for the gauge** (see FR-013a).
 
-**Measured window sizes** (JETI Studio emulator, firmware 6.04, with
-`tools/probe/PROBE.lua`, 2026-09-27):
+**Measured window sizes** (`tools/probe/PROBE.lua`; the transmitter's own
+screenshots, 2026-10-03):
 
-| Window | Reported size | Visible |
+| Window | DS-24 II transmitter | JETI Studio emulator 6.04 (2026-09-27) |
 | --- | --- | --- |
-| Single (small) | **157 × 60 px** | about 157 × 34 |
-| Double (large) | **157 × 127 px** | about 157 × 101 |
-| Full screen | **320 × 260 px** (sizes 3 and 4 measure the same) | about 320 × 234 |
+| Single (small) | **150 × 23 px**, all visible | 157 × 60, about 157 × 34 visible |
+| Double (large) | **150 × 68 px**, all visible | 157 × 127, about 157 × 101 visible |
+| Full screen (sizes 3 and 4) | **316 × 159 px**, all visible | 320 × 260, about 320 × 234 visible |
 
-Lua on the II uses these window sizes even though JETI lists the display as
-480 × 480; it scales them up about 1.44x. On the II the desktop draws each
-window's title bar inside that area, so about 25 px at the bottom is never
-visible (measured with the probe's ruler, 2026-09-27). The layout is designed
-for the visible sizes and adapts to each window:
+**The transmitter is the target.** The first design used the emulator's
+sizes. On the transmitter (2026-10-03) the single window showed only the
+MAX value and the double window a cramped strip. The full-screen gauge was
+cut off and filled only part of the screen, because the transmitter's
+"full screen" is a titled 316 × 159 area across the top two thirds of the
+panel. The transmitter draws each title bar above the window and enlarges
+Lua drawing about 1.45×, so curves made of coarse segments look stepped.
+The layouts below were chosen by the user that day and adapt to the
+emulator's larger windows too:
 
-- **Double window (157 × 101 visible).** The full ~270° dial, about 110 px across,
-  centered, with the large center number and unit. The Max / Stall /
-  Overspeed rows go in the corners around the dial, because there is no room
-  for a side panel.
-- **Full screen.** The layout closest to the reference photo: a large dial on
-  the left with the session max centered in the open bottom of the dial, and
-  on the right a side panel with well-spaced labeled rows: Stall,
-  Overspeed, then Air density (the correction, e.g. "+8%", or OFF / GPS) and,
-  while correction is on, the field elevation, the temperature in use with
-  its source (FR-044, added 2026-09-30) and the uncorrected sensor speed
-  (added 2026-09-27). That is six rows when correction is on, about 38 px
-  each in the visible height. The dial is about 210 px across, with a side
-  panel roughly 90 px wide. Scale numbers and the unit use a larger font than
-  in the double window. The full-screen window has no status bar: with one,
-  the desktop's model tile covers its lower-left quarter.
-- **Single window (157 × 34 visible).** Too short for a round dial. It uses
-  the compact version: a 180° arc of the same style with the unit inside it,
-  the current speed as a large number beside it, and max as a small labeled
-  number at the right. There is no numbered scale.
+- **Double window (150 × 68).** A small ~270° dial, about 74 px across, on
+  the left: face, track, overspeed zone, major ticks, stall and landing
+  marks, value arc and max marker, but no scale numbers (too small to
+  read). The current speed is large on the right with its unit below, and
+  MAX near the bottom. Stall and overspeed appear only as rim marks; there
+  is no room for their rows.
+- **Full screen (316 × 159).** The layout closest to the reference photo: a
+  dial about 180 px across on the left, with the session max centered in
+  its open bottom. On the right, a side panel of **one-line rows**, a small
+  label with its value right-aligned: Stall, Over (overspeed), Density (the
+  correction, e.g. "+8%", or OFF / GPS) and, while correction is on, Elev
+  (field elevation), the temperature in use with its source (FR-044) and
+  Raw (the uncorrected sensor speed). Six rows of about 26 px. The window
+  uses size 4: with size 3 the desktop's model tile covers its lower-left
+  corner.
+- **Single window (150 × 23).** No room for an arc. The current speed and
+  unit at the left and MAX at the right share one line, over a thin
+  horizontal bar: the value in the current-speed color, the overspeed zone
+  at the right end, and a max tick in the max color.
 
 ---
 
@@ -539,8 +544,12 @@ settings screen must say the voice files are missing.
 - **FR-013**: The app MUST offer two main-screen telemetry windows on the
   DS-24 II (and DC-24 II), the maximum an app may register:
   - "Speed Gauge": the pilot places it at single or double size;
-  - a full-screen window, also titled "Speed Gauge" (the user chose not to
-    add "(full screen)" to the title, 2026-09-27).
+  - a full-screen window titled "Speed Gauge (full screen)". On 2026-09-27
+    the user chose the same title as the first window. Transmitter testing
+    on 2026-10-03 showed two identical "Speed Gauge" entries in Displayed
+    telemetry, so the user asked for names that tell them apart. The
+    full-screen window has no title bar, so the name appears only in that
+    list.
 - **FR-013a**: The gauge is not supported on other transmitters. If the app
   runs on one, the telemetry window MUST show a short notice (e.g. "Speed
   Gauge needs DS-24 II") instead of a mis-drawn gauge. Callouts and warnings
@@ -558,12 +567,14 @@ settings screen must say the voice files are missing.
     mark is drawn in the overspeed color instead of the current-speed color
     (added 2026-09-27).
 - **FR-014a**: Current speed MUST also be shown as a large number with its unit
-  at the center of the dial (double size) or next to the arc (single size).
+  at the center of the dial (full screen), beside the dial (double size) or
+  above the bar (single size).
 - **FR-015**: The window MUST show current speed and session max speed as
   numbers, with units.
-- **FR-016**: In the double size, and in the single size where it fits, the
-  window SHOULD show secondary information: stall and overspeed speeds as rim
-  marks and as small labeled rows (Max / Stall / Overspeed).
+- **FR-016**: Where it fits, the window SHOULD show secondary information:
+  stall and overspeed speeds as rim marks (double and full screen) and as
+  labeled rows (full screen). The double window has room for the marks only,
+  and the single window shows the overspeed zone on its bar.
 - **FR-016a**: When correction is on, stall and landing-speed marks on the
   dial MUST be placed at their true-airspeed equivalents (setting × correction
   factor). The needle then crosses a mark at the moment its warning or
@@ -781,9 +792,9 @@ settings screen must say the voice files are missing.
 ## Assumptions
 
 - **Target and baseline.** The gauge targets the DS-24 II / DC-24 II
-  (firmware 6.x) only, using the measured Lua window sizes (157 × 60,
-  157 × 127 and 320 × 260, of which about 25 px at the bottom is hidden by
-  the window title), not the panel's 480 × 480. The original app was tested
+  (firmware 6.x) only, using the Lua window sizes measured on the
+  transmitter (150 × 23, 150 × 68 and 316 × 159), not the panel's
+  480 × 480 or the emulator's larger windows. The original app was tested
   only on the original DS-24. The original's
   behavior (v2.1) is the baseline; where this spec is silent, match it.
 - **Audio.** Speed Gauge's own voice set (Amy) is the primary audio when

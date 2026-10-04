@@ -21,6 +21,12 @@ Reference values (must hold within 0.001): `factor(0, nil)` = 1.0000,
 `factor(1524, nil)` = 1.0773, `factor(1524, 35)` = 1.1337,
 `factor(4572, 50)` = 1.4097.
 
+The 2026-09-30 spec changes (narrower FR-020 limits, sensor temperature) need
+no module change: the app clamps inputs before calling, and a sensor
+temperature arrives as the same `tempC` argument. `factor(4572, 50)` is now
+outside the app's input range but stays as a test of the formula. The
+in-range limit values are in research R1.
+
 ## `ag_gauge` (`src/Apps/lib/ag_gauge.lua`)
 
 Drawing helpers. The draw functions use `lcd` and must only be called from a
