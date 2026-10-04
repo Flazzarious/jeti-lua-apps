@@ -1038,10 +1038,12 @@ local function drawGlow(L, r, f0, f1)
   local step = L.glowStep
   local top = L.arcR - L.arcW / 2    -- the arc's inner edge
   if liveLines then
-    -- Emulator: side-by-side translucent polylines at each band's target alpha.
+    -- Emulator: side-by-side translucent polylines, every other band at
+    -- double width, to keep the full-screen redraw within its CPU budget
+    -- (full screen stopped there with all nine, 2026-10-03).
     local A = L.glowT
-    for i = 1, L.glowN do
-      gauge.arc(r, glowDial, L.cx, L.cy, top - (i - 0.5) * step, f0, f1, step + 1, A[i])
+    for i = 1, L.glowN, 2 do
+      gauge.arc(r, glowDial, L.cx, L.cy, top - i * step, f0, f1, 2 * step + 1, A[i])
     end
     return
   end
