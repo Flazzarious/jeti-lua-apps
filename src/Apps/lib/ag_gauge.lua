@@ -3,8 +3,8 @@
 -- SPDX-License-Identifier: MIT
 --
 -- Shared module (constitution VII): no mutable state. newDial, newCircle,
--- point and scaleStep are pure and may be called anywhere. face, arc, mark
--- and tick draw with lcd and may only be called from a registered print
+-- point and scaleStep are pure and may be called anywhere. face, arc, band,
+-- mark and tick draw with lcd and may only be called from a registered print
 -- function. Callers set the color with lcd.setColor before each draw call and
 -- pass in their own renderer from lcd.renderer().
 --
@@ -106,6 +106,48 @@ function M.arc(r, dial, cx, cy, radius, f0, f1, width, alpha)
   c, s = point(dial, f1)
   r:addPoint(cx + c * radius, cy + s * radius)
   r:renderPolyline(width, alpha or 1)
+end
+
+-- Most dial steps in one band polygon. JETI Studio crashed drawing a
+-- 90-step (about 184-point) band; DFM-InsP's live arcs stay near 24 steps
+-- (about 50 points) on the transmitter. 18 steps is at most 40 points.
+local BAND_STEPS = 18
+
+-- One polygon of a band: the outer edge forward, the inner edge back.
+local function bandPart(r, dial, cx, cy, rOuter, rInner, f0, f1, alpha)
+  local n = dial.n
+  local k0, k1 = math.floor(f0 * n) + 1, math.ceil(f1 * n) - 1
+  r:reset()
+  local c, s = point(dial, f0)
+  r:addPoint(cx + c * rOuter, cy + s * rOuter)
+  for k = k0, k1 do
+    r:addPoint(cx + dial.cx[k + 1] * rOuter, cy + dial.sy[k + 1] * rOuter)
+  end
+  c, s = point(dial, f1)
+  r:addPoint(cx + c * rOuter, cy + s * rOuter)
+  r:addPoint(cx + c * rInner, cy + s * rInner)
+  for k = k1, k0, -1 do
+    r:addPoint(cx + dial.cx[k + 1] * rInner, cy + dial.sy[k + 1] * rInner)
+  end
+  c, s = point(dial, f0)
+  r:addPoint(cx + c * rInner, cy + s * rInner)
+  r:renderPolygon(alpha or 1)
+end
+
+-- Filled ring segment between radii rOuter and rInner, from fraction f0 to
+-- f1. Unlike a wide polyline it covers each pixel once, with no overlapping
+-- joints, so a translucent band has no bright seams and both edges follow
+-- the circle (added after transmitter testing, 2026-10-03). Drawn as pieces
+-- of at most BAND_STEPS dial steps each. alpha 0..1, default 1.
+function M.band(r, dial, cx, cy, rOuter, rInner, f0, f1, alpha)
+  f0 = clamp01(f0)
+  f1 = clamp01(f1)
+  local n = dial.n
+  while f1 > f0 do
+    local fb = math.min(f1, (math.floor(f0 * n) + BAND_STEPS) / n)
+    bandPart(r, dial, cx, cy, rOuter, rInner, f0, fb, alpha)
+    f0 = fb
+  end
 end
 
 -- Anti-aliased radial line at fraction f between radii r1 and r2.

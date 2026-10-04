@@ -73,9 +73,14 @@ local C_SCALE = { 200, 200, 200 }
 local C_MINOR = { 110, 118, 130 }
 local C_TEXT = { 255, 255, 255 }
 -- Glow inside the value arc: bands fading toward the dial center (reference
--- image). Alpha per band, outermost first. Few, wide bands: each band is a
--- full arc of renderer points, and the glow dominated the CPU figure.
-local GLOW_ALPHA = { 0.40, 0.24, 0.13, 0.06, 0.025 }
+-- image), from GLOW[1] alpha at the arc to GLOW[2] at the innermost band.
+-- Many thin bands with a gentle fade read as a gradient; each band is a
+-- renderer polyline, and the glow is the biggest drawing cost (R6).
+local GLOW = { 0.36, 0.02 }
+-- TEMPORARY (2026-10-03): show this call's and the worst system.getCPU() on
+-- the full-screen gauge, to measure the glow on the transmitter. Remove
+-- before release.
+local DEBUG_CPU = true
 
 local TXT_NOTICE = "Speed Gauge needs DS-24 II"
 local TXT_MAX = "MAX"
@@ -641,7 +646,7 @@ local function updateAutoHint()
   if idxAutoHint then
     local text = ""
     if cfg.fScale == 0 then
-      text = "Auto: " .. fullScale
+      text = "Auto (overspeed + 15%): " .. fullScale
     end
     form.setProperties(idxAutoHint, { label = text })
   end
@@ -836,7 +841,10 @@ local function initForm()
 
   -- Gauge
   heading("Gauge")
-  addInt("Gauge full scale (" .. u .. ", 0 = auto)", "fScale", 0, 2000, 0, 10, onThresholdChanged)
+  -- Renamed from "Gauge full scale" after transmitter testing (2026-10-03).
+  addInt("Gauge max limit (" .. u .. ", 0 = auto)", "fScale", 0, 2000, 0, 10, onThresholdChanged)
+  hint("Highest speed on the dial. To use your sensor's")
+  hint("whole range, enter its top speed (MSpeed 450: 280 mph)")
   idxAutoHint = hint("")
   form.addRow(2)
   form.addLabel({ label = "Current speed color", width = LABEL_W })
@@ -873,6 +881,13 @@ end
 
 local roundDial, faceCircle, glowDial = nil, nil, nil   -- glowDial: coarse copy for the soft glow
 local rend = nil            -- one renderer, created lazily and reused (R6)
+local cpuPeak = 0           -- DEBUG_CPU only
+
+-- JETI Studio's simulator crashes (access violation in Qt6Core) once the
+-- speed arc and its glow are drawn as filled polygons (2026-10-03); the
+-- transmitter draws them fine. Its windows (widths 157, 320) therefore use
+-- polylines for arcs and glow, as 0.1.0 did. Set per frame in printGauge.
+local liveLines = false
 
 -- One layout cache per layout, rebuilt when the window size or scale changes.
 local layStrip = { w = 0 }
@@ -934,6 +949,26 @@ local function buildScale(L, dial, minorPer, withLabels)
   L.labels = withLabels
 end
 
+-- Glow bands for a layout: n bands step px apart, alpha falling
+-- geometrically from GLOW[1] to GLOW[2] so neighbors differ only slightly.
+-- The bands are nested filled ring segments, all starting at the arc:
+-- layer k reaches k * step inward, so the glow builds up toward the arc
+-- and neighbors share no seams. Each layer's alpha is solved so the total
+-- in band k is the target A_k: (1 - A_k) = (1 - a_k)(1 - A_k+1).
+local function buildGlow(L, step, n)
+  L.glowStep, L.glowN = step, n
+  local A, a = {}, {}
+  local k = (GLOW[2] / GLOW[1]) ^ (1 / (n - 1))
+  for i = 1, n do
+    A[i] = GLOW[1] * k ^ (i - 1)
+  end
+  a[n] = A[n]
+  for i = n - 1, 1, -1 do
+    a[i] = 1 - (1 - A[i]) / (1 - A[i + 1])
+  end
+  L.glowA, L.glowT = a, A
+end
+
 -- Double window (transmitter 150 x 68): a small 270-degree dial on the left
 -- without scale numbers (too small to read), current speed and MAX on the
 -- right. Stall and overspeed stay as rim marks only (FR-016 "SHOULD").
@@ -942,7 +977,7 @@ local function buildRound(L, w, h)
   L.R, L.cx = R, 2 + R
   L.cy = math.floor((h - R * 1.707) / 2 + R)
   L.arcR, L.arcW, L.markW = R - 3, 4, 3
-  L.glowStep, L.glowN = 3, 3
+  buildGlow(L, 2, 6)
   L.tickOut, L.majorLen, L.minorLen = R - 7, 4, 2
   L.labelFont = FONT_MINI
   L.dial, L.face, L.showMarks = roundDial, true, true
@@ -964,7 +999,7 @@ local function buildFull(L, w, h)
   L.R, L.cx = R, 2 + R
   L.cy = math.floor((h - R * 1.707) / 2 + R)
   L.arcR, L.arcW, L.markW = R - 5, 7, 5
-  L.glowStep, L.glowN = 5, 5
+  buildGlow(L, 3, 9)
   L.tickOut, L.majorLen, L.minorLen = R - 11, 9, 5
   L.labelFont = big and FONT_NORMAL or FONT_MINI
   L.unitFont = L.labelFont
@@ -1001,32 +1036,123 @@ end
 -- r: bands fading toward the dial center, as in the reference image.
 local function drawGlow(L, r, f0, f1)
   local step = L.glowStep
-  local r0 = L.arcR - L.arcW // 2 - step // 2
+  local top = L.arcR - L.arcW / 2    -- the arc's inner edge
+  if liveLines then
+    -- Emulator: side-by-side translucent polylines at each band's target alpha.
+    local A = L.glowT
+    for i = 1, L.glowN do
+      gauge.arc(r, glowDial, L.cx, L.cy, top - (i - 0.5) * step, f0, f1, step + 1, A[i])
+    end
+    return
+  end
+  local a = L.glowA
   for i = 1, L.glowN do
-    gauge.arc(r, glowDial, L.cx, L.cy, r0 - (i - 1) * step, f0, f1, step + 1, GLOW_ALPHA[i])
+    gauge.band(r, glowDial, L.cx, L.cy, top, top - i * step, f0, f1, a[i])
   end
 end
 
 -- The transmitter draws lines at Lua resolution and enlarges them ~1.45x
--- without smoothing, so curved edges step (2026-10-03). A wider pass at
--- partial alpha under the solid arc gives the edge pixels in-between
+-- without smoothing, so curved edges step (2026-10-03). Arcs are filled
+-- ring segments (no overlapping polyline joints), with a slightly wider
+-- translucent segment under each to give the edge pixels in-between
 -- colors, which hides the steps much as anti-aliasing would.
 local SOFT_ALPHA = 0.35
 
 local function softArc(r, dial, cx, cy, radius, f0, f1, width)
-  gauge.arc(r, dial, cx, cy, radius, f0, f1, width + 2, SOFT_ALPHA)
-  gauge.arc(r, dial, cx, cy, radius, f0, f1, width)
+  if liveLines then
+    gauge.arc(r, dial, cx, cy, radius, f0, f1, width + 2, SOFT_ALPHA)
+    gauge.arc(r, dial, cx, cy, radius, f0, f1, width)
+    return
+  end
+  local hw = width / 2
+  gauge.band(r, dial, cx, cy, radius + hw + 1, radius - hw - 1, f0, f1, SOFT_ALPHA)
+  gauge.band(r, dial, cx, cy, radius + hw, radius - hw, f0, f1)
 end
 
--- Smooth face and track drawn in advance by tools/dial/make_dial.py, one PNG
--- per transmitter window size (dial-316x159.png, dial-150x68.png), as
--- DFM-InsP does for its dials. Loaded once per size; nil (other sizes, such
--- as the emulator's, or a missing file) means draw them live.
-local function loadDialImage(L, w, h)
+-- Smooth images drawn in advance by tools/dial/make_dial.py for each
+-- transmitter window size, as DFM-InsP does for its dials: the face and
+-- track (dial-WxH.png), and full 270-degree rings for the overspeed zone
+-- (ring-WxH-z.png), the speed arc past the limit (-o) and the speed arc in
+-- each color preset (-1 .. -9). Loaded once per size, the speed arc again
+-- when its color changes. nil (other sizes, such as the emulator's, or a
+-- missing file) means draw that part live.
+local function loadDialImages(L, w, h)
   if L.imgW ~= w or L.imgH ~= h then
+    local ring = AUDIO_DIR .. "ring-" .. w .. "x" .. h .. "-"
     L.img = lcd.loadImage(AUDIO_DIR .. "dial-" .. w .. "x" .. h .. ".png")
+    L.ringZone = lcd.loadImage(ring .. "z.png")
+    L.ringOver = lcd.loadImage(ring .. "o.png")
+    L.ringPath, L.ringCurIdx = ring, nil
     L.imgW, L.imgH = w, h
   end
+  if L.ringCurIdx ~= cfg.colCur then
+    L.ringCur = lcd.loadImage(L.ringPath .. cfg.colCur .. ".png")
+    L.ringCurIdx = cfg.colCur
+  end
+end
+
+-- Point on the arc's center line at fraction f, rounded to pixels.
+local function ringCut(L, f)
+  local c, s = gauge.point(L.dial, f)
+  return round(L.cx + c * L.arcR), round(L.cy + s * L.arcR)
+end
+
+-- Shows the part of a pre-drawn ring image from fraction f0 to f1 by
+-- clipping to rectangles. The 270-degree sweep has three 90-degree sectors:
+-- left (f 0..1/3, the ring runs up, cut horizontally), top (1/3..2/3, runs
+-- right, cut vertically) and right (2/3..1, runs down, cut horizontally),
+-- so each cut crosses the ring nearly square. Adjacent sectors split at the
+-- 135- and 45-degree points; both sides show the same image, so no seam.
+-- lcd.setClipping also moves the drawing origin to the clip rectangle's
+-- top-left corner (transmitter, 2026-10-03), so the image is drawn at minus
+-- that corner to stay in place.
+local function drawRing(L, img, f0, f1)
+  if f1 <= f0 then
+    return
+  end
+  local w, h, cx = L.imgW, L.imgH, L.cx
+  local _, ySplit = ringCut(L, 1 / 3)   -- same height at 1/3 and 2/3
+  local _
+  if f0 < 1 / 3 then                     -- left: y falls as f rises
+    local top, bottom = ySplit, h
+    if f1 < 1 / 3 then
+      _, top = ringCut(L, f1)
+    end
+    if f0 > 0 then
+      _, bottom = ringCut(L, f0)
+    end
+    if bottom > top then
+      lcd.setClipping(0, top, cx, bottom - top)
+      lcd.drawImage(0, -top, img)
+    end
+  end
+  if f1 > 1 / 3 and f0 < 2 / 3 then      -- top: x rises with f
+    local left, right = 0, w
+    if f0 > 1 / 3 then
+      left = ringCut(L, f0)
+    end
+    if f1 < 2 / 3 then
+      right = ringCut(L, f1)
+    end
+    if right > left then
+      lcd.setClipping(left, 0, right - left, ySplit)
+      lcd.drawImage(-left, 0, img)
+    end
+  end
+  if f1 > 2 / 3 then                     -- right: y rises with f
+    local top, bottom = ySplit, h
+    if f0 > 2 / 3 then
+      _, top = ringCut(L, f0)
+    end
+    if f1 < 1 then
+      _, bottom = ringCut(L, f1)
+    end
+    if bottom > top then
+      lcd.setClipping(cx, top, w - cx, bottom - top)
+      lcd.drawImage(-cx, -top, img)
+    end
+  end
+  lcd.resetClipping()
 end
 
 -- Fixed parts of the dial: background, face, track, overspeed zone and its
@@ -1037,7 +1163,7 @@ local function drawStatic(L, w, h)
   local cx, cy, arcR, dial = L.cx, L.cy, L.arcR, L.dial
   setColor(C_BG)
   lcd.drawFilledRectangle(0, 0, w, h)
-  loadDialImage(L, w, h)
+  loadDialImages(L, w, h)
   if L.img then
     lcd.drawImage(0, 0, L.img)
   else
@@ -1051,7 +1177,11 @@ local function drawStatic(L, w, h)
   end
   setColor(C_ZONE)
   drawGlow(L, r, fOver, 1)
-  softArc(r, dial, cx, cy, arcR, fOver, 1, 4)
+  if L.ringZone then
+    drawRing(L, L.ringZone, fOver, 1)
+  else
+    softArc(r, dial, cx, cy, arcR, fOver, 1, 4)
+  end
   setColor(C_MINOR)
   for k = 1, #L.nx1 do
     lcd.drawLine(L.nx1[k], L.ny1[k], L.nx2[k], L.ny2[k])
@@ -1085,11 +1215,19 @@ local function drawValue(L)
     local fBelow = math.min(f, fOver)
     setColor(COLORS[cfg.colCur])
     drawGlow(L, rend, 0, fBelow)
-    softArc(rend, dial, cx, cy, arcR, 0, fBelow, L.arcW)
+    if L.ringCur then
+      drawRing(L, L.ringCur, 0, fBelow)
+    else
+      softArc(rend, dial, cx, cy, arcR, 0, fBelow, L.arcW)
+    end
     if f > fOver then
       setColor(C_ZONE)
       drawGlow(L, rend, fOver, f)
-      softArc(rend, dial, cx, cy, arcR, fOver, f, L.arcW)
+      if L.ringOver then
+        drawRing(L, L.ringOver, fOver, math.min(f, 1))
+      else
+        softArc(rend, dial, cx, cy, arcR, fOver, f, L.arcW)
+      end
     end
     setColor(C_TEXT)
     gauge.mark(rend, dial, cx, cy, arcR - L.arcW, arcR + 2, f, 2)
@@ -1179,6 +1317,16 @@ local function drawFull(w, h)
       tempLabel == TXT_TEMP.out and C_ZONE or nil)
     drawPanelRow(L, 5, TXT_SENSOR, sensText, unitText)
   end
+  if DEBUG_CPU then
+    -- This call's CPU share at its end, and the worst seen (top-left corner).
+    local c = system.getCPU()
+    if c > cpuPeak then
+      cpuPeak = c
+    end
+    setColor(C_ZONE)
+    lcd.drawNumber(2, 0, c, FONT_MINI)
+    lcd.drawNumber(26, 0, cpuPeak, FONT_MINI)
+  end
 end
 
 local function drawStrip(w, h)
@@ -1231,7 +1379,8 @@ local function printGauge(w, h)
     rend = lcd.renderer()
   end
   -- Only the emulator hides a title bar inside the window (see TITLE_H).
-  if w == 157 or w == 320 then
+  liveLines = w == 157 or w == 320
+  if liveLines then
     h = h - TITLE_H
   end
   if h < 45 then
@@ -1315,7 +1464,7 @@ local function init()
   -- and save renderer calls every frame.
   roundDial = gauge.newDial(90, 225, 270)
   faceCircle = gauge.newCircle(90)
-  glowDial = gauge.newDial(27, 225, 270)
+  glowDial = gauge.newDial(54, 225, 270)   -- 5-degree steps (10 looked polygonal)
   gaugeOk = string.find(system.getDeviceType() or "", "24 II", 1, true) ~= nil
 
   system.registerForm(1, MENU_APPS, APP_NAME, initForm, keyForm, nil, closeForm)

@@ -394,7 +394,7 @@ reading its label and hint.
 | *(new)* | Temperature sensor | Used when source is Sensor. Lists only telemetry values that report a temperature. Hint: "Sensors inside the model can read warmer than outside air" |
 | *(new)* | Correct for air density: on/off | Shows the resulting factor, e.g. "+13%" |
 | *(new)* | Current speed color / Max speed color | Gauge colors |
-| *(new)* | Gauge full scale | Top of the dial |
+| *(new)* | Gauge max limit (0 = auto) | Highest speed on the dial; enter the sensor's top speed to use its whole range. Renamed from "Gauge full scale" after transmitter testing, 2026-10-03 |
 | *(new)* | Reset max speed | Clears the session max |
 | *(new)* | Announce stall speed at startup | Turns off the startup announcement (FR-028) |
 | *(new)* | Voice: Speed Gauge / Transmitter | Which voice speaks callouts (FR-032). Shows "voice files missing" if the Speed Gauge voice isn't installed |

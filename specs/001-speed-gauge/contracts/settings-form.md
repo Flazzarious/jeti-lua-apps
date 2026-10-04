@@ -40,7 +40,7 @@ px as in v2.1; hints are `FONT_MINI` rows.
 | 24b | *temperature status* | label | FR-042, while correction is on: "Temp: 15 °C standard" / "Temp: 20 °C manual" / "Temp: 35 °C from MSpeed 450" / "Sensor not available - using standard". Updated live while the form is open (R17) |
 | 24c | *hint* | label | "Leave correction off if your sensor already corrects for air density" |
 | | **Gauge** | | |
-| 25 | Gauge full scale (*unit*, 0 = auto) | intbox 0–2000 | hint shows "Auto: 230" |
+| 25 | Gauge max limit (*unit*, 0 = auto) | intbox 0–2000 | Renamed from "Gauge full scale" (2026-10-03). Hints: "Highest speed on the dial. To use your sensor's whole range, enter its top speed (MSpeed 450: 280 mph)" and "Auto (overspeed + 15%): 230" |
 | 26 | Current speed color | selectbox | R8 presets (no red or orange); default Cyan |
 | 27 | Max speed color | selectbox | R8 presets; default Yellow |
 | 28 | Reset max speed | link | clears session max (FR-019, US3 #6) |

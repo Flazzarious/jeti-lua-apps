@@ -103,6 +103,11 @@ the emulator's numbers above:
 - No app gets more than this area: DFM-InsP (MIT; studied, not copied) also
   registers size-4 windows, clears `0, 0, 319, 158`, and ships its panel
   images at 318 × 159.
+- **`lcd.setClipping(x, y, w, h)` also moves the origin** to (x, y): after
+  it, `lcd.drawImage(0, 0, img)` puts the image's corner at the clip
+  rectangle's corner, not the window's. Draw at `(-x, -y)` to keep window
+  coordinates. Clipping itself works on images (transmitter, 2026-10-03,
+  `Screen017/018.png`). `lcd.resetClipping()` restores the window.
 - The transmitter can save screenshots to the SD card root
   (`Screen001.png`, 480 × 480): the quickest way to check a layout.
 - **Model tile:** the desktop's model tile (model name, image, page "n/3")

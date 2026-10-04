@@ -1,19 +1,25 @@
-"""make_dial.py - pre-drawn, smooth dial backgrounds for Speed Gauge.
+"""make_dial.py - pre-drawn, smooth dial images for Speed Gauge.
 
 Copyright (c) 2026 Aaron George
 SPDX-License-Identifier: MIT
 
 The DS-24 II draws Lua lines and shapes at Lua resolution and enlarges them
 about 1.45x without smoothing, so live curves look stepped. Images keep
-their smoothed edges (DFM-InsP's dials are PNGs). This script draws the
-parts of the dial that never change with settings, the face and the track
-ring, as anti-aliased PNGs, one per transmitter window size:
+their smoothed edges (DFM-InsP's dials are PNGs). This script draws, for
+each transmitter window size that shows a dial:
 
-    src/Apps/AG-SpdGa/dial-316x159.png   full screen
-    src/Apps/AG-SpdGa/dial-150x68.png    double window
+    dial-WxH.png       the face and track ring (opaque), drawn first
+    ring-WxH-z.png     the overspeed zone ring, all 270 degrees (transparent)
+    ring-WxH-o.png     the speed arc in the overspeed color, past the limit
+    ring-WxH-1..9.png  the speed arc in each current-speed color preset
+
+The app shows only the needed part of a ring with lcd.setClipping. Sizes:
+316 x 159 (full screen) and 150 x 68 (double window). Output goes to
+src/Apps/AG-SpdGa/.
 
 The geometry must match buildFull / buildRound in src/Apps/AG-SpdGa.lua,
-and the colors C_BG, C_FACE and C_TRACK. Run after changing either:
+and the colors C_BG, C_FACE, C_TRACK, C_ZONE and COLORS. Run after
+changing either:
 
     python tools/dial/make_dial.py
 
@@ -31,7 +37,14 @@ OUT = REPO / "src" / "Apps" / "AG-SpdGa"
 C_BG = (8, 10, 14)
 C_FACE = (20, 24, 32)
 C_TRACK = (70, 78, 90)
-TRACK_W = 3          # same width as the live track
+C_ZONE = (255, 80, 0)
+COLORS = [  # COLORS in the app, same order (research R8)
+    (0, 190, 255), (40, 110, 255), (255, 255, 255), (0, 210, 100),
+    (170, 240, 0), (230, 60, 230), (150, 100, 255), (170, 170, 170),
+    (255, 225, 0),
+]
+TRACK_W = 3          # live track width
+ZONE_W = 4           # live overspeed zone width
 SS = 4               # samples per pixel along each axis
 
 
@@ -39,14 +52,14 @@ def full_geometry(w, h):
     """buildFull: dial on the left of the full-screen window."""
     r = math.floor(min((h - 4) / 1.707, (w - 130) / 2 - 2))
     cy = math.floor((h - r * 1.707) / 2 + r)
-    return r, 2 + r, cy, r - 5
+    return {"r": r, "cx": 2 + r, "cy": cy, "arc_r": r - 5, "arc_w": 7}
 
 
 def round_geometry(w, h):
     """buildRound: small dial on the left of the double window."""
     r = math.floor(min((h - 4) / 1.707, w * 0.55 / 2))
     cy = math.floor((h - r * 1.707) / 2 + r)
-    return r, 2 + r, cy, r - 3
+    return {"r": r, "cx": 2 + r, "cy": cy, "arc_r": r - 3, "arc_w": 4}
 
 
 def in_sweep(dx, dy):
@@ -56,60 +69,108 @@ def in_sweep(dx, dy):
     return not (225 < a < 315)
 
 
-def render(w, h, geometry):
-    r, cx, cy, arc_r = geometry(w, h)
-    img_w = min(w, cx + r + 2)    # just the dial; the app fills the rest
-    rows = []
-    half = TRACK_W / 2
+def coverage(w, h, g, test, near):
+    """Fraction of each pixel's SS x SS samples for which test(d, dx, dy) is
+    true; pixels whose center isn't near(d) are skipped as 0 or 1."""
+    cx, cy = g["cx"] + 0.5, g["cy"] + 0.5   # Lua pixel (x, y) spans [x, x+1)
+    out = []
     step = 1 / SS
     for py in range(h):
-        row = bytearray()
-        for px in range(img_w):
-            face = track = 0
+        row = []
+        for px in range(w):
+            d0 = math.hypot(px + 0.5 - cx, py + 0.5 - cy)
+            hit = near(d0)
+            if hit is not None:
+                row.append(hit)
+                continue
+            n = 0
             for sy in range(SS):
-                y = py + (sy + 0.5) * step
+                dy = py + (sy + 0.5) * step - cy
                 for sx in range(SS):
-                    x = px + (sx + 0.5) * step
-                    # Lua draws pixel (px, py) over [px, px+1); centers at +0.5.
-                    dx, dy = x - (cx + 0.5), y - (cy + 0.5)
-                    d = math.hypot(dx, dy)
-                    if d <= r:
-                        face += 1
-                        if abs(d - arc_r) <= half and in_sweep(dx, dy):
-                            track += 1
-            n = SS * SS
-            f, t = face / n, track / n
-            px_col = []
-            for c in range(3):
-                v = C_BG[c] * (1 - f) + C_FACE[c] * f       # face over background
-                v = v * (1 - t) + C_TRACK[c] * t            # track over face
-                px_col.append(round(v))
-            row += bytes(px_col)
-        rows.append(bytes(row))
-    return img_w, rows
+                    dx = px + (sx + 0.5) * step - cx
+                    if test(math.hypot(dx, dy), dx, dy):
+                        n += 1
+            row.append(n / (SS * SS))
+        out.append(row)
+    return out
 
 
-def write_png(path, w, h, rows):
-    raw = b"".join(b"\x00" + row for row in rows)   # filter type 0 per row
+def ring_coverage(w, h, g, radius, width):
+    half = width / 2
+
+    def test(d, dx, dy):
+        return abs(d - radius) <= half and in_sweep(dx, dy)
+
+    def near(d):
+        return 0 if abs(d - radius) > half + 1.5 else None
+
+    return coverage(w, h, g, test, near)
+
+
+def face_coverage(w, h, g):
+    r = g["r"]
+
+    def test(d, dx, dy):
+        return d <= r
+
+    def near(d):
+        if d < r - 1.5:
+            return 1
+        if d > r + 1.5:
+            return 0
+        return None
+
+    return coverage(w, h, g, test, near)
+
+
+def write_png(path, w, h, rows, alpha):
+    raw = b"".join(b"\x00" + bytes(row) for row in rows)   # filter type 0
+    color_type = 6 if alpha else 2                        # RGBA or RGB, 8-bit
 
     def chunk(kind, data):
         return (struct.pack(">I", len(data)) + kind + data
                 + struct.pack(">I", zlib.crc32(kind + data) & 0xFFFFFFFF))
 
-    png = (b"\x89PNG\r\n\x1a\n"
-           + chunk(b"IHDR", struct.pack(">IIBBBBB", w, h, 8, 2, 0, 0, 0))  # 8-bit RGB
-           + chunk(b"IDAT", zlib.compress(raw, 9))
-           + chunk(b"IEND", b""))
-    path.write_bytes(png)
+    path.write_bytes(b"\x89PNG\r\n\x1a\n"
+                     + chunk(b"IHDR", struct.pack(">IIBBBBB", w, h, 8, color_type, 0, 0, 0))
+                     + chunk(b"IDAT", zlib.compress(raw, 9))
+                     + chunk(b"IEND", b""))
+
+
+def dial_image(w, h, g):
+    """Opaque: background, face, track ring."""
+    face = face_coverage(w, h, g)
+    track = ring_coverage(w, h, g, g["arc_r"], TRACK_W)
+    rows = []
+    for fr, tr in zip(face, track):
+        row = []
+        for f, t in zip(fr, tr):
+            for c in range(3):
+                v = C_BG[c] * (1 - f) + C_FACE[c] * f
+                row.append(round(v * (1 - t) + C_TRACK[c] * t))
+        rows.append(row)
+    return rows
+
+
+def ring_image(cov, color):
+    """Transparent: one color, alpha = coverage."""
+    return [[v for a in row for v in (*color, round(255 * a))] for row in cov]
 
 
 def main():
     for w, h, geometry in ((316, 159, full_geometry), (150, 68, round_geometry)):
-        img_w, rows = render(w, h, geometry)
-        path = OUT / f"dial-{w}x{h}.png"
-        write_png(path, img_w, h, rows)
-        r, cx, cy, arc_r = geometry(w, h)
-        print(f"{path.relative_to(REPO)}: {img_w} x {h}, R={r} cx={cx} cy={cy} track R={arc_r}")
+        g = geometry(w, h)
+        img_w = min(w, g["cx"] + g["r"] + 2)   # just the dial; the app fills the rest
+        tag = f"{w}x{h}"
+        write_png(OUT / f"dial-{tag}.png", img_w, h, dial_image(img_w, h, g), False)
+        zone = ring_coverage(img_w, h, g, g["arc_r"], ZONE_W)
+        write_png(OUT / f"ring-{tag}-z.png", img_w, h, ring_image(zone, C_ZONE), True)
+        value = ring_coverage(img_w, h, g, g["arc_r"], g["arc_w"])
+        write_png(OUT / f"ring-{tag}-o.png", img_w, h, ring_image(value, C_ZONE), True)
+        for i, color in enumerate(COLORS, 1):
+            write_png(OUT / f"ring-{tag}-{i}.png", img_w, h, ring_image(value, color), True)
+        print(f"{tag}: {img_w} x {h}, R={g['r']} cx={g['cx']} cy={g['cy']} "
+              f"arc R={g['arc_r']} width {g['arc_w']}; 12 images")
 
 
 if __name__ == "__main__":
