@@ -104,13 +104,13 @@ local KEYS = {
   "sId", "sPar", "sLbl", "sType", "swOn", "swCont", "tMin", "tMax", "sens",
   "vLand", "vStall", "vOver", "cal", "units", "numOnly", "startAnn", "densOn",
   "elev", "temp", "tSrc", "tId", "tPar", "tLbl", "colCur", "colMax", "fScale",
-  "voice", "cfgV",
-}  -- 28 keys (limit 30)
+  "voice", "vArm", "landOn", "cfgV",
+}  -- 30 keys: the limit (constitution IV). Make room before adding another.
 local DEFAULTS = {
   sId = 0, sPar = 0, sLbl = "", sType = 1, tMin = 2, tMax = 40, sens = 10,
   vLand = 60, vStall = 45, vOver = 200, cal = 100, units = 1, numOnly = 0,
   startAnn = 1, densOn = 0, elev = 0, tSrc = 1, tId = 0, tPar = 0, tLbl = "",
-  colCur = 1, colMax = 9, fScale = 0, voice = 0, cfgV = 2,
+  colCur = 1, colMax = 9, fScale = 0, voice = 0, vArm = 30, landOn = 1, cfgV = 2,
 }  -- swOn / swCont default to nil; temp depends on units
 
 -- Input limits (FR-020, R16). One source for the intboxes, the units
@@ -124,7 +124,7 @@ local RANGES = {
   vLand = { 0, 1000 }, vStall = { 0, 1000 }, vOver = { 0, 1000 },
   cal = { 1, 200 }, units = { 1, 5 }, numOnly = { 0, 1 }, startAnn = { 0, 1 },
   densOn = { 0, 1 }, tSrc = { 1, 3 }, voice = { 0, 2 }, colCur = { 1, 9 },
-  colMax = { 1, 9 }, fScale = { 0, 2000 },
+  colMax = { 1, 9 }, fScale = { 0, 2000 }, vArm = { 0, 1000 }, landOn = { 0, 1 },
 }
 
 local cfg = {}
@@ -374,7 +374,7 @@ local shownSpd = nil        -- sensorSpd * kDens: shown, spoken, max, overspeed
 local maxSpd = 0
 local prevDistinct = nil    -- previous distinct shownSpd, for spike filtering (R5)
 local distinctSince = 0     -- when shownSpd last changed
-local everAboveHalf = false
+local armed = false         -- sensor speed has exceeded vArm this session (latched)
 local everAboveLanding = false
 local belowLanding = false
 local aliveSaid = false
@@ -390,7 +390,7 @@ local gaugeOk = false       -- device is a DS-24 II (R12)
 local function resetSession()
   sensorSpd, shownSpd = nil, nil
   maxSpd, prevDistinct, distinctSince = 0, nil, 0
-  everAboveHalf, everAboveLanding, belowLanding, aliveSaid = false, false, false, false
+  armed, everAboveLanding, belowLanding, aliveSaid = false, false, false, false
   stallArmed, overArmed = true, true
   lastSpokenSpd, lastSpokenAt = 0, nil
   lastTick = system.getTimeCounter()
@@ -475,7 +475,7 @@ local function checkWarnings(anySwitch)
     system.playFile(snd.over, AUDIO_IMMEDIATE)
     system.vibration(true, 3)
   end
-  if everAboveHalf and not aliveSaid then
+  if armed and not aliveSaid then
     aliveSaid = true
     system.playFile(snd.alive, AUDIO_IMMEDIATE)
   end
@@ -486,11 +486,14 @@ local function checkCallout(now, onSw, contSw)
   if not (onSw or contSw) then
     return
   end
-  if not (contSw or everAboveHalf) then
-    return                  -- FR-009: silent until first above half landing speed
+  if not armed then
+    return                  -- FR-009: silent until first above the arming speed
   end
   local interval
-  if contSw or belowLanding then
+  -- Landing speed callouts (landOn, added 2026-10-03): when off, landing
+  -- speed doesn't change the callouts; it still arms the stall warning.
+  local landing = cfg.landOn == 1
+  if contSw or (landing and belowLanding) then
     interval = cfg.tMin * 1000
   else
     local d = math.abs(shownSpd - lastSpokenSpd) / cfg.sens
@@ -506,7 +509,8 @@ local function checkCallout(now, onSw, contSw)
   local n = math.floor(shownSpd + 0.5)
   lastSpokenSpd = n
   lastSpokenAt = now
-  local short = cfg.numOnly == 1 or contSw or belowLanding or not everAboveLanding
+  local short = cfg.numOnly == 1 or contSw
+    or (landing and (belowLanding or not everAboveLanding))
   -- App voice: number file, then unit file, queued as one phrase (FR-031).
   -- Either the whole phrase is in the app voice or none of it is (R14).
   local nf = numFile(n)
@@ -707,6 +711,7 @@ local function onUnitsChanged(newUnits)
   end
   convert("sens", 1, 100)
   convert("vLand", 0, 1000)
+  convert("vArm", 0, 1000)
   convert("vStall", 0, 1000)
   convert("vOver", 0, 1000)
   if cfg.fScale ~= 0 then
@@ -767,9 +772,14 @@ local function initForm()
   form.addRow(2)
   form.addLabel({ label = "Callouts on/off switch", width = LABEL_W })
   form.addInputbox(cfg.swOn, true, function(v) save("swOn", v) end)
+  hint("Speaks speed: more often as it changes, every")
+  hint("shortest time below landing speed")
   form.addRow(2)
   form.addLabel({ label = "Continuous callouts switch", width = LABEL_W })
   form.addInputbox(cfg.swCont, true, function(v) save("swCont", v) end)
+  hint("Number only, every shortest time; works")
+  hint("without the on/off switch")
+  hint("Either switch also turns on the warnings")
 
   -- Callouts
   heading("Callouts")
@@ -777,8 +787,12 @@ local function initForm()
   hint("Speak sooner when speed changes by this much")
   addInt("Shortest time between callouts (s)", "tMin", 1, 10, 2, 1)
   addInt("Longest time between callouts (s)", "tMax", 10, 60, 40, 1)
+  addInt("Callouts start above (" .. u .. ")", "vArm", 0, 1000, 30, 1)
+  hint("No callouts or 'airspeed alive' until first this fast")
+  addCheck("Landing speed callouts", "landOn")
   addInt("Landing speed (" .. u .. ")", "vLand", 0, 1000, 60, 1, onThresholdChanged)
-  hint("Callouts every shortest time below this")
+  hint("If on: short callouts every shortest time below")
+  hint("this. Also arms the stall warning once exceeded")
   addCheck("Speak number only (no units)", "numOnly")
   addCheck("Announce stall speed at startup", "startAnn")
   -- Voice (FR-032): an unset choice shows what is actually used.
@@ -1093,18 +1107,39 @@ local function loadDialImages(L, w, h)
   end
 end
 
--- Point on the arc's center line at fraction f, rounded to pixels.
-local function ringCut(L, f)
-  local c, s = gauge.point(L.dial, f)
-  return round(L.cx + c * L.arcR), round(L.cy + s * L.arcR)
+-- Dial fractions where the sweep crosses the center lines: 180 deg (left),
+-- 90 deg (top) and 0 deg (right). They split the sweep into four quadrants.
+local QUAD = { 0, 1 / 6, 1 / 2, 5 / 6, 1 }
+
+-- Narrows the clip rectangle (x0, y0)-(x1, y1) to one side of the cut at
+-- fraction f: keepLarger keeps the part with larger fractions. The cut is
+-- horizontal where the radius at f is closer to horizontal, else vertical.
+local function clipCut(L, f, keepLarger, x0, y0, x1, y1)
+  local c, s = gauge.point(L.dial, f)   -- s is the screen sine (y points down)
+  if math.abs(c) >= math.abs(s) then
+    -- Horizontal cut: on the right half (c > 0), y grows with f.
+    local y = round(L.cy + s * L.arcR)
+    if (c > 0) == keepLarger then
+      y0 = math.max(y0, y)
+    else
+      y1 = math.min(y1, y)
+    end
+  else
+    -- Vertical cut: on the top half (s < 0), x grows with f.
+    local x = round(L.cx + c * L.arcR)
+    if (s < 0) == keepLarger then
+      x0 = math.max(x0, x)
+    else
+      x1 = math.min(x1, x)
+    end
+  end
+  return x0, y0, x1, y1
 end
 
--- Shows the part of a pre-drawn ring image from fraction f0 to f1 by
--- clipping to rectangles. The 270-degree sweep has three 90-degree sectors:
--- left (f 0..1/3, the ring runs up, cut horizontally), top (1/3..2/3, runs
--- right, cut vertically) and right (2/3..1, runs down, cut horizontally),
--- so each cut crosses the ring nearly square. Adjacent sectors split at the
--- 135- and 45-degree points; both sides show the same image, so no seam.
+-- Shows the part of a pre-drawn ring image (ring and glow) from fraction
+-- f0 to f1 through clip rectangles, one per quadrant of the dial. Quadrants
+-- meet on the center lines, which run along the radius, so neighbors join
+-- exactly, glow included; only the cuts at f0 and f1 are straight edges.
 -- lcd.setClipping also moves the drawing origin to the clip rectangle's
 -- top-left corner (transmitter, 2026-10-03), so the image is drawn at minus
 -- that corner to stay in place.
@@ -1112,46 +1147,24 @@ local function drawRing(L, img, f0, f1)
   if f1 <= f0 then
     return
   end
-  local w, h, cx = L.imgW, L.imgH, L.cx
-  local _, ySplit = ringCut(L, 1 / 3)   -- same height at 1/3 and 2/3
-  local _
-  if f0 < 1 / 3 then                     -- left: y falls as f rises
-    local top, bottom = ySplit, h
-    if f1 < 1 / 3 then
-      _, top = ringCut(L, f1)
-    end
-    if f0 > 0 then
-      _, bottom = ringCut(L, f0)
-    end
-    if bottom > top then
-      lcd.setClipping(0, top, cx, bottom - top)
-      lcd.drawImage(0, -top, img)
-    end
-  end
-  if f1 > 1 / 3 and f0 < 2 / 3 then      -- top: x rises with f
-    local left, right = 0, w
-    if f0 > 1 / 3 then
-      left = ringCut(L, f0)
-    end
-    if f1 < 2 / 3 then
-      right = ringCut(L, f1)
-    end
-    if right > left then
-      lcd.setClipping(left, 0, right - left, ySplit)
-      lcd.drawImage(-left, 0, img)
-    end
-  end
-  if f1 > 2 / 3 then                     -- right: y rises with f
-    local top, bottom = ySplit, h
-    if f0 > 2 / 3 then
-      _, top = ringCut(L, f0)
-    end
-    if f1 < 1 then
-      _, bottom = ringCut(L, f1)
-    end
-    if bottom > top then
-      lcd.setClipping(cx, top, w - cx, bottom - top)
-      lcd.drawImage(-cx, -top, img)
+  local w, h, cx, cy = L.imgW, L.imgH, L.cx, L.cy
+  for q = 1, 4 do
+    local qa, qb = QUAD[q], QUAD[q + 1]
+    local fa, fb = math.max(f0, qa), math.min(f1, qb)
+    if fb > fa then
+      local left, bottom = q <= 2, q == 1 or q == 4
+      local x0, x1 = left and 0 or cx, left and cx or w
+      local y0, y1 = bottom and cy or 0, bottom and h or cy
+      if fa > qa then
+        x0, y0, x1, y1 = clipCut(L, fa, true, x0, y0, x1, y1)
+      end
+      if fb < qb then
+        x0, y0, x1, y1 = clipCut(L, fb, false, x0, y0, x1, y1)
+      end
+      if x1 > x0 and y1 > y0 then
+        lcd.setClipping(x0, y0, x1 - x0, y1 - y0)
+        lcd.drawImage(-x0, -y0, img)
+      end
     end
   end
   lcd.resetClipping()
@@ -1178,10 +1191,12 @@ local function drawStatic(L, w, h)
     softArc(r, dial, cx, cy, arcR, 0, 1, 3)
   end
   setColor(C_ZONE)
-  drawGlow(L, r, fOver, 1)
+  -- Ring images include their glow; drawing the glow live cost too much
+  -- CPU on the transmitter (a redraw hit the limit at speed, 2026-10-03).
   if L.ringZone then
     drawRing(L, L.ringZone, fOver, 1)
   else
+    drawGlow(L, r, fOver, 1)
     softArc(r, dial, cx, cy, arcR, fOver, 1, 4)
   end
   setColor(C_MINOR)
@@ -1216,18 +1231,18 @@ local function drawValue(L)
     -- arc sits on top of its brightest band.
     local fBelow = math.min(f, fOver)
     setColor(COLORS[cfg.colCur])
-    drawGlow(L, rend, 0, fBelow)
     if L.ringCur then
       drawRing(L, L.ringCur, 0, fBelow)
     else
+      drawGlow(L, rend, 0, fBelow)
       softArc(rend, dial, cx, cy, arcR, 0, fBelow, L.arcW)
     end
     if f > fOver then
       setColor(C_ZONE)
-      drawGlow(L, rend, fOver, f)
       if L.ringOver then
         drawRing(L, L.ringOver, fOver, math.min(f, 1))
       else
+        drawGlow(L, rend, fOver, f)
         softArc(rend, dial, cx, cy, arcR, fOver, f, L.arcW)
       end
     end
@@ -1530,8 +1545,10 @@ local function loop()
   shownSpd = sensorSpd * kDens
 
   -- Flight flags use sensor speed (FR-011).
-  if sensorSpd > cfg.vLand / 2 then
-    everAboveHalf = true
+  -- Arming speed (FR-009, changed 2026-10-03): callouts, continuous
+  -- callouts and "airspeed alive" wait until this is first exceeded.
+  if sensorSpd > cfg.vArm then
+    armed = true
   end
   if sensorSpd > cfg.vLand then
     everAboveLanding = true

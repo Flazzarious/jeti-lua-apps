@@ -11,7 +11,7 @@ Two kinds of state: **model settings**, persisted per model with
 
 All values are integers, strings or SwitchItems (no floats). Speeds are stored
 in the selected units; elevation and temperature in the unit system the speed
-units imply (FR-023). 28 keys, under the limit of 30. The `winSz` fallback
+units imply (FR-023). 30 keys: the limit of 30 (constitution IV); make room before adding another. The `winSz` fallback
 is not needed: size 0 was verified in the emulator (research R7), so the key
 is never created.
 
@@ -44,6 +44,8 @@ is never created.
 | `colMax` | int | 1–9 | 9 Yellow | Max speed color |
 | `fScale` | int unit | 0 = Auto, 10–2000 | 0 | Gauge full scale |
 | `voice` | int | 0 not chosen, 1 Speed Gauge, 2 Transmitter | 0 | Voice (FR-032). 0 resolves to Speed Gauge if the voice files are present, else Transmitter (research R14) |
+| `vArm` | int unit | 0–1000 | 30 | Callouts start above (FR-009, added 2026-10-03). Converted with the other speeds on a units change |
+| `landOn` | int 0/1 | | 1 | Landing speed callouts (FR-006, added 2026-10-03). Off: below-landing fast short callouts stop; stall arming unchanged |
 | `cfgV` | int | | 2 | Settings layout version. 1 = 0.1.0 (had `tStd`); 2 = this design |
 
 Defaults for speeds match v2.1 (`VrefSpd` 60, `Vs0Spd` 45, `maxSpd` 200 in
@@ -107,7 +109,7 @@ Reset by `init()`, so it resets on power-on, model load and app reload
 | `distinctSince` | int ms | 0 | When `shownSpd` last changed; a value held 1 s counts for the max (R5) |
 | `everAboveLanding` | bool | false | Sensor speed has exceeded `vLand` this session |
 | `belowLanding` | bool | false | Currently at/below `vLand` after being above |
-| `everAboveHalf` | bool | false | Sensor speed has exceeded `vLand / 2` this session (FR-009 gate) |
+| `armed` | bool | false | Sensor speed has exceeded `vArm` this session (FR-009 gate; was `everAboveHalf`, `vLand / 2`) |
 | `aliveSaid` | bool | false | "Airspeed alive" has played |
 | `stallArmed` | bool | true | Stall warning may fire |
 | `overArmed` | bool | true | Overspeed warning may fire |
@@ -140,10 +142,10 @@ Warnings (a crossing fires only while a switch is on; re-arming is always tracke
             fired --[sensorSpd > vStall]--> armed
  overspeed: armed --[shownSpd > vOver]--> fired (sound, vibrate 3)
             fired --[shownSpd <= vOver]--> armed
- alive:     not said --[everAboveHalf]--> said (once per session)
+ alive:     not said --[armed]--> said (once per session)
 
 Flight flags (whenever valid):
- sensorSpd > vLand / 2         -> everAboveHalf = true (latched)
+ sensorSpd > vArm              -> armed = true (latched)
  sensorSpd > vLand             -> everAboveLanding = true, belowLanding = false
  sensorSpd <= vLand and ever   -> belowLanding = true
 
@@ -151,7 +153,7 @@ Callout due when all hold:
  - a switch is on
  - not system.isPlayback()
  - now >= lastSpokenAt + interval   (R9)
- - continuous on, or everAboveHalf (FR-009)
+ - armed (FR-009; continuous mode no longer bypasses it)
  Short form (number only) if numOnly, belowLanding (or never above), or continuous.
 ```
 

@@ -181,8 +181,8 @@ def main() -> int:
                     help="output folder (default: src/Apps/AG-SpdGa/voice)")
     ap.add_argument("--rate", type=int, choices=(16000, 22050, 44100), default=22050,
                     help="output sample rate (default 22050, Amy's own)")
-    ap.add_argument("--speed", type=float, default=1.3,
-                    help="speaking speed; 1.3 is 30%% faster than Piper's own pace (default 1.3, chosen after listening on the transmitter)")
+    ap.add_argument("--speed", type=float, default=1.5,
+                    help="speaking speed relative to Piper's own pace (default 1.5: fits SC-009's 1.3 s)")
     args = ap.parse_args()
 
     if not args.model.is_file():

@@ -90,7 +90,7 @@ Defaults: mph, landing 60, stall 45, overspeed 200.
 | 9 | Repeat crossings 10× each | Exactly one warning per crossing | SC-002 |
 | 10 | Restart app, speed 40 without ever > 60 | No stall warning | US2 #2 |
 | 11 | Both switches off | Silence; gauge still moves | US1 #5, FR-012 |
-| 12 | Continuous switch on | Number every 2 s at any speed | US1 #4 |
+| 12 | Continuous switch on, before and after first passing 30 | Silent while never above 30; then a number every 2 s at any speed | US1 #4, #7, FR-009 |
 | 13 | Set speed that takes > 2 s to speak repeatedly | No backlog; callouts wait | FR-007 |
 
 Gauge (run each in the single, double and full-screen windows; compare with

@@ -89,6 +89,18 @@ principle I).
   wasn't. The side panel now has a Temperature row showing the temperature
   in use and its source (FR-044).
 
+### Session 2026-10-03 (first transmitter tests)
+
+- Q: With callouts on and the model standing still, callouts still came
+  (continuous mode ignored the old "half of landing speed" rule). How
+  should callouts wait for flight? → A: A new setting, **"Callouts start
+  above"** (default 30 mph), arms callouts once sensor speed first exceeds
+  it. It stays armed for the session (restart or model change re-arms it),
+  so approach and landing callouts continue. It applies to normal and
+  continuous callouts and to "airspeed alive", and replaces the hidden
+  half-of-landing-speed rule. Stall and overspeed warnings are unaffected
+  (FR-009).
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Hear speed during flight (Priority: P1)
@@ -119,15 +131,16 @@ speed.
 3. **Given** the switch is on and the model has been above landing speed,
    **When** speed drops below landing speed, **Then** callouts come every
    "shortest time between callouts".
-4. **Given** the continuous-callouts switch is on, **When** at any speed,
-   **Then** speed is spoken every "shortest time between callouts",
-   regardless of the on/off switch.
+4. **Given** the continuous-callouts switch is on and callouts are armed
+   (FR-009), **When** at any speed, **Then** speed is spoken every
+   "shortest time between callouts", regardless of the on/off switch.
 5. **Given** both switches are off, **Then** nothing is spoken.
 6. **Given** a callout is still being spoken, **When** the next callout comes
    due, **Then** it waits until speech finishes rather than queueing up.
-7. **Given** the model has not yet exceeded half of landing speed this session
-   (sitting on the ground, taxiing), **Then** normal callouts stay silent
-   unless the continuous-callouts switch is on.
+7. **Given** the model has not yet exceeded "Callouts start above" (default
+   30 mph) this session (sitting on the ground, taxiing), **Then** no speed
+   is spoken, with either switch on (changed 2026-10-03: continuous mode no
+   longer bypasses this).
 
 ---
 
@@ -156,8 +169,8 @@ speed. Each warning should play exactly once per crossing.
 3. **Given** speed rises above the overspeed warning speed, **Then** the
    overspeed warning plays once and the stick vibrates, and it re-arms after
    speed drops back to or below the overspeed speed.
-4. **Given** it is the first time this session that sensor speed exceeds half
-   of landing speed, **Then** "airspeed alive" plays once.
+4. **Given** it is the first time this session that sensor speed exceeds
+   "Callouts start above" (FR-009), **Then** "airspeed alive" plays once.
 5. **Given** density correction is on at 5,000 ft (standard temperature) and
    the stall warning is set to 40 mph, **When** the model slows, **Then** the
    stall warning fires when sensor speed reaches 40 mph. At that moment the
@@ -382,7 +395,7 @@ reading its label and hint.
 | Speed change scale factor | Callout sensitivity (*unit* change), e.g. "(mph change)" | Speed change that makes callouts come faster. Smaller = chattier. Hint: "Speak sooner when speed changes by this much" |
 | Call Speed < Vref every (sec) | Shortest time between callouts (s) | Also the interval below landing speed and in continuous mode |
 | Call Speed at least every (sec) | Longest time between callouts (s) | Upper limit when speed is steady |
-| Reference speed (Vref) | Landing speed (fast callouts below) | Below this, speak every "shortest time" |
+| Reference speed (Vref) | Landing speed callouts (on/off) + Landing speed | On: below landing speed, short callouts every "shortest time". Off: landing speed only arms the stall warning. Toggle added and labels changed 2026-10-03 |
 | Stall speed (Vs0) | Stall warning at | Warning threshold |
 | Speed Max Warning | Overspeed warning at | Warning threshold |
 | Airspeed Calibration Multiplier (%) | Sensor calibration (%) | Scales the sensor reading; 100 = unchanged |
@@ -513,16 +526,23 @@ settings screen must say the voice files are missing.
   an interval of roughly 20 s, matching the original app's behavior.
 - **FR-006**: Below landing speed (once the model has been above it this
   session), or while the continuous switch is on, callouts MUST occur every
-  "shortest time between callouts".
+  "shortest time between callouts". The below-landing part applies only
+  while **"Landing speed callouts"** is on (default on; added 2026-10-03).
+  When it's off, landing speed doesn't change callouts, but it still arms
+  the stall warning (FR-011).
 - **FR-007**: A new callout MUST NOT start while the previous one is still
   playing.
 - **FR-008**: Callouts MUST be rounded to the nearest whole unit. Units MUST
   be spoken unless "speak number only" is set, or the speed is below landing
-  speed, or continuous mode is on (short callouts when timing matters,
-  matching the original).
-- **FR-009**: Normal callouts MUST stay silent until sensor speed first
-  exceeds half of landing speed in the session. Continuous mode overrides
-  this.
+  speed (only while "Landing speed callouts" is on), or continuous mode is
+  on (short callouts when timing matters, matching the original).
+- **FR-009**: Callouts, normal and continuous, and "airspeed alive" MUST
+  stay silent until sensor speed first exceeds the **"Callouts start
+  above"** setting (0–1000 in the selected units, default 30 mph) in the
+  session. Once exceeded they stay armed until the session ends (power-on,
+  model change or app reload). Stall and overspeed warnings don't depend on
+  it. (Changed 2026-10-03 from "half of landing speed", which continuous
+  mode overrode.)
 
 **Warnings**
 

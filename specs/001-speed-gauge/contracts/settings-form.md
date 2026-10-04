@@ -12,15 +12,18 @@ px as in v2.1; hints are `FONT_MINI` rows.
 | 3 | Sensor type | selectbox | Airspeed (pitot) / GPS; with GPS a hint row reads "GPS: warnings use ground speed, wind shifts them" (spec Assumptions) |
 | 4 | Units | selectbox | mph, km/h, kt, m/s, ft/s; converts settings (R10) |
 | 5 | Sensor calibration (%) | intbox 1–200 | hint "100 = unchanged" |
-| 6 | Callouts on/off switch | inputbox | proportional allowed |
-| 7 | Continuous callouts switch | inputbox | |
+| 6 | Callouts on/off switch | inputbox | proportional allowed. Hints (2026-10-03): "Speaks speed: more often as it changes, every" / "shortest time below landing speed" |
+| 7 | Continuous callouts switch | inputbox | Hints (2026-10-03): "Number only, every shortest time; works" / "without the on/off switch" / "Either switch also turns on the warnings" |
 | | **Callouts** | | |
 | 8 | Callout sensitivity (*unit*) | intbox 1–100 | |
 | 9 | *hint* | label | "Speak sooner when speed changes by this much" |
 | 10 | Shortest time between callouts (s) | intbox 1–10 | |
 | 11 | Longest time between callouts (s) | intbox 10–60 | |
-| 12 | Landing speed (*unit*) | intbox 0–1000 | |
-| 13 | *hint* | label | "Callouts every shortest time below this" |
+| 11a | Callouts start above (*unit*) | intbox 0–1000, default 30 | FR-009, added 2026-10-03; saves `vArm` |
+| 11b | *hint* | label | "No callouts or 'airspeed alive' until first this fast" |
+| 11c | Landing speed callouts | checkbox, default on | FR-006, added 2026-10-03; saves `landOn` |
+| 12 | Landing speed (*unit*) | intbox 0–1000 | Also arms the stall warning (FR-011) |
+| 13 | *hint* | label | "If on: short callouts every shortest time below" / "this. Also arms the stall warning once exceeded" |
 | 14 | Speak number only (no units) | checkbox | |
 | 15 | Announce stall speed at startup | checkbox | FR-028 |
 | 15a | Voice | selectbox Speed Gauge / Transmitter | FR-032. Shows the resolved choice for `voice = 0` (research R14). Saves 1 or 2 |

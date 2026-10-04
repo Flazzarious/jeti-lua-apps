@@ -331,7 +331,7 @@ Everything else matches v2.1.
 | 10 | Switch on only at `== 1` | `> 0.5` (R10) | R10 |
 | 11 | No density correction | Optional, airspeed sensors only | US4 |
 | 12 | Unused `V_ref_speed.wav`, `Spd_ann_act.wav` shipped | Not copied | cleanup |
-| 13 | Normal callouts need *current* speed > Vref/2 | Latched: once exceeded this session, stays open | FR-009, US1 #7 |
+| 13 | Normal callouts need *current* speed > Vref/2 | A "Callouts start above" setting (default 30 mph), latched for the session, gating normal and continuous callouts and "airspeed alive" (changed 2026-10-03) | FR-009, US1 #7 |
 | 14 | Transmitter voice for numbers, DFM recordings for warnings | One app voice (Amy) for all speech when installed; v2.1 audio as fallback, or by choice | US6, FR-030–FR-037 |
 | 15 | No temperature input | Temperature source Standard / Manual / Sensor for density correction | FR-038–FR-044 |
 

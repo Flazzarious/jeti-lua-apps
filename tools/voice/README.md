@@ -40,7 +40,7 @@ using the transmitter's voice and DFM's original recordings.
 | `--model` | (required) | Path to the `.onnx` file |
 | `--out` | `src/Apps/AG-SpdGa/voice` | Output folder |
 | `--rate` | `22050` | Sample rate: 16000, 22050 or 44100 Hz. Use 44100 if the transmitter won't play 22.05 kHz (research R13) |
-| `--speed` | `1.3` | Speaking speed relative to Piper's own pace. 1.3 was chosen after listening on the transmitter (2026-10-03): 1.0 and 1.2 sounded slow |
+| `--speed` | `1.5` | Speaking speed relative to Piper's own pace. 1.5 makes every number up to 199 fit SC-009's 1.3 s (longest: 1.28 s, 2026-10-03). 1.0–1.3 sounded slow or ran over. Piper varies slightly between runs: if the self-check fails, try 1.55 |
 
 Each file is mono and 16-bit, trimmed of leading and trailing silence
 (20 ms kept at each end), and normalized to the same peak level (−1 dBFS).

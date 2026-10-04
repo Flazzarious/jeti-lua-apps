@@ -20,7 +20,7 @@ applies to the whole phrase.
 | --- | --- | --- | --- |
 | Startup | `init()`, `startAnn = 1`, `cal ≠ 100` | `playFile(V.."cal.wav", Q)`, `playFile(V..cal..".wav", Q)`, `playFile(V.."pct.wav", Q)` | `playFile(D.."airspeed_cal_factor.wav", Q)`, `playNumber(cal, 0, "%")` |
 | Startup | `init()`, `startAnn = 1` | `playFile(V.."stallat.wav", Q)`, `playFile(V..vStall..".wav", Q)`, `playFile(unitFile, Q)` | `playFile(D.."stall_speed_warning_at.wav", Q)`, `playNumber(vStall, 0, unitSpoken)` |
-| Airspeed alive | first `everAboveHalf` with a switch on | `playFile(V.."alive.wav", I)` | `playFile(D.."airspeed_alive.wav", I)` |
+| Airspeed alive | first `armed` (speed above `vArm`) with a switch on | `playFile(V.."alive.wav", I)` | `playFile(D.."airspeed_alive.wav", I)` |
 | Stall | stall armed → fired | `playFile(V.."stall.wav", I)`, `vibration(true, 4)` | `playFile(D.."stall_warning.wav", I)`, `vibration(true, 4)` |
 | Overspeed | overspeed armed → fired | `playFile(V.."over.wav", I)`, `vibration(true, 3)` | `playFile(D.."overspeed.wav", I)`, `vibration(true, 3)` |
 | Callout, full | callout due, not short form | `playFile(V..n..".wav", Q)`, `playFile(unitFile, Q)` | `playNumber(n, 0, unitSpoken, "Speed")` |
