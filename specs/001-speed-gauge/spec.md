@@ -522,8 +522,8 @@ settings screen must say the voice files are missing.
 
 - **FR-005**: When the on/off switch is on, the app MUST speak speed at a
   variable interval. The interval runs from "shortest time between callouts"
-  (1–10 s, default 2 s) to "longest time between callouts" (10–60 s, default
-  40 s). It gets shorter as the speed change since the last callout grows
+  (1–10 s, default 2 s) to "longest time between callouts" (2–60 s, default
+  40 s, never below the shortest time; changed from 10–60 s on 2026-10-04). It gets shorter as the speed change since the last callout grows
   relative to "callout sensitivity" (1–100 in the selected units, default 10).
   With the default settings, a speed change equal to the sensitivity MUST give
   an interval of roughly 20 s, matching the original app's behavior.
@@ -539,6 +539,9 @@ settings screen must say the voice files are missing.
   be spoken unless "speak number only" is set, or the speed is below landing
   speed (only while "Landing speed callouts" is on), or continuous mode is
   on (short callouts when timing matters, matching the original).
+- **FR-008b**: No speed callout MUST ever be spoken below 5 mph, or its
+  equivalent in the selected units (8 km/h, 4.3 kt, 2.2 m/s, 7.3 ft/s); it
+  isn't needed and is annoying (added 2026-10-04). Warnings are unaffected.
 - **FR-009a**: Continuous callouts MUST speak only while sensor speed is above
   "Callouts start above": they stop when the model slows below it, e.g. on
   landing (added 2026-10-03). Below it, the on/off switch's normal
@@ -619,6 +622,14 @@ settings screen must say the voice files are missing.
   dial.
 - **FR-019**: Session max MUST reset at the start of each session and when the
   user chooses "Reset max speed". It is not saved between sessions.
+- **FR-019a**: A new session max MUST be called out ("max", the number and
+  unit) once it hasn't risen for 1 second, if it beats the last announced
+  max by at least the callout sensitivity (so small creeps in cruise don't
+  repeat it). It follows the callout rules: a switch on, armed (FR-009), and
+  never overlapping (FR-007). Without the app voice it is the number and
+  unit only, because the transmitter's voice pack has no "max" (added
+  2026-10-04 at the user's request; 1 s was the user's suggestion and
+  holds because the max is already spike-filtered, R5).
 
 **Air density**
 
@@ -724,7 +735,8 @@ settings screen must say the voice files are missing.
   - the unit phrases "miles per hour", "kilometers per hour", "knots",
     "meters per second", "feet per second" and "percent";
   - the phrases "stall warning", "overspeed", "airspeed alive", "stall
-    warning at" and "airspeed calibration".
+    warning at", "airspeed calibration" and "max" (added 2026-10-04,
+    FR-019a).
   Each is a separate pre-generated audio file in the app's asset folder
   (`/Apps/AG-SpdGa/voice/`). The default voice is Piper's US English
   **"Amy"**, chosen by the user on 2026-09-28.

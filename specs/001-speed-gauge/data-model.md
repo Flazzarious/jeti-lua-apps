@@ -24,7 +24,7 @@ is never created.
 | `swOn` | SwitchItem | | nil | Callouts on/off switch |
 | `swCont` | SwitchItem | | nil | Continuous callouts switch |
 | `tMin` | int s | 1–10 | 2 | Shortest time between callouts |
-| `tMax` | int s | 10–60 | 40 | Longest time between callouts |
+| `tMax` | int s | 2–60, ≥ `tMin` | 40 | Longest time between callouts (2–60 since 2026-10-04; raised to `tMin` on load and when either changes) |
 | `sens` | int unit | 1–100 | 10 | Callout sensitivity (speed change) |
 | `vLand` | int unit | 0–1000 | 60 | Landing speed (fast callouts below) |
 | `vStall` | int unit | 0–1000 | 45 | Stall warning at |

@@ -18,7 +18,7 @@ px as in v2.1; hints are `FONT_MINI` rows.
 | 8 | Callout sensitivity (*unit*) | intbox 1–100 | |
 | 9 | *hint* | label | "Speak sooner when speed changes by this much" |
 | 10 | Shortest time between callouts (s) | intbox 1–10 | |
-| 11 | Longest time between callouts (s) | intbox 10–60 | |
+| 11 | Longest time between callouts (s) | intbox 2–60 | Never below row 10: it stops at the shortest, and raising the shortest past it raises it (FR-005, 2026-10-04) |
 | 11a | Callouts start above (*unit*) | intbox 0–1000, default 30 | FR-009, added 2026-10-03; saves `vArm` |
 | 11b | *hint* | label | "No callouts or 'airspeed alive' until first this fast" |
 | 11c | Landing speed callouts | checkbox, default on | FR-006, added 2026-10-03; saves `landOn` |

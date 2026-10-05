@@ -25,6 +25,9 @@ applies to the whole phrase.
 | Overspeed | overspeed armed → fired | `playFile(V.."over.wav", I)`, `vibration(true, 3)` | `playFile(D.."overspeed.wav", I)`, `vibration(true, 3)` |
 | Callout, full | callout due, not short form | `playFile(V..n..".wav", Q)`, `playFile(unitFile, Q)` | `playNumber(n, 0, unitSpoken, "Speed")` |
 | Callout, short | callout due, short form | `playFile(V..n..".wav", Q)` | `playNumber(n, 0)` |
+| Max speed | session max unchanged for 1 s and ≥ last announced max + sensitivity (FR-019a) | `playFile(V.."max.wav", Q)`, `playFile(V..n..".wav", Q)`, `playFile(unitFile, Q)` | `playNumber(n, 0, unitSpoken)` |
+
+No callout or max callout below 5 mph or its equivalent (FR-008b).
 
 `Q` = `AUDIO_QUEUE`, `I` = `AUDIO_IMMEDIATE`, `n = round(shownSpd)`.
 

@@ -50,6 +50,7 @@ VOICE.over = VOICE.dir .. "over.wav"
 VOICE.alive = VOICE.dir .. "alive.wav"
 VOICE.stallAt = VOICE.dir .. "stallat.wav"
 VOICE.cal = VOICE.dir .. "cal.wav"
+VOICE.max = VOICE.dir .. "max.wav"         -- max-speed callout (FR-019a)
 
 -- Units. The sensor value is m/s, as in DFM v2.1 (R3).
 local UNITS_TEXT = { "mph", "km/h", "kt", "m/s", "ft/s" }
@@ -81,7 +82,7 @@ local GLOW = { 0.36, 0.02 }
 -- TEMPORARY (2026-10-03): show this call's and the worst system.getCPU() on
 -- the full-screen gauge, to measure the glow on the transmitter. Remove
 -- before release.
-local DEBUG_CPU = true
+local DEBUG_CPU = false     -- off after transmitter testing (T080, 2026-10-04)
 
 local TXT_NOTICE = "Speed Gauge needs DS-24 II"
 local TXT_MAX = "MAX"
@@ -121,7 +122,7 @@ local LIM = {
   tempF = { -20, 130 }, tempC = { -29, 54 },
 }
 local RANGES = {
-  sType = { 1, 2 }, tMin = { 1, 10 }, tMax = { 10, 60 }, sens = { 1, 100 },
+  sType = { 1, 2 }, tMin = { 1, 10 }, tMax = { 2, 60 }, sens = { 1, 100 },
   vLand = { 0, 1000 }, vStall = { 0, 1000 }, vOver = { 0, 1000 },
   cal = { 1, 200 }, units = { 1, 5 }, numOnly = { 0, 1 }, startAnn = { 0, 1 },
   densOn = { 0, 1 }, tSrc = { 1, 3 }, voice = { 0, 2 }, colCur = { 1, 9 },
@@ -172,6 +173,9 @@ local function loadSettings()
   if cfg.fScale ~= 0 and cfg.fScale < 10 then
     save("fScale", 10)
   end
+  if cfg.tMax < cfg.tMin then
+    save("tMax", cfg.tMin)    -- longest is never below shortest (FR-005)
+  end
   if UNITS_IMPERIAL[cfg.units] then
     clampKey("elev", LIM.elevFt[1], LIM.elevFt[2])
     clampKey("temp", LIM.tempF[1], LIM.tempF[2])
@@ -199,6 +203,15 @@ local densActive = false    -- correction on and an airspeed sensor
 local densRowText = "OFF"   -- full-screen AIR DENSITY row: "+8%", "OFF" or "GPS"
 local elevText, elevUnitText = "0", "ft"
 local stallText, overText = "45", "200"
+
+-- Callout floor and max-speed callout (FR-008b, FR-019a, 2026-10-04), in
+-- one table because the main chunk is near Lua's 200-local limit.
+local pk = {
+  minSpoken = 5,            -- no callouts below this (5 mph in the user's units)
+  holdMs = 1000,            -- announce a new max once it hasn't risen for this long
+  at = nil,                 -- when the session max last rose; nil = nothing pending
+  said = 0,                 -- last max announced (rounded), 0 = none yet
+}
 
 local function recomputeSensor()
   kSensor = UNITS_MULT[cfg.units] * cfg.cal / 100
@@ -291,6 +304,8 @@ end
 local function recomputeUnitText()
   unitText = UNITS_TEXT[cfg.units]
   unitSpoken = UNITS_SPOKEN[cfg.units]
+  -- No callout is ever spoken below 5 mph, in any units (FR-008b, 2026-10-04).
+  pk.minSpoken = 2.2352 * UNITS_MULT[cfg.units]
 end
 
 -- Which voice speaks (R14). voiceOk is set once in init().
@@ -315,7 +330,7 @@ local function checkVoiceFiles()
       return false
     end
   end
-  for _, p in ipairs({ VOICE.pct, VOICE.stall, VOICE.over, VOICE.alive, VOICE.stallAt, VOICE.cal,
+  for _, p in ipairs({ VOICE.pct, VOICE.stall, VOICE.over, VOICE.alive, VOICE.stallAt, VOICE.cal, VOICE.max,
     VOICE.dir .. "0.wav", VOICE.dir .. VOICE.maxNum .. ".wav" }) do
     if not fileExists(p) then
       return false
@@ -399,6 +414,7 @@ local function resetSession()
   lastTick = system.getTimeCounter()
   curRounded, maxRounded, sensRounded = nil, 0, nil
   curText, maxText, sensText = TXT_NO_DATA, "0", TXT_NO_DATA
+  pk.at, pk.said = nil, 0
   resetTempSensor()
   recomputeDensity()
 end
@@ -406,6 +422,7 @@ end
 local function resetMax()
   maxSpd, prevDistinct = 0, nil
   maxRounded, maxText = 0, "0"
+  pk.at, pk.said = nil, 0
 end
 
 ------------------------------------------------------------------------------
@@ -438,6 +455,7 @@ local function updateMax(now)
   end
   if confirmed ~= nil and confirmed > maxSpd then
     maxSpd = confirmed
+    pk.at = now               -- max-speed callout waits until it stops rising
   end
   local r = math.floor(shownSpd + 0.5)
   if r ~= curRounded then
@@ -503,6 +521,26 @@ local function checkCallout(now, onSw, contSw)
   end
   if not armed then
     return                  -- FR-009: silent until first above the arming speed
+  end
+  -- Max speed (FR-019a): once the session max hasn't risen for pk.holdMs, and
+  -- beats the last announced max by at least the callout sensitivity (so
+  -- small creeps in cruise don't chatter), say "max", the number and unit.
+  if pk.at ~= nil and now - pk.at >= pk.holdMs and maxRounded >= pk.said + cfg.sens
+    and not system.isPlayback() then
+    pk.at, pk.said = nil, maxRounded
+    lastSpokenAt = now
+    local nf = numFile(maxRounded)
+    if nf then
+      system.playFile(VOICE.max, AUDIO_QUEUE)
+      system.playFile(nf, AUDIO_QUEUE)
+      system.playFile(snd.unit, AUDIO_QUEUE)
+    else
+      system.playNumber(maxRounded, 0, unitSpoken)   -- the voice pack has no "max"
+    end
+    return
+  end
+  if shownSpd < pk.minSpoken then
+    return                  -- FR-008b: never a callout below 5 mph
   end
   local interval
   -- Landing speed callouts (landOn, added 2026-10-03): when off, landing
@@ -800,8 +838,19 @@ local function initForm()
   heading("Callouts")
   addInt("Callout sensitivity (" .. u .. " change)", "sens", 1, 100, 10, 1)
   hint("Speak sooner when speed changes by this much")
-  addInt("Shortest time between callouts (s)", "tMin", 1, 10, 2, 1)
-  addInt("Longest time between callouts (s)", "tMax", 10, 60, 40, 1)
+  -- Longest 2-60 s, never below shortest (FR-005, changed 2026-10-04):
+  -- it stops at the shortest, and raising the shortest past it raises it.
+  local idxTMax
+  local function keepTMax()
+    if cfg.tMax < cfg.tMin then
+      save("tMax", cfg.tMin)
+      if idxTMax then
+        form.setValue(idxTMax, cfg.tMax)
+      end
+    end
+  end
+  addInt("Shortest time between callouts (s)", "tMin", 1, 10, 2, 1, keepTMax)
+  idxTMax = addInt("Longest time between callouts (s)", "tMax", 2, 60, 40, 1, keepTMax)
   addInt("Callouts start above (" .. u .. ")", "vArm", 0, 1000, 30, 1)
   hint("No callouts or 'airspeed alive' until first this fast")
   addCheck("Landing speed callouts", "landOn")

@@ -37,8 +37,9 @@ PHRASES = [  # (file stem, text): FR-030
     ("alive", "airspeed alive"),
     ("stallat", "stall warning at"),
     ("cal", "airspeed calibration"),
+    ("max", "max"),              # max-speed callout (FR-019a, 2026-10-04)
 ]
-EXPECTED = MAX_NUM + 1 + len(PHRASES)  # 512
+EXPECTED = MAX_NUM + 1 + len(PHRASES)  # 513
 
 SILENCE = 184         # |sample| below this is silence: about -45 dBFS
 PAD_S = 0.020         # silence kept at each end so words don't clip
@@ -184,6 +185,8 @@ def main() -> int:
                     help="output sample rate (default 22050, Amy's own)")
     ap.add_argument("--speed", type=float, default=1.5,
                     help="speaking speed relative to Piper's own pace (default 1.5: fits SC-009's 1.3 s)")
+    ap.add_argument("--missing", action="store_true",
+                    help="only synthesize files that don't exist yet (keeps the rest unchanged)")
     args = ap.parse_args()
 
     if not args.model.is_file():
@@ -209,6 +212,8 @@ def main() -> int:
     syn_config = SynthesisConfig(length_scale=1.0 / args.speed)
     phrases = phrase_list()
     for k, (stem, text) in enumerate(phrases, 1):
+        if args.missing and (out / f"{stem}.wav").is_file():
+            continue
         samples, rate = synthesize(voice, syn_config, text)
         samples = normalize(trim(samples, rate))
         write_wav(out / f"{stem}.wav", resample(samples, rate, args.rate), args.rate)
