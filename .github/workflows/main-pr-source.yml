@@ -1,0 +1,27 @@
+# Enforces the branch rule: main is only updated by a pull request from
+# develop. The main ruleset requires this check, so a PR into main from any
+# other branch (or from a fork) cannot be merged.
+name: Main PR source
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions: {}
+
+jobs:
+  check-source:
+    name: PR source is develop
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require develop as the source branch
+        env:
+          HEAD_REF: ${{ github.head_ref }}
+          HEAD_REPO: ${{ github.event.pull_request.head.repo.full_name }}
+          BASE_REPO: ${{ github.repository }}
+        run: |
+          if [ "$HEAD_REF" != "develop" ] || [ "$HEAD_REPO" != "$BASE_REPO" ]; then
+            echo "::error::main only accepts pull requests from develop in this repository (got $HEAD_REPO:$HEAD_REF)."
+            exit 1
+          fi
+          echo "Source is develop. OK."

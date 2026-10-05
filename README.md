@@ -91,15 +91,19 @@ tools/probe/PROBE.lua             Dev tool: prints the screen/window sizes in th
    firmware/emulator version; `.lc` files are never committed.
 6. First real run on a dedicated test model.
 
-## Branching (Gitflow)
+## Branching
 
 | Branch | From | Merges into | Holds |
 | --- | --- | --- | --- |
 | `main` | | | Released versions only. Every commit is a release, tagged |
-| `develop` | `main` | `main` via a release branch | Finished features waiting for a release |
-| `feature/NNN-name` | `develop` | `develop` | One spec's work, e.g. `feature/001-speed-gauge` |
-| `release/x.y.z` | `develop` | `main` and `develop` | Version bumps and last fixes before a release |
-| `hotfix/x.y.z` | `main` | `main` and `develop` | Urgent fixes to a released app |
+| `develop` | `main` | `main`, by pull request only | Finished features waiting for a release |
+| `feature/NNN-name` | `develop` | `develop`, by pull request | One spec's work, e.g. `feature/001-speed-gauge` |
+
+`main` is updated **only** by a pull request from `develop`; GitHub enforces
+this (a ruleset on `main` and the `PR source is develop` check in
+`.github/workflows/main-pr-source.yml`). Version bumps and last fixes happen
+on the feature branch or on `develop` before that pull request; there are no
+release or hotfix branches.
 
 - A feature branch uses the same `NNN-name` as its `specs/` folder, and
   carries that spec from `/speckit-specify` through `/speckit-implement`.

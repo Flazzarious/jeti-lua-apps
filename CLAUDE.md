@@ -76,16 +76,21 @@ src/Apps/lib/ag_xxxxx.lua  shared module, loaded with require("ag_xxxxx")
 - `loop()` runs every 20-30 ms: rate-limit with `system.getTimeCounter()`, and
   don't format strings or build tables per call.
 
-## Branching (Gitflow)
+## Branches
 
-- Work on `feature/NNN-name`, branched from `develop`, with the same `NNN-name`
-  as the spec folder. Never commit directly to `main` or `develop`.
-- Features merge into `develop`. Releases go `develop` → `release/x.y.z` →
-  `main`, tagged `<script>-v<version>` (e.g. `AG-SpdGa-v1.0.0`). Hotfixes branch
-  from `main` and merge into both.
-- Spec Kit finds the feature via `.specify/feature.json`, not the branch name,
-  so the `feature/` prefix is fine.
-- Ask before pushing, merging into `develop`/`main`, or tagging.
+- `main` is updated **only** by a pull request from `develop`. Never commit
+  or push to `main` directly, and never open a PR into `main` from any other
+  branch. GitHub enforces this (a ruleset on `main` plus the
+  `PR source is develop` check in `.github/workflows/main-pr-source.yml`).
+- Feature work goes on `feature/NNN-name`, branched from `develop`, with the
+  same `NNN-name` as the spec folder, and is merged back into `develop` by
+  pull request. Never commit directly to `develop` either.
+- When `develop` is ready to release, open a PR from `develop` into `main`.
+  After it merges, tag the release `<script>-v<version>` (e.g.
+  `AG-SpdGa-v0.3.0`).
+- Spec Kit finds the feature via `.specify/feature.json`, not the branch
+  name, so the `feature/` prefix is fine.
+- Ask before pushing, opening or merging pull requests, or tagging.
 
 ## Checking work
 
