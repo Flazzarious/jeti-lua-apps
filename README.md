@@ -7,7 +7,7 @@ spec-driven workflow (GitHub Spec Kit + Claude Code) in VS Code.
 
 | App | Script | Status | Spec | Based on |
 | --- | --- | --- | --- | --- |
-| Speed Gauge | [`AG-SpdGa.lua`](src/Apps/AG-SpdGa.lua) | Release candidate (0.3.0) | [001](specs/001-speed-gauge/spec.md) | DFM Speed Announcer by Dave McQueeney (MIT) |
+| Speed Gauge | [`AG-SpdGa.lua`](src/Apps/AG-SpdGa.lua) | Released (0.3.0) | [001](specs/001-speed-gauge/spec.md) | DFM Speed Announcer by Dave McQueeney (MIT) |
 
 Speed Gauge speaks in its own voice (Piper "Amy"), in
 `src/Apps/AG-SpdGa/voice/`. Those files are licensed CC BY-SA 4.0, not MIT
