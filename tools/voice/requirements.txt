@@ -1,0 +1,4 @@
+# Voice generator only (tools/voice/make_voice.py); never deployed.
+# piper-tts is GPL-3.0-or-later (OHF-Voice/piper1-gpl). It is installed
+# locally to generate the files; no Piper code is copied into this repo.
+piper-tts==1.8.0

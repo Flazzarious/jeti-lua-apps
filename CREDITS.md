@@ -22,6 +22,8 @@ comes directly from that app:
 Speed Gauge exists because that work made it possible. The original is kept
 unmodified in
 [`docs/examples/dfm-speed-announce/`](docs/examples/dfm-speed-announce/).
+The WAV files Speed Gauge reuses carry their own credit note in
+[`src/Apps/AG-SpdGa/CREDITS.txt`](src/Apps/AG-SpdGa/CREDITS.txt).
 
 DFM Speed Announcer was itself inspired by Tero's Altitude Announcer
 from [RC-Thoughts.com](https://www.rc-thoughts.com), whose style it followed.
@@ -53,6 +55,30 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
+
+## Speed Gauge voice — Piper and the "Amy" voice
+
+Speed Gauge's app voice (callouts, warnings and startup announcement) is a
+set of WAV files generated with **Piper**, a local neural text-to-speech
+engine, using the voice model **"Amy"** (`en_US-amy-medium`) by
+**Mycroft / Rhasspy**.
+
+- **Piper:** created as [rhasspy/piper](https://github.com/rhasspy/piper)
+  (MIT), now continued as the `piper-tts` package from
+  [OHF-Voice/piper1-gpl](https://github.com/OHF-Voice/piper1-gpl)
+  (GPL-3.0-or-later). It is only installed locally to run the generator;
+  no Piper code is part of this repository or of Speed Gauge.
+- **Amy voice model:** [rhasspy/piper-voices](https://huggingface.co/rhasspy/piper-voices),
+  licensed Creative Commons Attribution-ShareAlike 4.0 International
+  ([CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/)).
+
+The generated files are in this repository, in
+[`src/Apps/AG-SpdGa/voice/`](src/Apps/AG-SpdGa/voice/), and are licensed
+**CC BY-SA 4.0**, not MIT like the rest of the repository; that folder's
+`CREDITS.txt` carries the attribution. The license of the recordings the
+Amy model was trained on is undocumented. They were generated with
+[`tools/voice/`](tools/voice/README.md), which can regenerate them (the
+user chose to commit them, 2026-10-03; spec FR-035).
 
 ## JETI model official demos
 

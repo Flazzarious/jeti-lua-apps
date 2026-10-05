@@ -9,3 +9,10 @@ docs/vendor/
 .DS_Store
 Thumbs.db
 *.swp
+
+# Python bytecode and virtual environments from tools/
+__pycache__/
+*.pyc
+.venv/
+venv/
+
