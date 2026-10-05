@@ -9,6 +9,16 @@ spec-driven workflow (GitHub Spec Kit + Claude Code) in VS Code.
 | --- | --- | --- | --- | --- |
 | Speed Gauge | [`AG-SpdGa.lua`](src/Apps/AG-SpdGa.lua) | Released (0.3.0) | [001](specs/001-speed-gauge/spec.md) | DFM Speed Announcer by Dave McQueeney (MIT) |
 
+To put an app on your transmitter, see [Installing apps](#installing-apps).
+
+### Speed Gauge
+
+Speaks the model's airspeed, warns at stall and overspeed, and shows speed on
+a round gauge, with optional air-density correction (field elevation plus
+standard, manual or sensor temperature). DS-24 II / DC-24 II only. Based on
+DFM Speed Announcer by Dave McQueeney. Full behavior:
+[spec 001](specs/001-speed-gauge/spec.md).
+
 Speed Gauge speaks in its own voice (Piper "Amy"), in
 `src/Apps/AG-SpdGa/voice/`. Those files are licensed CC BY-SA 4.0, not MIT
 (see [CREDITS.md](CREDITS.md)); [`tools/voice/`](tools/voice/README.md)
@@ -34,6 +44,9 @@ src/Apps/                         Mirrors /Apps on the transmitter SD card
   AG-xxxxx.lua                    One script per app
   AG-xxxxx/                       That app's sounds, images, language files
   lib/ag_xxxxx.lua                Shared modules, require("ag_xxxxx")
+catalog/apps.json                 JETI Studio app catalog (generated, see Installing apps)
+catalog/sources.json              Hand-edited app list the catalog is built from
+tools/catalog/make_catalog.py     Builds and checks catalog/apps.json
 tools/check.py                    Syntax, forbidden-API, naming, encoding checks
 tools/pdf2md.py                   Converts Jeti's API PDF for local reference
 tests/test_ag_dens.lua            Optional desktop test for the density module (any Lua 5.3)
@@ -51,8 +64,66 @@ tools/probe/PROBE.lua             Dev tool: prints the screen/window sizes in th
   and shared by every app, so modules hold no state of their own.
 - **Specs are per feature, not per app.** A new app and a later change to an
   existing app each get the next number in `specs/`.
-- **Deploying.** Copy the app's script, its `AG-xxxxx/` folder, and any `lib/`
-  modules it uses.
+- **Installing.** An app is its script, its `AG-xxxxx/` folder, and the
+  `lib/` modules it uses. See [Installing apps](#installing-apps).
+
+## Installing apps
+
+There are two ways to get an app onto the transmitter: from JETI Studio's app
+catalog, or by copying files by hand. Both need the transmitter connected to
+the PC by USB. The DS-24 II then appears as a drive (e.g. `E:`) holding its SD
+card.
+
+> **Requires a DS-24 II or DC-24 II** (firmware 6.x). Speed Gauge's display is
+> designed for the 24 II screen.
+
+### Option A: JETI Studio app catalog
+
+This repo publishes a catalog that JETI Studio's Lua app manager can read.
+Every file in it is downloaded from the app's release tag on GitHub (e.g.
+`AG-SpdGa-v0.3.0`) and checked by size and SHA-1 before it is installed.
+
+1. In JETI Studio, open the Lua app manager's sources, the same list that
+   holds JETI's own catalog and LeonAirRC's, and add:
+   ```
+   https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/main/catalog/apps.json
+   ```
+   JETI Studio keeps this list in its settings as `AppSources`.
+2. Connect the transmitter. Speed Gauge appears in the app list; install it.
+   JETI Studio copies every file to the right place.
+3. On the transmitter, add the app (step 4 of Option B).
+
+Updates show up in the app manager after each release.
+
+### Option B: copy by hand
+
+The repo's `src/Apps/` folder mirrors the transmitter's `Apps` folder, so
+copying is a straight mirror. For Speed Gauge:
+
+| Copy from the repo | To the transmitter |
+| --- | --- |
+| `src\Apps\AG-SpdGa.lua` | `E:\Apps\AG-SpdGa.lua` |
+| `src\Apps\AG-SpdGa\` (the whole folder: sounds, the `voice` subfolder, images, credits) | `E:\Apps\AG-SpdGa\` |
+| `src\Apps\lib\ag_dens.lua` and `ag_gauge.lua` | `E:\Apps\lib\` |
+
+1. Get the files from a release: on GitHub, choose the tag (e.g.
+   `AG-SpdGa-v0.3.0`) and download the ZIP, or `git checkout AG-SpdGa-v0.3.0`.
+   Don't install from `develop` or a feature branch.
+2. Copy the three items above. Copying all of `src\Apps\` over `E:\Apps\`
+   does the same thing, and also installs any other apps in the repo. Keep
+   the folder names exactly as they are: the app plays its sounds from
+   `/Apps/AG-SpdGa/...`, and a renamed folder means silent warnings.
+3. Eject the drive in Windows before unplugging the cable.
+4. On the transmitter: **Applications → User Applications → +**, choose
+   Speed Gauge, then open it from the Applications menu to set it up.
+
+**Updating** works the same way: copy the new files over the old ones. Your
+settings are kept, because the transmitter stores them under the script's
+filename, which never changes.
+
+**In the emulator**, copy the same items into
+`%LOCALAPPDATA%\JETI-Studio\Emulator\Apps\`, then refresh the apps
+(Applications → User Applications → F1 → F3).
 
 ## First-time setup
 
@@ -83,11 +154,12 @@ tools/probe/PROBE.lua             Dev tool: prints the screen/window sizes in th
 2. Implement in `src/Apps/` following the naming rules above.
 3. `python tools/check.py` must pass. LuaLS must show no errors.
 4. Run in the JETI Studio DS-24 II emulator: copy the app into
-   `%LOCALAPPDATA%\JETI-Studio\Emulator\Apps`. For sensors, use LeonAirRC's
+   `%LOCALAPPDATA%\JETI-Studio\Emulator\Apps` (see
+   [Installing apps](#installing-apps), Option B). For sensors, use LeonAirRC's
    [Emulator Telemetry](https://github.com/LeonAirRC/Jeti-Lua-Apps) app.
    Remember the emulator has `os`, `debug` and `coroutine`; the radio does not.
 5. Copy the app to `/Apps` on the transmitter's SD card (it mounts as USB mass
-   storage). Optionally ship `.lc` bytecode compiled by the matching
+   storage; see [Installing apps](#installing-apps)). Optionally ship `.lc` bytecode compiled by the matching
    firmware/emulator version; `.lc` files are never committed.
 6. First real run on a dedicated test model.
 
@@ -111,6 +183,27 @@ release or hotfix branches.
   quickstart's emulator scenarios have been run.
 - Tag releases on `main` as `<script>-v<version>`, e.g. `AG-SpdGa-v1.0.0`,
   matching the app's `version` field. Each app has its own version.
+
+### Releasing an app (and its catalog entry)
+
+The catalog points at release tags, so it is regenerated **before** the
+release merges and checked **after** it is tagged:
+
+1. On the feature branch, set the new `version` in the app script and run
+   `python tools/catalog/make_catalog.py`. It reads each app's version,
+   hashes its committed files, and writes `catalog/apps.json` with URLs for
+   the tag the release will get. Commit the catalog with the release.
+2. Merge the feature into `develop`, then `develop` into `main` by pull
+   request.
+3. Tag the merge commit on `main` `<script>-v<version>` and push the tag,
+   immediately: until the tag exists, the catalog's links don't resolve.
+4. Run `python tools/catalog/make_catalog.py --check`. It fails if the tag is
+   missing, or if any tagged file doesn't match the catalog's size and hash.
+
+A new app is added to the catalog by adding it to `catalog/sources.json`.
+That entry holds the menu name, author, description link and preview icon;
+the script works out the files, including the `lib/` modules the app
+`require`s.
 - Never commit directly to `main` or `develop`.
 
 ## Style reference: HELLO.lua

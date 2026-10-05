@@ -1,0 +1,14 @@
+{
+  "_comment": "Hand-edited app list for JETI Studio's catalog. Run tools/catalog/make_catalog.py to rebuild apps.json; never edit apps.json by hand. hw: transmitter hardware codes. 3867 is the DS-24 II (seen in the JETI Studio emulator); 3866 is assumed to be the DC-24 II, as DFM's catalog lists the two together. Unconfirmed: check a real DC-24 II.",
+  "rawBase": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps",
+  "hw": [3866, 3867],
+  "apps": [
+    {
+      "script": "AG-SpdGa",
+      "name": { "en": "Speed Gauge" },
+      "author": "Aaron George",
+      "description": { "en": "https://github.com/Flazzarious/jeti-lua-apps#speed-gauge" },
+      "previewIcon": "src/Apps/AG-SpdGa/dial-150x68.png"
+    }
+  ]
+}

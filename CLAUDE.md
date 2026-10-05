@@ -91,6 +91,10 @@ src/Apps/lib/ag_xxxxx.lua  shared module, loaded with require("ag_xxxxx")
 - Spec Kit finds the feature via `.specify/feature.json`, not the branch
   name, so the `feature/` prefix is fine.
 - Ask before pushing, opening or merging pull requests, or tagging.
+- A release also updates the JETI Studio catalog. Before the release merge,
+  run `python tools/catalog/make_catalog.py` and commit `catalog/apps.json`;
+  after tagging, run it with `--check`. Never edit `catalog/apps.json` by
+  hand; add new apps to `catalog/sources.json`. See README "Releasing".
 
 ## Checking work
 
