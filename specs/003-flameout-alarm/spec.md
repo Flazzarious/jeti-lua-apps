@@ -105,12 +105,17 @@ threshold < idle RPM < start overshoot.
   transmitter, and is the layout for single size (User Story 7,
   FR-031–FR-031c).
 - Q: If telemetry is lost while the flameout alarm is already sounding,
-  what should the alarm do? → A: Keep going. No "telemetry lost" callout
-  interrupts it; the window shows FLAMEOUT with a "no telemetry" note. It
-  still stops only on Cut or a relight seen in valid data (FR-020a).
+  what should the alarm do? → A: Keep going; the window shows FLAMEOUT with
+  a "no telemetry" note. It still stops only on Cut or a relight seen in
+  valid data (FR-020a). Revised the same day: once the loss passes the
+  telemetry-loss delay, the "telemetry lost" callout is spoken once between
+  alarm cycles, so the pilot also knows the data is gone.
 - Q: How long must the RPM sensor go without valid data before the app
   treats it as telemetry lost? → A: Adjustable in settings as the
   telemetry-loss delay, default 2 s (FR-008, FR-020).
+- Q: How are idle and max RPM entered, given the transmitter's number entry
+  stops at 32,767? → A: To the nearest 100 RPM, shown in thousands with one
+  decimal ("35.0" = 35,000 RPM) (FR-006).
 - Q: How should the app handle ECUs that send RPM in a scaled unit, such as
   thousands of RPM? → A: Plain RPM by default, with a manual sensor scale
   setting (×1, ×10, ×100, ×1000, default ×1). No automatic unit conversion
@@ -328,9 +333,10 @@ the window shows NO TELEMETRY.
 3. **Given** NO TELEMETRY while Armed, **When** valid data returns with RPM at
    or above the arming threshold, **Then** the app is Armed again with no
    alarm.
-4. **Given** the flameout alarm is active, **When** RPM data stops being
-   valid, **Then** the alarm continues, no "telemetry lost" callout plays,
-   and the window shows FLAMEOUT with a "no telemetry" note.
+4. **Given** the flameout alarm is active, **When** RPM data has been
+   invalid for the telemetry-loss delay, **Then** the alarm continues, the
+   "telemetry lost" callout is spoken once between alarm cycles, and the
+   window shows FLAMEOUT with a "no telemetry" note.
 
 ---
 
@@ -459,8 +465,9 @@ transmitter window.
 - **Model copied from another model.** The copied sensor assignment may not
   exist on the new model's receiver; handled as above.
 - **Telemetry lost during the flameout alarm.** The engine is most likely
-  still out, so the alarm keeps going; only Cut or a relight seen in valid
-  data stops it.
+  still out, so the alarm keeps going; once the loss passes the
+  telemetry-loss delay, "telemetry lost" is spoken once between alarm
+  cycles. Only Cut or a relight seen in valid data stops the alarm.
 - **Thresholds set nonsensically** (flameout threshold at or above the
   arming threshold, or arming threshold at or above idle RPM). Setup blocks
   it and explains.
@@ -486,17 +493,22 @@ transmitter window.
   screen MUST say which is missing when the user tries.
 - **FR-004**: When the model has no telemetry sensors listed, the settings
   screen MUST explain that the ECU must send RPM telemetry and that telemetry
-  must have been received at least once.
+  must have been received at least once, and that some ECU adapters take up
+  to a minute after power-up before their sensors appear.
 - **FR-005**: Users MUST be able to select the Cut switch and its Cut
   position. A Cut switch is required for monitoring (FR-003).
 - **FR-006**: Users MUST set idle RPM by typing in the idle specified in the
   ECU setup. It has no default. There is no automatic or learned idle in this
-  release.
+  release. Idle RPM and max RPM (FR-031b) are entered to the nearest 100 RPM
+  and shown in thousands with one decimal, e.g. "35.0" for 35,000 RPM and
+  "152.0" for 152,000 RPM, because the transmitter's number entry can't hold
+  values above 32,767 (research R1).
 - **FR-006a**: Users MUST be able to set a sensor scale of ×1, ×10, ×100 or
   ×1000, default ×1 (the sensor sends plain RPM). The app multiplies the
   sensor's value by the scale before every use: display, arming and
-  detection. Idle RPM and max RPM are always typed in plain RPM. The app
-  does not convert units automatically.
+  detection. Idle RPM and max RPM are always entered as true engine RPM
+  (FR-006), whatever the sensor scale. The app does not convert units
+  automatically.
 - **FR-007**: Users MUST be able to set the arming threshold and the
   flameout threshold as editable percentages of idle RPM, defaulting to 90%
   and 70% (see Assumptions). Settings MUST show each one's RPM value next to
@@ -549,11 +561,12 @@ transmitter window.
   telemetry-loss delay while Armed, the app MUST give a "telemetry lost" warning that is clearly different from the
   flameout alarm, and MUST show NO TELEMETRY. Telemetry loss MUST never
   trigger the flameout alarm.
-- **FR-020a**: When the RPM sensor stops reporting valid data while the
-  flameout alarm is active, the alarm MUST continue unchanged, with no
-  "telemetry lost" callout, and the window MUST show FLAMEOUT with a "no
-  telemetry" note. The alarm still stops only on Cut, or on a relight seen
-  in valid data (FR-018).
+- **FR-020a**: When the RPM sensor has reported no valid data for the
+  telemetry-loss delay while the flameout alarm is active, the alarm MUST
+  continue, the "telemetry lost" callout MUST be spoken once between two
+  alarm cycles (without stopping or restarting the alarm), and the window
+  MUST show FLAMEOUT with a "no telemetry" note. The alarm still stops only
+  on Cut, or on a relight seen in valid data (FR-018).
 - **FR-021**: When valid data returns, the app MUST resume from the RPM it
   then sees: Armed if RPM is at or above the arming threshold, otherwise following the
   normal detection rules (the detection delay restarts).
@@ -637,8 +650,10 @@ transmitter window.
   negligible.
 - **FR-035**: The README MUST state that the app is advisory, does not replace
   the ECU's failsafe, shutdown or auto-restart logic nor the pilot's own
-  monitoring, and only works on turbines that send RPM telemetry. It MUST
-  also explain: entering idle RPM from the ECU setup; the start overshoot and
+  monitoring, and only works on turbines whose RPM reaches the transmitter
+  as a normal telemetry sensor. It MUST list what is known per ECU brand
+  (research R1), including that RPM visible only in a JetiBox screen or
+  inside another vendor's app can't be used. It MUST also explain: entering idle RPM from the ECU setup; the start overshoot and
   why the arming threshold sits below idle; the arming threshold having to
   stay above any RPM the engine reaches before it runs on its own; and the
   effects of an idle typed too high or too low.
@@ -720,6 +735,12 @@ transmitter window.
   "learn idle" helper or an idle derived automatically each session is a
   possible later extension; either would need to wait for the overshoot to
   decay before recording.
+- **ECU telemetry** (research R1): JetCat, Xicoy, KingTech and Swiwin (via
+  a VSpeak converter) deliver RPM as a plain RPM value on a standard
+  telemetry sensor, so the default ×1 scale fits. JetCentral's adapter V2,
+  Enjet, and Swiwin's direct connection are unconfirmed and are checked in
+  testing. ECU status sensors exist for some brands but not all, so v1 uses
+  RPM only.
 - **Bar full scale** defaults to 4 × idle RPM when max RPM isn't entered.
   Typical model turbines reach roughly 3–4.5 times their idle speed at full
   throttle, so
@@ -737,7 +758,8 @@ transmitter window.
   detection and ECU status sensors are possible later extensions (draft open
   questions 3 and 5).
 - **"Telemetry lost" warning** is a short spoken "Engine telemetry lost" in
-  the app voice, given once per loss event, with NO TELEMETRY shown until data
+  the app voice, given once per loss event (once the telemetry-loss delay
+  has passed, whether Armed or alarming), with NO TELEMETRY shown until data
   returns. It does not repeat, because the transmitter already announces
   signal loss itself.
 - **One engine per model** in v1. Two-engine models are out of scope; a later
