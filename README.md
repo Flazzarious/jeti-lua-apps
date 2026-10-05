@@ -7,7 +7,12 @@ spec-driven workflow (GitHub Spec Kit + Claude Code) in VS Code.
 
 | App | Script | Status | Spec | Based on |
 | --- | --- | --- | --- | --- |
-| Speed Gauge | `AG-SpdGa.lua` | Spec written | [001](specs/001-speed-gauge/spec.md) | DFM Speed Announcer by Dave McQueeney (MIT) |
+| Speed Gauge | [`AG-SpdGa.lua`](src/Apps/AG-SpdGa.lua) | Release candidate (0.3.0) | [001](specs/001-speed-gauge/spec.md) | DFM Speed Announcer by Dave McQueeney (MIT) |
+
+Speed Gauge speaks in its own voice (Piper "Amy"), in
+`src/Apps/AG-SpdGa/voice/`. Those files are licensed CC BY-SA 4.0, not MIT
+(see [CREDITS.md](CREDITS.md)); [`tools/voice/`](tools/voice/README.md)
+regenerates them. Without them the app works in the transmitter's voice.
 
 Apps here are for telemetry, timers, announcements and displays only. Nothing
 in this repo may control surfaces, throttle or any flight function. See the
@@ -31,6 +36,8 @@ src/Apps/                         Mirrors /Apps on the transmitter SD card
   lib/ag_xxxxx.lua                Shared modules, require("ag_xxxxx")
 tools/check.py                    Syntax, forbidden-API, naming, encoding checks
 tools/pdf2md.py                   Converts Jeti's API PDF for local reference
+tests/test_ag_dens.lua            Optional desktop test for the density module (any Lua 5.3)
+tools/probe/PROBE.lua             Dev tool: prints the screen/window sizes in the emulator
 ```
 
 ### Multiple apps, one repo
@@ -83,6 +90,28 @@ tools/pdf2md.py                   Converts Jeti's API PDF for local reference
    storage). Optionally ship `.lc` bytecode compiled by the matching
    firmware/emulator version; `.lc` files are never committed.
 6. First real run on a dedicated test model.
+
+## Branching
+
+| Branch | From | Merges into | Holds |
+| --- | --- | --- | --- |
+| `main` | | | Released versions only. Every commit is a release, tagged |
+| `develop` | `main` | `main`, by pull request only | Finished features waiting for a release |
+| `feature/NNN-name` | `develop` | `develop`, by pull request | One spec's work, e.g. `feature/001-speed-gauge` |
+
+`main` is updated **only** by a pull request from `develop`; GitHub enforces
+this (a ruleset on `main` and the `PR source is develop` check in
+`.github/workflows/main-pr-source.yml`). Version bumps and last fixes happen
+on the feature branch or on `develop` before that pull request; there are no
+release or hotfix branches.
+
+- A feature branch uses the same `NNN-name` as its `specs/` folder, and
+  carries that spec from `/speckit-specify` through `/speckit-implement`.
+- Merge a feature into `develop` only after `tools/check.py` passes and the
+  quickstart's emulator scenarios have been run.
+- Tag releases on `main` as `<script>-v<version>`, e.g. `AG-SpdGa-v1.0.0`,
+  matching the app's `version` field. Each app has its own version.
+- Never commit directly to `main` or `develop`.
 
 ## Style reference: HELLO.lua
 

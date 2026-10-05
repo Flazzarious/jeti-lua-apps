@@ -55,6 +55,52 @@ principle I).
 - Q: Does GPS get density correction? → A: No. GPS measures ground speed,
   which air density doesn't affect (confirmed by the user).
 
+### Session 2026-09-28
+
+- Q: Should callouts use a better voice than the transmitter's built-in one?
+  → A: Yes. After comparing three generated samples (Piper "Lessac", "Amy"
+  and "Ryan"), the user chose **Amy** as the clearest. All of Speed Gauge's
+  speech then uses that one voice: numbers, units, warnings and startup.
+  See User Story 6 and FR-030–FR-037.
+
+### Session 2026-09-30
+
+- Q: What limits apply to field elevation and temperature? → A: Elevation is
+  **−300 to 10,000 ft** (−90 to 3,050 m). The user proposed −10 to 8,000 ft.
+  Checking real airfields showed that range would exclude, among others:
+  - Leadville CO (9,934 ft, North America's highest) and Telluride CO
+    (9,078 ft);
+  - Death Valley's Furnace Creek (−208 ft), Thermal CA (−114 ft) and
+    Amsterdam Schiphol (−11 ft).
+  The user chose the recommended wider range. Temperature is **−20 to
+  130 °F** (−29 to 54 °C). The user first proposed −10 to 120 °F, then chose
+  the wider range for margin in extreme cold and desert heat.
+- Q: Should Speed Gauge use a temperature sensor, such as the MSpeed's? → A:
+  Yes. Temperature can come from a selectable telemetry sensor or be set
+  manually; standard temperature stays available (FR-038–FR-043). This
+  replaces the earlier assumption that live sensor temperature was out of
+  scope for v1. Live pressure stays out of scope: the MSpeed doesn't report
+  it.
+- Q: What if the sensor reads outside the limits, e.g. heat-soaked in the sun
+  before a flight? → A: Use the default (standard temperature) while it's out
+  of range. Resume using the sensor automatically once it comes back into
+  range, e.g. after cooling to ambient in flight (FR-040).
+- Q: Is the sensor temperature shown on the full-screen gauge? → A: It
+  wasn't. The side panel now has a Temperature row showing the temperature
+  in use and its source (FR-044).
+
+### Session 2026-10-03 (first transmitter tests)
+
+- Q: With callouts on and the model standing still, callouts still came
+  (continuous mode ignored the old "half of landing speed" rule). How
+  should callouts wait for flight? → A: A new setting, **"Callouts start
+  above"** (default 30 mph), arms callouts once sensor speed first exceeds
+  it. It stays armed for the session (restart or model change re-arms it),
+  so approach and landing callouts continue. It applies to normal and
+  continuous callouts and to "airspeed alive", and replaces the hidden
+  half-of-landing-speed rule. Stall and overspeed warnings are unaffected
+  (FR-009).
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Hear speed during flight (Priority: P1)
@@ -85,15 +131,16 @@ speed.
 3. **Given** the switch is on and the model has been above landing speed,
    **When** speed drops below landing speed, **Then** callouts come every
    "shortest time between callouts".
-4. **Given** the continuous-callouts switch is on, **When** at any speed,
-   **Then** speed is spoken every "shortest time between callouts",
-   regardless of the on/off switch.
+4. **Given** the continuous-callouts switch is on and callouts are armed
+   (FR-009), **When** at any speed, **Then** speed is spoken every
+   "shortest time between callouts", regardless of the on/off switch.
 5. **Given** both switches are off, **Then** nothing is spoken.
 6. **Given** a callout is still being spoken, **When** the next callout comes
    due, **Then** it waits until speech finishes rather than queueing up.
-7. **Given** the model has not yet exceeded half of landing speed this session
-   (sitting on the ground, taxiing), **Then** normal callouts stay silent
-   unless the continuous-callouts switch is on.
+7. **Given** the model has not yet exceeded "Callouts start above" (default
+   30 mph) this session (sitting on the ground, taxiing), **Then** no speed
+   is spoken, with either switch on (changed 2026-10-03: continuous mode no
+   longer bypasses this).
 
 ---
 
@@ -115,15 +162,18 @@ speed. Each warning should play exactly once per crossing.
 1. **Given** the model has been above landing speed this session, **When**
    sensor speed drops to or below the stall warning speed, **Then** the stall
    warning plays once and the right stick vibrates, and it re-arms when speed
-   rises back above the stall warning speed.
+   rises back above the stall warning speed. At most **two** stall warnings
+   play per slowdown: after the second, it stays silent until speed rises
+   above landing speed again (e.g. a go-around), so speed wobbling around
+   the stall setting on landing isn't distracting (changed 2026-10-03).
 2. **Given** the model has *not* yet been above landing speed this session,
    **When** sensor speed is below the stall warning speed, **Then** no stall
    warning plays (so it doesn't fire on the ground).
 3. **Given** speed rises above the overspeed warning speed, **Then** the
    overspeed warning plays once and the stick vibrates, and it re-arms after
    speed drops back to or below the overspeed speed.
-4. **Given** it is the first time this session that sensor speed exceeds half
-   of landing speed, **Then** "airspeed alive" plays once.
+4. **Given** it is the first time this session that sensor speed exceeds
+   "Callouts start above" (FR-009), **Then** "airspeed alive" plays once.
 5. **Given** density correction is on at 5,000 ft (standard temperature) and
    the stall warning is set to 40 mph, **When** the model slows, **Then** the
    stall warning fires when sensor speed reaches 40 mph. At that moment the
@@ -152,13 +202,18 @@ moves, the max marker stays at the peak, and both numbers match.
 **Acceptance Scenarios**:
 
 1. **Given** the window is placed in the normal (single) size, **Then** it
-   shows a round gauge with the current-speed indicator and max-speed marker,
-   the current speed as a number, and the session max as a number, all
-   readable without overlap.
-2. **Given** the window is placed in the double size, **Then** it shows the
-   same content larger. As room permits it also shows secondary information:
-   the stall and overspeed speeds, marked on the gauge dial and/or as labeled
-   numbers, and the current speed as a number in the center of the dial.
+   shows the current speed and session max as numbers over a thin bar
+   gauge. The bar's value, overspeed zone and max tick are visible, all
+   readable without overlap (changed from a compact arc after transmitter
+   testing, 2026-10-03).
+2. **Given** the window is placed in the double size, **Then** it shows a
+   small dial in the style of the visual design reference below: dark
+   face, ticks, colored value arc, overspeed zone, stall and landing marks
+   and max marker. The current speed is a large number with its unit beside
+   the dial, with MAX below it.
+2a. **Given** the full-screen window is selected, **Then** it shows a large
+   dial with a side panel of labeled values, as in the visual design
+   reference.
 3. **Given** speed rises to a new peak and then falls, **Then** the max-speed
    marker stays at the peak in its own color while the current-speed indicator
    follows the current speed in front of it.
@@ -173,14 +228,97 @@ moves, the max marker stays at the peak, and both numbers match.
 7. **Given** speed is above the gauge's full scale, **Then** the indicator
    stops at full scale and the numeric value still shows the actual speed.
 
+**Visual design reference** (provided by the user, 2026-09-27): a car
+head-up-display speedometer. The photo is a third-party product image, so it
+isn't committed. A local copy is at `docs/vendor/gauge-reference.jpg` on the
+development PC; `docs/vendor/` is gitignored. Open it when planning or building
+the gauge. The elements to carry over:
+
+- **Dark round face.** A dark, circular dial background inside the window,
+  independent of the transmitter's screen theme. This gives the colored arc
+  its contrast.
+- **About 270° sweep.** The dial runs clockwise from lower-left (zero) over the
+  top to lower-right (full scale), leaving the bottom open.
+- **Rim scale.** Major ticks with numbers around the outside, and lighter minor
+  ticks between them.
+- **Glowing value arc.** Current speed is shown mainly as a thick colored arc
+  that fills the rim from zero up to the current speed, like the blue sweep in
+  the reference, with a bright tip at its end. A glow in the arc's color
+  fades from the arc inward toward the center of the dial, as in the
+  reference. Past the overspeed mark, the arc and its glow switch to the
+  overspeed color (FR-014).
+- **Warning zone.** A red/orange band on the rim from the overspeed warning
+  speed to full scale, like the reference's red zone near the top, with the
+  same inward glow. The stall and landing marks sit on the rim as small
+  ticks (FR-016a).
+- **Big center number.** Current speed as a large number in the middle of the
+  dial, with the unit in smaller text underneath. This is the primary numeric
+  readout.
+- **Session max, easy to spot.** A thick tick across the rim in the max color
+  (bright yellow by default), drawn on top of the value arc. It stays at the
+  peak while the arc moves beneath it, and the max also appears as a labeled
+  number. (Originally "kept subtle"; a thin white tick proved too hard to see
+  in emulator testing, 2026-09-27.)
+- **Secondary data as small rows.** "Max", "Stall" and "Overspeed", each a
+  short label with a value. They go beside or below the dial wherever room
+  allows, like the reference's side panel.
+
+**Target screen: DS-24 II only.** The gauge is designed for the DS-24 II
+(and the DC-24 II, which shares its display): a 4" color screen that JETI
+lists as 480 × 480 px, running the JUi2 interface. Earlier transmitters (the
+original DC/DS-24, DC/DS-16/14, DS-12) have smaller screens and are **not
+supported for the gauge** (see FR-013a).
+
+**Measured window sizes** (`tools/probe/PROBE.lua`; the transmitter's own
+screenshots, 2026-10-03):
+
+| Window | DS-24 II transmitter | JETI Studio emulator 6.04 (2026-09-27) |
+| --- | --- | --- |
+| Single (small) | **150 × 23 px**, all visible | 157 × 60, about 157 × 34 visible |
+| Double (large) | **150 × 68 px**, all visible | 157 × 127, about 157 × 101 visible |
+| Full screen (sizes 3 and 4) | **316 × 159 px**, all visible | 320 × 260, about 320 × 234 visible |
+
+**The transmitter is the target.** The first design used the emulator's
+sizes. On the transmitter (2026-10-03) the single window showed only the
+MAX value and the double window a cramped strip. The full-screen gauge was
+cut off and filled only part of the screen, because the transmitter's
+"full screen" is a titled 316 × 159 area across the top two thirds of the
+panel. The transmitter draws each title bar above the window and enlarges
+Lua drawing about 1.45×, so curves made of coarse segments look stepped.
+The layouts below were chosen by the user that day and adapt to the
+emulator's larger windows too:
+
+- **Double window (150 × 68).** A small ~270° dial, about 74 px across, on
+  the left: face, track, overspeed zone, major ticks, stall and landing
+  marks, value arc and max marker, but no scale numbers (too small to
+  read). The current speed is large on the right with its unit below, and
+  MAX near the bottom. Stall and overspeed appear only as rim marks; there
+  is no room for their rows.
+- **Full screen (316 × 159).** The layout closest to the reference photo: a
+  dial about 180 px across on the left, with the session max centered in
+  its open bottom. On the right, a side panel of **one-line rows**, a small
+  label with its value right-aligned: Stall, Over (overspeed), Density (the
+  correction, e.g. "+8%", or OFF / GPS) and, while correction is on, Elev
+  (field elevation), the temperature in use with its source (FR-044) and
+  Raw (the uncorrected sensor speed). Six rows of about 26 px. The window
+  uses size 4: with size 3 the desktop's model tile covers its lower-left
+  corner.
+- **Single window (150 × 23).** No room for an arc. The current speed and
+  unit at the left and MAX at the right share one line, over a thin
+  horizontal bar: the value in the current-speed color, the overspeed zone
+  at the right end, and a max tick in the max color.
+
 ---
 
 ### User Story 4 - Correct for air density (Priority: P2)
 
-A pilot flying from a high or hot field enters the field elevation and,
-optionally, today's temperature. The spoken speed, gauge and max speed then
-show true airspeed. If no temperature is entered, the app assumes the standard
-temperature for that elevation.
+A pilot flying from a high or hot field enters the field elevation and
+chooses where the temperature comes from:
+- **Standard**: the standard temperature for that elevation;
+- **Manual**: today's temperature, typed in;
+- **Sensor**: read live from a telemetry sensor that reports temperature,
+  such as the MSpeed.
+The spoken speed, gauge and max speed then show true airspeed.
 
 **Why this priority**: Without it, speeds at high fields read noticeably low
 (about 8% low at 5,000 ft on a standard day, and more when it's hot). But the
@@ -206,6 +344,24 @@ when off.
    speed.
 6. **Given** correction is on, **Then** the settings screen shows the current
    correction factor (e.g. "+13%") so the pilot can see its effect.
+7. **Given** correction is on at 5,000 ft, Temperature source is Sensor, and
+   the selected sensor reads 35 °C, **Then** a 100 mph sensor speed displays
+   as 113 mph (±1), the same as entering 35 °C manually. The settings screen
+   shows the live reading and its source (e.g. "35 °C from MSpeed").
+8. **Given** Temperature source is Sensor, **When** the sensor reading is lost
+   or out of range, **Then** the correction uses standard temperature for the
+   field elevation. Callouts and warnings continue without interruption, and
+   the settings screen says the sensor isn't available.
+8a. **Given** a hot day where the model sat in the sun and the sensor reads
+   140 °F at takeoff, **Then** the correction uses standard temperature, and
+   the full-screen panel shows that the sensor is out of range. **When** the
+   sensor cools in flight to 95 °F and stays in range for 10 seconds, **Then**
+   the correction switches back to the sensor reading without any action from
+   the pilot.
+9. **Given** Temperature source is Sensor, **When** the reading drifts by a
+   fraction of a degree, **Then** the displayed speed doesn't jitter. The
+   correction updates only when the temperature changes by at least 1 °C
+   (or 2 °F).
 
 ---
 
@@ -239,25 +395,72 @@ reading its label and hint.
 | *(new)* | Sensor type: Airspeed (pitot) / GPS | GPS disables density correction |
 | Select Enable Switch | Callouts on/off switch | Turns automatic callouts on |
 | Select Continuous Ann Switch | Continuous callouts switch | Speak every "shortest time", always |
-| Speed change scale factor | Callout sensitivity (speed change) | Speed change that makes callouts come faster. Smaller = chattier. Hint: "Speak sooner when speed changes by this much" |
+| Speed change scale factor | Callout sensitivity (*unit* change), e.g. "(mph change)" | Speed change that makes callouts come faster. Smaller = chattier. Hint: "Speak sooner when speed changes by this much" |
 | Call Speed < Vref every (sec) | Shortest time between callouts (s) | Also the interval below landing speed and in continuous mode |
 | Call Speed at least every (sec) | Longest time between callouts (s) | Upper limit when speed is steady |
-| Reference speed (Vref) | Landing speed (fast callouts below) | Below this, speak every "shortest time" |
+| Reference speed (Vref) | Landing speed callouts (on/off) + Landing speed | On: below landing speed, short callouts every "shortest time". Off: landing speed only arms the stall warning. Toggle added and labels changed 2026-10-03 |
 | Stall speed (Vs0) | Stall warning at | Warning threshold |
 | Speed Max Warning | Overspeed warning at | Warning threshold |
 | Airspeed Calibration Multiplier (%) | Sensor calibration (%) | Scales the sensor reading; 100 = unchanged |
 | Select speed units | Units | mph, km/h, knots, m/s, ft/s |
 | Short Announcement | Speak number only (no units) | Say "85" instead of "speed 85 mph" |
 | *(new)* | Field elevation | For density correction |
-| *(new)* | Temperature (blank = standard) | For density correction |
+| *(new)* | Temperature source: Standard / Manual / Sensor | Where density correction gets temperature (FR-038). Replaces the earlier "Use standard temperature" checkbox |
+| *(new)* | Temperature (manual) | Used when source is Manual. Limited to −20 to 130 °F (FR-020) |
+| *(new)* | Temperature sensor | Used when source is Sensor. Lists only telemetry values that report a temperature. Hint: "Sensors inside the model can read warmer than outside air" |
 | *(new)* | Correct for air density: on/off | Shows the resulting factor, e.g. "+13%" |
 | *(new)* | Current speed color / Max speed color | Gauge colors |
-| *(new)* | Gauge full scale | Top of the dial |
+| *(new)* | Gauge max limit (0 = auto) | Highest speed on the dial; enter the sensor's top speed to use its whole range. Renamed from "Gauge full scale" after transmitter testing, 2026-10-03 |
 | *(new)* | Reset max speed | Clears the session max |
+| *(new)* | Announce stall speed at startup | Turns off the startup announcement (FR-028) |
+| *(new)* | Voice: Speed Gauge / Transmitter | Which voice speaks callouts (FR-032). Shows "voice files missing" if the Speed Gauge voice isn't installed |
+
+---
+
+### User Story 6 - One clear voice for every callout (Priority: P3)
+
+The pilot hears every callout in the same clear, natural voice, "Amy". That
+covers speed numbers, units, warnings and the startup announcement. It is
+easier to understand over wind and motor noise than the transmitter's
+built-in number voice mixed with older recorded warnings. If the voice files
+aren't installed, the app still works with the transmitter's voice.
+
+**Why this priority**: It makes callouts easier to understand, but everything
+works without it, so it comes after the core stories.
+
+**Independent Test**: With the voice files installed and "Voice: Speed Gauge"
+selected, vary the simulated speed in the emulator. Every callout, the three
+warnings and the startup announcement should be in the Amy voice, with no
+audible gap between number and unit. Then remove the voice folder and
+reload the app. Callouts must continue in the transmitter's voice, and the
+settings screen must say the voice files are missing.
+
+**Acceptance Scenarios**:
+
+1. **Given** the voice files are installed and Voice is "Speed Gauge",
+   **When** a callout of 85 mph with units is due, **Then** the pilot hears
+   "eighty-five miles per hour" in the Amy voice as one continuous phrase.
+2. **Given** the same setup, **When** a stall, overspeed or airspeed-alive
+   warning fires, **Then** it is spoken in the Amy voice.
+3. **Given** a callout value above the highest number in the voice set,
+   **Then** that callout uses the transmitter's voice. It is not skipped.
+4. **Given** the voice files are missing or incomplete, **Then** callouts use
+   the transmitter's voice and the warnings use DFM's original recordings.
+   The settings screen shows "voice files missing".
+5. **Given** Voice is set to "Transmitter", **Then** the app behaves as
+   without this story: the transmitter speaks numbers, and warnings use the
+   original recordings.
 
 ---
 
 ### Edge Cases
+
+- **Voice files partly installed** (e.g. the copy to the SD card was
+  interrupted). Any callout whose files aren't all present falls back for
+  that callout only; the app never plays half a phrase.
+- **Number and unit spoken back to back.** They are two files, and the
+  pause between them must not sound like two separate announcements
+  (SC-009).
 
 - **Receiver not yet connected at power-on.** Sensors that appear later must
   become selectable without restarting the app. The original built its sensor
@@ -284,6 +487,17 @@ reading its label and hint.
   settings are per model.
 - **Very high temperature or elevation input.** Inputs are limited to
   plausible ranges (see FR-020).
+- **Temperature sensor inside a warm fuselage.** It may read well above the
+  outside air (sun, electronics); +10 °C shifts the correction by about
+  1.7%. The app can't detect this, so the help text warns about it, and
+  Manual stays available.
+- **Temperature sensor appears after startup or isn't found.** Handled the
+  same way as the speed sensor (FR-002, FR-003): it becomes selectable when it
+  appears, and a saved selection that isn't present shows as "not found".
+- **Saved value outside the range** (e.g. saved by an earlier version with
+  wider limits, or converted between unit systems). It is clamped into the
+  range when loaded, and the clamped value is what the settings show and the
+  correction uses.
 - **Telemetry window size changes** (user moves it between single and double).
   The layout adapts on the next draw.
 
@@ -308,29 +522,45 @@ reading its label and hint.
 
 - **FR-005**: When the on/off switch is on, the app MUST speak speed at a
   variable interval. The interval runs from "shortest time between callouts"
-  (1–10 s, default 2 s) to "longest time between callouts" (10–60 s, default
-  40 s). It gets shorter as the speed change since the last callout grows
+  (1–10 s, default 2 s) to "longest time between callouts" (2–60 s, default
+  40 s, never below the shortest time; changed from 10–60 s on 2026-10-04). It gets shorter as the speed change since the last callout grows
   relative to "callout sensitivity" (1–100 in the selected units, default 10).
   With the default settings, a speed change equal to the sensitivity MUST give
   an interval of roughly 20 s, matching the original app's behavior.
 - **FR-006**: Below landing speed (once the model has been above it this
   session), or while the continuous switch is on, callouts MUST occur every
-  "shortest time between callouts".
+  "shortest time between callouts". The below-landing part applies only
+  while **"Landing speed callouts"** is on (default on; added 2026-10-03).
+  When it's off, landing speed doesn't change callouts, but it still arms
+  the stall warning (FR-011).
 - **FR-007**: A new callout MUST NOT start while the previous one is still
   playing.
 - **FR-008**: Callouts MUST be rounded to the nearest whole unit. Units MUST
   be spoken unless "speak number only" is set, or the speed is below landing
-  speed, or continuous mode is on (short callouts when timing matters,
-  matching the original).
-- **FR-009**: Normal callouts MUST stay silent until sensor speed first
-  exceeds half of landing speed in the session. Continuous mode overrides
-  this.
+  speed (only while "Landing speed callouts" is on), or continuous mode is
+  on (short callouts when timing matters, matching the original).
+- **FR-008b**: No speed callout MUST ever be spoken below 5 mph, or its
+  equivalent in the selected units (8 km/h, 4.3 kt, 2.2 m/s, 7.3 ft/s); it
+  isn't needed and is annoying (added 2026-10-04). Warnings are unaffected.
+- **FR-009a**: Continuous callouts MUST speak only while sensor speed is above
+  "Callouts start above": they stop when the model slows below it, e.g. on
+  landing (added 2026-10-03). Below it, the on/off switch's normal
+  callouts still apply.
+- **FR-009**: Callouts, normal and continuous, and "airspeed alive" MUST
+  stay silent until sensor speed first exceeds the **"Callouts start
+  above"** setting (0–1000 in the selected units, default 30 mph) in the
+  session. Once exceeded they stay armed until the session ends (power-on,
+  model change or app reload). Stall and overspeed warnings don't depend on
+  it. (Changed 2026-10-03 from "half of landing speed", which continuous
+  mode overrode.)
 
 **Warnings**
 
 - **FR-010**: The app MUST give the stall, overspeed and "airspeed alive"
-  warnings as described in User Story 2, each once per crossing, with the
-  existing warning sounds and stick vibration patterns.
+  warnings as described in User Story 2, each once per crossing, with stick
+  vibration patterns and spoken warnings. The stall warning plays at most
+  twice per slowdown and re-arms fully only above landing speed (US2 #1). The warnings use the Speed Gauge
+  voice when available (FR-030), otherwise DFM's original recordings.
 - **FR-011**: Stall, landing-speed and "airspeed alive" checks MUST compare
   sensor speed (not density-corrected) against the user's settings. Those
   settings are the model's sea-level values, so the warnings fire at the same
@@ -342,38 +572,80 @@ reading its label and hint.
 
 **Gauge**
 
-- **FR-013**: The app MUST offer a main-screen telemetry window that works in
-  both single and double sizes.
-- **FR-014**: The window MUST show a round, speedometer-style gauge. It shows
-  current speed as the dominant indicator and session max speed as a less
-  prominent marker, in a different color, drawn behind the current-speed
-  indicator.
+- **FR-013**: The app MUST offer two main-screen telemetry windows on the
+  DS-24 II (and DC-24 II), the maximum an app may register:
+  - "Speed Gauge": the pilot places it at single or double size;
+  - a full-screen window titled "Speed Gauge (full screen)". On 2026-09-27
+    the user chose the same title as the first window. Transmitter testing
+    on 2026-10-03 showed two identical "Speed Gauge" entries in Displayed
+    telemetry, so the user asked for names that tell them apart. The
+    full-screen window has no title bar, so the name appears only in that
+    list.
+- **FR-013a**: The gauge is not supported on other transmitters. If the app
+  runs on one, the telemetry window MUST show a short notice (e.g. "Speed
+  Gauge needs DS-24 II") instead of a mis-drawn gauge. Callouts and warnings
+  MUST still work, because they don't depend on the screen.
+- **FR-014**: The window MUST show a round, speedometer-style gauge following
+  the visual design reference in User Story 3:
+  - a dark dial face;
+  - a rim scale with ticks and numbers;
+  - current speed as a filled colored arc from zero to the current speed (the
+    dominant indicator);
+  - session max as a thin marker in a different color, which the value arc
+    passes beneath;
+  - an overspeed zone from the overspeed warning speed to full scale;
+  - past the overspeed warning speed, the part of the value arc beyond that
+    mark is drawn in the overspeed color instead of the current-speed color
+    (added 2026-09-27).
+- **FR-014a**: Current speed MUST also be shown as a large number with its unit
+  at the center of the dial (full screen), beside the dial (double size) or
+  above the bar (single size).
 - **FR-015**: The window MUST show current speed and session max speed as
   numbers, with units.
-- **FR-016**: In the double size, and in the single size where it fits, the
-  window SHOULD show secondary information: stall and overspeed speeds on
-  the dial or as labels, and current speed in the center of the dial.
+- **FR-016**: Where it fits, the window SHOULD show secondary information:
+  stall and overspeed speeds as rim marks (double and full screen) and as
+  labeled rows (full screen). The double window has room for the marks only,
+  and the single window shows the overspeed zone on its bar.
 - **FR-016a**: When correction is on, stall and landing-speed marks on the
   dial MUST be placed at their true-airspeed equivalents (setting × correction
   factor). The needle then crosses a mark at the moment its warning or
   callout change happens. Any numeric label for these speeds shows the
   setting as entered.
 - **FR-017**: Users MUST be able to choose the current-speed and max-speed
-  colors from a preset list of at least 6 distinct colors. The defaults MUST be
-  clearly distinguishable from each other and readable on the transmitter's
-  default display theme.
+  colors from a preset list of at least 6 distinct colors. The defaults are a
+  blue/cyan value arc (as in the reference) and a bright yellow max marker,
+  drawn thick enough to stand out from the arc (changed from white after
+  emulator testing, 2026-09-27: white was too subtle). Neither color choice
+  may be the same as the red/orange overspeed zone.
 - **FR-018**: Gauge full scale MUST be user-settable. The default is derived
   from the overspeed warning speed, so overspeed sits near the top of the
   dial.
 - **FR-019**: Session max MUST reset at the start of each session and when the
   user chooses "Reset max speed". It is not saved between sessions.
+- **FR-019a**: A new session max MUST be called out ("max", the number and
+  unit) once it hasn't risen for 1 second, if it beats the last announced
+  max by at least the callout sensitivity (so small creeps in cruise don't
+  repeat it). It follows the callout rules: a switch on, armed (FR-009), and
+  never overlapping (FR-007). Without the app voice it is the number and
+  unit only, because the transmitter's voice pack has no "max" (added
+  2026-10-04 at the user's request; 1 s was the user's suggestion and
+  holds because the max is already spike-filtered, R5).
 
 **Air density**
 
-- **FR-020**: Users MUST be able to enter field elevation (−1,000 to 15,000 ft,
-  or the metric equivalent) and, optionally, the outside temperature
-  (−30 to 50 °C, or the Fahrenheit equivalent). If temperature is not set,
-  the standard-atmosphere temperature for the entered elevation is used.
+- **FR-020**: Users MUST be able to enter field elevation and, optionally,
+  the outside temperature, limited to these ranges:
+
+  | Setting | Imperial | Metric |
+  | --- | --- | --- |
+  | Field elevation | −300 to 10,000 ft | −90 to 3,050 m |
+  | Temperature | −20 to 130 °F | −29 to 54 °C |
+
+  The editor MUST not allow values outside these limits. If temperature is
+  not set, the standard-atmosphere temperature for the entered elevation is
+  used; across the elevation range it stays within the temperature limits
+  (about −5 °C at 10,000 ft). Values saved outside the limits are clamped
+  when loaded (Edge Cases).
 - **FR-021**: When correction is on and the sensor type is airspeed, displayed
   speed, spoken speed, session max and overspeed check MUST use true airspeed,
   computed from the standard atmosphere at the entered elevation and
@@ -383,6 +655,51 @@ reading its label and hint.
   a percentage while correction is on.
 - **FR-023**: Elevation and temperature MUST use feet/°F when speed units are
   mph, knots or ft/s, and meters/°C otherwise.
+
+**Temperature source**
+
+- **FR-038**: The settings MUST offer **Temperature source: Standard / Manual
+  / Sensor**. The default is Standard.
+  - **Standard** uses the standard-atmosphere temperature for the field
+    elevation.
+  - **Manual** uses the entered temperature (FR-020).
+  - **Sensor** reads a selected telemetry value live.
+- **FR-039**: In Sensor mode, the user MUST be able to pick the temperature
+  value from the telemetry sensors. The list shows only values that report a
+  temperature unit (°C or °F), such as the MSpeed's temperature. The
+  selection is remembered per model and identified by the sensor itself, as
+  for the speed sensor (FR-003).
+- **FR-040**: A sensor reading MUST be used only while it is valid and within
+  the temperature limits of FR-020. A reading that is invalid or out of range
+  (e.g. a sensor heat-soaked in the sun before flight) makes the correction
+  use the default, standard temperature for the field elevation.
+  - **Resuming:** the app MUST switch back to the sensor automatically once
+    the reading has been valid and in range for at least 10 seconds (two
+    consecutive reads, FR-041). The pilot does nothing. The wait stops a
+    reading near a limit from flipping back and forth.
+  - **Callouts and warnings:** losing or rejecting the temperature reading
+    MUST NOT affect callouts, warnings or the gauge beyond this fallback. The
+    switch between sensor and standard temperature is itself a change in the
+    correction factor, so FR-041's no-callout rule applies.
+  - **What isn't caught:** a heat-soaked sensor reading below the upper limit
+    (e.g. 115 °F on a 95 °F day) can't be told apart from a hot day. The
+    warm-fuselage caveat and the Manual option cover it.
+- **FR-041**: The sensor temperature MUST be read at most every 5 seconds. The
+  correction factor MUST update only when the temperature has moved at least
+  1 °C (2 °F) from the value in use, so the displayed speed doesn't jitter.
+  A change in the factor alone MUST NOT trigger a callout.
+- **FR-042**: While correction is on, the settings screen MUST show the
+  temperature in use and where it came from: "standard", "manual", "from
+  <sensor name>", or "sensor not available — using standard".
+- **FR-043**: Temperature source affects only density correction. Stall,
+  landing-speed and "airspeed alive" checks still use sensor speed (FR-011),
+  and GPS sources still get no correction (User Story 4, scenario 5).
+- **FR-044**: The full-screen side panel MUST show a **Temperature** row while
+  density correction is active. It shows the temperature in use, with its
+  unit (°F or °C per FR-023), and its source: standard, manual or sensor.
+  While the sensor reading is being rejected (FR-040), the row MUST make
+  that visible, e.g. "SENSOR OUT" with the standard temperature being used.
+  The single and double windows don't show temperature; there's no room.
 
 **Settings and lifecycle**
 
@@ -410,6 +727,49 @@ reading its label and hint.
   - **Repository documentation:** the README and `CREDITS.md`.
   - **Asset folder:** reused WAV files keep their credit, via a short credits
     note placed with them.
+
+**Voice**
+
+- **FR-030**: Speed Gauge MUST support a single app voice for all its speech:
+  - whole numbers **0–500**;
+  - the unit phrases "miles per hour", "kilometers per hour", "knots",
+    "meters per second", "feet per second" and "percent";
+  - the phrases "stall warning", "overspeed", "airspeed alive", "stall
+    warning at", "airspeed calibration" and "max" (added 2026-10-04,
+    FR-019a).
+  Each is a separate pre-generated audio file in the app's asset folder
+  (`/Apps/AG-SpdGa/voice/`). The default voice is Piper's US English
+  **"Amy"**, chosen by the user on 2026-09-28.
+- **FR-031**: A callout in the app voice MUST be a number file followed by a
+  unit file where units are spoken (FR-008). It is queued so the two play as
+  one phrase, and FR-007 applies to the phrase as a whole.
+- **FR-032**: The settings MUST offer **Voice: Speed Gauge / Transmitter**.
+  The default is Speed Gauge when the voice files are present, otherwise
+  Transmitter.
+- **FR-033**: At startup the app MUST check that the voice files are
+  installed. It uses the app voice only if they are. Any callout it can't
+  fully speak in the app voice falls back to the transmitter's voice: a
+  number above 500, or a missing file. Warnings fall back to DFM's
+  recordings. A fallback MUST never silence a warning.
+- **FR-034**: The voice files MUST be generated by a script in the repo
+  (`tools/voice/`) from one Piper voice model, so every file matches in
+  voice, loudness and pacing. Each file is:
+  - mono, 16-bit, at a sample rate the transmitter supports (16 or 22.05 kHz);
+  - trimmed of leading and trailing silence;
+  - normalized to a common loudness.
+  The script MUST be re-runnable to switch voice or regenerate the set.
+- **FR-035**: The generated voice files are committed to the repository in
+  `src/Apps/AG-SpdGa/voice/` (changed 2026-10-03 at the user's request;
+  previously they were kept out of git). They are licensed CC BY-SA 4.0,
+  like the Amy voice model, not MIT like the rest of the repository; the
+  license of the recordings the model was trained on is undocumented.
+  `CREDITS.md`, the README and the folder's `CREDITS.txt` MUST say so. The
+  generator stays in the repo to regenerate the set.
+- **FR-036**: `CREDITS.md` MUST credit Piper (MIT) and the Amy voice model
+  (CC BY-SA 4.0, Mycroft / Rhasspy). The generated voice folder MUST contain
+  a short credits note carrying that attribution.
+- **FR-037**: DFM's original warning recordings stay in the asset folder as
+  the fallback set, with their existing credit.
 
 ### Key Entities
 
@@ -442,25 +802,50 @@ reading its label and hint.
   dial's stall mark.
 - **SC-004**: The gauge is readable at a glance in both single and double
   window sizes. A pilot can read current speed within 5% from the dial alone,
-  and read both numbers without overlap, on the DS-24 screen.
+  and read both numbers without overlap, on the DS-24 II screen.
 - **SC-005**: The gauge reflects a speed change within 0.5 s.
 - **SC-006**: A pilot new to the app configures sensor, switch, landing speed
   and stall warning in under 3 minutes without referring to documentation.
-- **SC-007**: Running the app does not noticeably slow the transmitter. Its
-  CPU figure in the transmitter's app overview stays below 20% during flight
-  with the gauge displayed.
+- **SC-007**: Running the app does not noticeably slow the transmitter, and no
+  single call comes close to the transmitter's per-call limit. The CPU figure
+  in the app overview is the highest share of a single call's budget seen
+  since the app started (the transmitter kills a script at 100%). It stays
+  below 50% with every window shown, full screen included, leaving at least 2x
+  headroom. (Revised 2026-09-27: the original "below 20% during flight"
+  assumed the figure was an overall load. Measured in the emulator: start-up
+  24%, loop 0–1%, single/double draw up to 18%, full-screen draw up to 43%;
+  the user accepted this with the full-screen glow as designed.)
 - **SC-008**: Every behavior of the original app is either kept or listed in
   this spec as deliberately changed. No setting disappears without
   explanation.
+- **SC-009**: In the app voice, a number-plus-unit callout plays with no
+  audible gap: the pause between the number file and the unit file is under
+  0.15 s. A number-only callout (used below landing speed and in continuous
+  mode, FR-008) for any value up to 199 lasts at most 1.3 s, so it fits the
+  default 2-second interval. Measured with the Amy voice, "one hundred
+  twelve" is 1.14 s. Longer callouts with units ("eighty-five miles per
+  hour" is about 2.0 s) happen only at the slower automatic intervals, and
+  FR-007 stops them queueing up. The generator MAY speed up speech slightly
+  (Piper's length scale) if flight testing shows callouts lag.
+- **SC-010**: With the voice files removed, every callout and warning in
+  quickstart still sounds, in the transmitter voice or DFM's recordings. None
+  is silent.
 
 ## Assumptions
 
-- **Target and baseline.** The target is the DS-24 II transmitter only (color
-  screen); the original app was also only tested on the DS-24. The original's
+- **Target and baseline.** The gauge targets the DS-24 II / DC-24 II
+  (firmware 6.x) only, using the Lua window sizes measured on the
+  transmitter (150 × 23, 150 × 68 and 316 × 159), not the panel's
+  480 × 480 or the emulator's larger windows. The original app was tested
+  only on the original DS-24. The original's
   behavior (v2.1) is the baseline; where this spec is silent, match it.
-- **Existing audio.** The existing WAV files (stall warning, overspeed,
-  airspeed alive, "stall speed warning at", cal factor) are reused. New voice
-  files are out of scope for v1.
+- **Audio.** Speed Gauge's own voice set (Amy) is the primary audio when
+  installed. DFM's original WAV files (stall warning, overspeed, airspeed
+  alive, "stall speed warning at", cal factor) stay as the fallback
+  (FR-033, FR-037).
+- **Voice files are generated and committed.** The full set is 512 short
+  files plus `CREDITS.txt` and `index.txt`, about 23 MB, in
+  `AG-SpdGa/voice/`, under CC BY-SA 4.0 (FR-035).
 - **Pitot sensors report indicated airspeed.** They convert pressure to speed
   using fixed sea-level air density. This holds for the sensors the original
   was tested with (Jeti MSpeed, Digitech, ASSI, Xicoy). A sensor that already
@@ -470,17 +855,22 @@ reading its label and hint.
   checks compare ground speed to the settings. Wind makes these approximate;
   the help text says so.
 - **Density correction scope.** Correction uses field elevation plus
-  temperature, assuming standard sea-level pressure at that elevation. Using a
-  live pressure/temperature sensor from the model is out of scope for v1.
-  Standard pressure is accurate enough for announcements (typically within a
-  few percent).
+  temperature, assuming standard sea-level pressure at that elevation.
+  Temperature can come from a sensor (FR-038). Live pressure from a sensor is
+  out of scope for v1: the MSpeed EX doesn't report it, and standard pressure
+  is accurate enough for announcements (typically within a few percent).
+- **MSpeed temperature.** Per its manual, the MSpeed EX reports temperature
+  alongside airspeed. The manual doesn't say whether this is outside-air or
+  housing temperature, hence the warm-fuselage caveat. It is unconfirmed
+  whether the MSpeed 450 EX reports temperature.
 - **Calibration file dropped.** The original's per-model calibration file
   (`DFM-<model>.jsn`) is not carried over; the calibration setting is saved
   per model like everything else.
 - **Session max** is not logged to file or saved. Logging it to the
   transmitter's telemetry log is a possible later feature.
-- **English only.** Labels and callouts are English for v1. Spoken numbers and
-  units follow the transmitter's voice language.
+- **English only.** Labels and callouts are English for v1. The app voice is
+  US English. With Voice set to Transmitter, spoken numbers and units follow
+  the transmitter's language.
 - **New app, new settings.** The app is named "Speed Gauge" (shown in the
   transmitter's app list and menu). Its script is `AG-SpdGa.lua`, with assets
   in `AG-SpdGa/`, following the repo's naming convention. Because the filename
