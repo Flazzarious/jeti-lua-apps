@@ -18,7 +18,7 @@ local gauge = require("ag_gauge")
 local dens = require("ag_dens")
 
 local APP_NAME = "Speed Gauge"
-local APP_VERSION = "0.2.0"
+local APP_VERSION = "0.3.0"
 local AUDIO_DIR = "/Apps/AG-SpdGa/"
 local TICK_MS = 100         -- loop logic runs at most 10x per second (R9)
 -- The JETI Studio emulator draws each window's title bar inside the reported
@@ -79,9 +79,9 @@ local C_TEXT = { 255, 255, 255 }
 -- Many thin bands with a gentle fade read as a gradient; each band is a
 -- renderer polyline, and the glow is the biggest drawing cost (R6).
 local GLOW = { 0.36, 0.02 }
--- TEMPORARY (2026-10-03): show this call's and the worst system.getCPU() on
--- the full-screen gauge, to measure the glow on the transmitter. Remove
--- before release.
+-- Diagnostic, off for release: true shows this call's and the worst
+-- system.getCPU() on the full-screen gauge (used to measure the glow on the
+-- transmitter, 2026-10-03; worst 14% at speed).
 local DEBUG_CPU = false     -- off after transmitter testing (T080, 2026-10-04)
 
 local TXT_NOTICE = "Speed Gauge needs DS-24 II"

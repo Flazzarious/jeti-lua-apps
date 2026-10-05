@@ -26,7 +26,7 @@ Official PDF: https://github.com/JETImodel/Lua-Apps/tree/master/Doc
 - Lua allows at most 200 local variables in one function, and the file's main
   chunk counts as one: an app with ~200 file-level `local`s won't compile
   ("too many local variables"; LuaLS reports `local-limit`). Group related
-  constants and state into tables. Speed Gauge 0.2.0 is at 181 of 200.
+  constants and state into tables. Speed Gauge 0.3.0 is at 191 of 200.
 
 ## Target hardware (DS-24 II)
 
@@ -108,6 +108,17 @@ the emulator's numbers above:
   rectangle's corner, not the window's. Draw at `(-x, -y)` to keep window
   coordinates. Clipping itself works on images (transmitter, 2026-10-03,
   `Screen017/018.png`). `lcd.resetClipping()` restores the window.
+- **Verified on the transmitter with Speed Gauge 0.3.0 (2026-10-03/04):**
+  - `system.getDeviceType()` contains "24 II" (the gauge draws, not the
+    "needs DS-24 II" notice); the emulator returns "JETI DS-24 II".
+  - Size-0 windows let the pilot place them at single or double size.
+  - Mono 16-bit 22.05 kHz WAVs play (Speed Gauge's app voice).
+  - `°` renders in `lcd.drawText` ("°F" on the gauge panel).
+  - One `lcd.renderer()` reused across frames works.
+  - A temperature value's unit ends in "C" or "F" and is 2–3 bytes (the
+    MSpeed temperature appears in Speed Gauge's filtered sensor list).
+  - Worst single-call CPU with images for the dial and arcs: 14% at speed,
+    full screen.
 - The transmitter can save screenshots to the SD card root
   (`Screen001.png`, 480 × 480): the quickest way to check a layout.
 - **Model tile:** the desktop's model tile (model name, image, page "n/3")

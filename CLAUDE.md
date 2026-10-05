@@ -98,10 +98,14 @@ src/Apps/lib/ag_xxxxx.lua  shared module, loaded with require("ag_xxxxx")
 ## Environment
 
 - **Target:** DS-24 II / DC-24 II only for anything drawn on screen. Design
-  for the measured Lua window sizes, not the panel's 480 × 480: small
-  157 × 60, large 157 × 127, full screen 320 × 260 (see
-  `docs/jeti-api-notes.md`; measure more with `tools/probe/PROBE.lua`). The
-  emulator runs firmware 6.04.
+  for the Lua window sizes measured **on the transmitter**, not the panel's
+  480 × 480 or the emulator's: small 150 × 23, large 150 × 68, full screen
+  316 × 159, all visible, with the title drawn above the window. The JETI
+  Studio emulator (firmware 6.04) reports 157 × 60 / 157 × 127 / 320 × 260
+  with a title bar inside. Details, scaling and drawing limits are in
+  `docs/jeti-api-notes.md`; measure more with `tools/probe/PROBE.lua`. The
+  emulator plays no Lua audio, so voice can only be tested on the
+  transmitter.
 
 - Windows, PowerShell. Spec Kit scripts are the PowerShell variants.
 - The deploy target is `/Apps` on the transmitter's SD card; `src/Apps/` mirrors

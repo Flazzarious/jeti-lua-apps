@@ -14,6 +14,8 @@ overspeed zone, big center number, sticky session-max marker). It targets the
 DS-24 II's measured Lua window sizes and shows a notice on other
 transmitters.
 
+**Release (2026-10-04):** the work below plus the transmitter fixes in tasks.md Phase 13 (T073–T091) ships as **0.3.0**, after live pitot testing on the DS-24 II.
+
 **Update 2026-10-03.** Version 0.1.0 is built (every non-manual task in
 tasks.md is done). The spec has since gained three changes, which this plan
 update covers and which ship as 0.2.0:
