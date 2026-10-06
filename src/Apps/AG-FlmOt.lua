@@ -176,6 +176,20 @@ local function checkAudio()
   audio.relit = fileExists(SND.relit)
 end
 
+-- Starts one alarm cycle (R2, R6, R7). AUDIO_IMMEDIATE stops any other
+-- foreground playback, so the alarm pre-empts other apps' speech (FR-025).
+-- Without the cycle files: two bursts of beeps, the second 2.5 s later.
+local function playCycle(now, file)
+  if audio.ok then
+    system.playFile(file, AUDIO_IMMEDIATE)
+  else
+    system.playBeep(9, 1800, 120)
+    st.beepAt = now + 2500
+  end
+  system.vibration(false, 4)
+  system.vibration(true, 4)
+end
+
 -- Stops alarm sound at once, mid-callout or mid-beep (R3).
 local function stopAlarm()
   system.stopPlayback(AUDIO_IMMEDIATE)
@@ -206,16 +220,51 @@ end
 local function onInvalid(now)           -- row 2 (US6)
 end
 
-local function stepDisarmed(now)        -- row 3 (US1)
+-- Row 3 (FR-014): arms once RPM has held the arming threshold for the
+-- arming time. The start overshoot above idle counts like any RPM above it.
+local function stepDisarmed(now)
+  if st.rpm >= d.armRpm then
+    st.armSince = st.armSince or now
+    if now - st.armSince >= d.armMs then
+      st.state = S.ARMED
+      st.armSince, st.lowSince = nil, nil
+    end
+  else
+    st.armSince = nil
+  end
 end
 
-local function stepArmed(now)           -- row 4 (US1)
+-- Row 4 (FR-015): RPM below the flameout threshold for the detection delay.
+local function stepArmed(now)
+  if st.rpm < d.flRpm then
+    st.lowSince = st.lowSince or now
+    if now - st.lowSince >= d.detMs then
+      st.state = S.FLAMEOUT
+      st.lowSince, st.armSince = nil, nil
+      st.cycleAt = now
+      playCycle(now, SND.cycle)
+    end
+  else
+    st.lowSince = nil
+  end
 end
 
 local function stepFlameout(now)       -- row 5 (US4)
 end
 
-local function stepCycle(now)           -- row 6 (US1)
+-- Row 6 (SC-012): a new cycle every 5 s, plus the second fallback beep burst.
+local function stepCycle(now)
+  if st.beepAt and now >= st.beepAt then
+    system.playBeep(9, 1800, 120)
+    st.beepAt = nil
+  end
+  if now - st.cycleAt >= CYCLE_MS then
+    st.cycleAt = st.cycleAt + CYCLE_MS
+    if now - st.cycleAt >= CYCLE_MS then
+      st.cycleAt = now          -- fell more than a cycle behind: restart the rhythm
+    end
+    playCycle(now, SND.cycle)
+  end
 end
 
 -- "112,400" for the window, rebuilt only when RPM / 100 changes.
@@ -413,6 +462,11 @@ end
 local function drawText(w)
   local r, g, b = lcd.getFgColor()
   lcd.setColor(r, g, b)
+  if st.state == S.FLAMEOUT then
+    lcd.drawText(4, 2, TXT.flameout, FONT_BIG)   -- dominant (FR-031)
+    lcd.drawText(w - 4 - lcd.getTextWidth(FONT_MINI, st.rpmText), 24, st.rpmText, FONT_MINI)
+    return
+  end
   lcd.drawText(4, 2, stateText(), FONT_MINI)
   lcd.drawText(w - 4 - lcd.getTextWidth(FONT_NORMAL, st.rpmText), 2, st.rpmText, FONT_NORMAL)
 end
