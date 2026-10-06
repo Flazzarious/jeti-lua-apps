@@ -205,6 +205,44 @@ end
 -- group; each user story fills its own.
 ------------------------------------------------------------------------------
 
+-- SIM (debug, R12): scripted RPM profiles in place of the sensor, chosen in
+-- the form while SIM is true. Each profile is a flat list of time (ms from
+-- selection), RPM pairs, linearly interpolated; RPM -1 means invalid data.
+-- The last value holds after the end.
+local sim = { idx = 1, t0 = 0, out = { value = 0, valid = true } }
+sim.names = { "Off (real sensor)", "Normal flight", "Failed start", "Flameout", "Auto-restart", "Dropouts" }
+sim.profiles = {           -- sim.names[i + 1]
+  { 0, 0, 5000, 0, 25000, 20000, 28000, 45000, 36000, 35000, 60000, 35000, 65000, 120000,
+    90000, 120000, 92000, 35000, 100000, 35000, 103000, 120000, 130000, 120000,
+    132000, 35000, 160000, 35000 },
+  { 0, 0, 5000, 0, 20000, 25000, 23000, 25000, 30000, 0 },
+  { 0, 0, 3000, 0, 15000, 40000, 20000, 60000, 40000, 60000, 43000, 0 },
+  { 0, 60000, 8000, 60000, 11000, 0, 16000, 0, 20000, 10000, 24000, 28000, 27000, 8000,
+    30000, 8000, 34000, 20000, 38000, 45000, 46000, 35000 },
+  { 0, 35000, 10000, 35000, 10001, -1, 10500, -1, 10501, 35000, 15000, 35000, 15001, -1,
+    18000, -1, 18001, 35000 },
+}
+
+local function simRead(now)
+  local p = sim.profiles[sim.idx - 1]
+  local t = now - sim.t0
+  local v = p[#p]
+  for i = 1, #p - 2, 2 do
+    if t < p[i + 2] then
+      local a, b = p[i + 1], p[i + 3]
+      if a < 0 or b < 0 then
+        v = -1
+      else
+        v = a + (b - a) * (t - p[i]) / (p[i + 2] - p[i])
+      end
+      break
+    end
+  end
+  sim.out.valid = v >= 0
+  sim.out.value = v
+  return sim.out
+end
+
 -- Unassigned switch = off. "On" is above half travel (R10).
 local function switchOn(item)
   if item == nil then
@@ -217,7 +255,15 @@ end
 local function stepTest(now)            -- test alarm, rows T1-T3 (US8)
 end
 
-local function onCut(now)               -- row 1 (US2)
+-- Row 1 (FR-016): Cut disarms at once and silently from any state. Arming
+-- again needs the switch out of Cut and row 3 (User Story 5).
+local function onCut()
+  if st.state == S.FLAMEOUT then
+    stopAlarm()
+  end
+  st.state = S.DISARMED
+  st.armSince, st.lowSince, st.invalidSince = nil, nil, nil
+  st.tlPending, st.lost = false, false
 end
 
 local function onInvalid(now)           -- row 2 (US6)
@@ -231,6 +277,9 @@ local function stepDisarmed(now)
     if now - st.armSince >= d.armMs then
       st.state = S.ARMED
       st.armSince, st.lowSince = nil, nil
+      if cfg.sayArm == 1 and audio.armed then
+        system.playFile(SND.armed, AUDIO_QUEUE)   -- FR-009; queued, never cuts a callout
+      end
     end
   else
     st.armSince = nil
@@ -394,6 +443,15 @@ local function initForm()
   end)
   idx.needs = hint("", false)
 
+  if SIM then                 -- debug only (R12): pick a scripted RPM profile
+    form.addRow(2)
+    form.addLabel({ label = "SIM profile", width = 120 })
+    form.addSelectbox(sim.names, sim.idx, false, function(i)
+      sim.idx, sim.t0 = i, system.getTimeCounter()
+      onCut()                 -- start each profile disarmed and silent
+    end, { width = 200 })
+  end
+
   heading("Engine")
   form.addRow(2)
   form.addLabel({ label = "RPM sensor", width = 120 })
@@ -516,21 +574,32 @@ local function loop()
     st.armSince, st.lowSince, st.invalidSince, st.lost = nil, nil, nil, false
   end
 
-  -- Row 1: Cut wins over everything (FR-016).
+  -- Always call through system: Emulator Telemetry replaces it (R9).
+  local s
+  if SIM and sim.idx > 1 then
+    s = simRead(now)
+  else
+    s = system.getSensorValueByID(cfg.sId, cfg.sPar)
+  end
+  local valid = false
+  st.sensorFound = s ~= nil
+  st.rpm = nil
+  if s ~= nil and s.valid then
+    valid = true
+    st.rpm = s.value * d.kScale
+  end
+
+  -- Row 1: Cut wins over everything (FR-016). The RPM above is still read so
+  -- the window follows the spool-down.
   if switchOn(cfg.swCut) then
-    onCut(now)
+    onCut()
+    updateRpmText()
     return
   end
 
-  -- Always call through system: Emulator Telemetry replaces it (R9).
-  local s = system.getSensorValueByID(cfg.sId, cfg.sPar)
-  if s == nil or not s.valid then
-    st.sensorFound = s ~= nil
-    st.rpm = nil
+  if not valid then
     onInvalid(now)            -- row 2
   else
-    st.sensorFound = true
-    st.rpm = s.value * d.kScale
     st.invalidSince, st.lost = nil, false
     if st.state == S.DISARMED then
       stepDisarmed(now)
