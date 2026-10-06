@@ -301,7 +301,24 @@ local function stepArmed(now)
   end
 end
 
-local function stepFlameout(now)       -- row 5 (US4)
+-- Row 5 (FR-017, FR-018): the alarm clears only when RPM holds the arming
+-- threshold for the arming time, usually during the relight overshoot.
+-- RPM in the startup range (an auto-restart cranking) breaks the timer and
+-- starts nothing new; the same alarm continues.
+local function stepFlameout(now)
+  if st.rpm >= d.armRpm then
+    st.armSince = st.armSince or now
+    if now - st.armSince >= d.armMs then
+      stopAlarm()
+      st.state = S.ARMED
+      st.armSince, st.lowSince = nil, nil
+      if cfg.sayRel == 1 and audio.relit then
+        system.playFile(SND.relit, AUDIO_QUEUE)
+      end
+    end
+  else
+    st.armSince = nil
+  end
 end
 
 -- Row 6 (SC-012): a new cycle every 5 s, plus the second fallback beep burst.

@@ -135,7 +135,7 @@ built and checked on its own.
 
 **Independent Test**: `SIM` profile 4 and quickstart scenarios 10–11 (SC-011).
 
-- [ ] T032 [US4] Fill `stepFlameout(now)` in `src/Apps/AG-FlmOt.lua` (row 5, FR-017, FR-018): `rpm >= armRpm` sets `armSince = armSince or now`; when `now - armSince >= armMs`: `stopAlarm()`, `state = ARMED`, `armSince = nil`, `lowSince = nil`, then play `SND.relit` with `AUDIO_QUEUE` if `sayRel == 1` and `fileOk.relit`. `rpm < armRpm` (the startup range) clears `armSince` and starts nothing new
+- [X] T032 [US4] Fill `stepFlameout(now)` in `src/Apps/AG-FlmOt.lua` (row 5, FR-017, FR-018): `rpm >= armRpm` sets `armSince = armSince or now`; when `now - armSince >= armMs`: `stopAlarm()`, `state = ARMED`, `armSince = nil`, `lowSince = nil`, then play `SND.relit` with `AUDIO_QUEUE` if `sayRel == 1` and `fileOk.relit`. `rpm < armRpm` (the startup range) clears `armSince` and starts nothing new
 - [ ] T033 [US4] MANUAL: Emulator, `SIM` profile 4: the failed attempt doesn't clear the alarm and no second event starts; the relight clears within 3.5 s of holding 31,500 and stays clear through the decay to 35,000. Without `SIM`: quickstart scenarios 10 and 11
 
 ---
