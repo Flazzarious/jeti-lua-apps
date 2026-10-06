@@ -159,6 +159,14 @@ the emulator's numbers above:
 - It also replaces `system.playFile`, `playNumber`, `playBeep`,
   `playSystemSound` and `vibration` with `print`: in the emulator, audio and
   vibration appear as lines in the Lua console instead of sound.
+- **`io.open` in the emulator needs a relative path** (JETI Studio 6.04,
+  2026-10-05, Flameout Alarm): `io.open("/Apps/AG-FlmOt/cycle.wav", "r")`
+  returns nil, while `io.open("Apps/AG-FlmOt/cycle.wav", "r")` works ("r"
+  and "rb" alike). The transmitter opens the absolute path (Speed Gauge's
+  voice check passes there). A file-existence check should try the
+  absolute path, then the same path without its leading "/". Playback keeps
+  the absolute path. Speed Gauge 0.3.0's check doesn't do this yet, so in
+  the emulator it always falls back to DFM's sounds and `playNumber`.
 - **The emulator plays no Lua audio even without that app** (JETI Studio,
   firmware 6.04, observed 2026-10-03: `playFile` with the telemetry app
   removed was silent). Anything that must be heard, such as WAV formats and

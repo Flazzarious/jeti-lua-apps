@@ -159,9 +159,12 @@ end
 -- Which files exist, checked once in init() (R6).
 local audio = { ok = false, tlost = false, armed = false, relit = false }
 
--- Jeti's io is function-style (constitution III).
+-- Jeti's io is function-style (constitution III). The transmitter opens
+-- "/Apps/..."; the JETI Studio emulator (6.04) only opens the same path
+-- without the leading "/" (2026-10-05), so try that too. Only this check
+-- uses it: playback keeps the absolute path.
 local function fileExists(path)
-  local f = io.open(path, "r")
+  local f = io.open(path, "r") or io.open(string.sub(path, 2), "r")
   if f then
     io.close(f)
     return true
