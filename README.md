@@ -14,6 +14,25 @@ Speed Gauge speaks in its own voice (Piper "Amy"), in
 (see [CREDITS.md](CREDITS.md)); [`tools/voice/`](tools/voice/README.md)
 regenerates them. Without them the app works in the transmitter's voice.
 
+## Install with JETI Studio
+
+1. In JETI Studio open **File → Configuration**, and add this line to the
+   list of Lua app sources:
+
+   ```
+   https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/main/Apps.json
+   ```
+
+2. Connect the transmitter by USB. The released apps appear in JETI
+   Studio's Lua app list; select one and install it.
+
+Each app installs exactly its released version (its files come from the
+release tag). Descriptions: [Speed Gauge](docs/apps/speed-gauge.md).
+
+For maintainers: after tagging a release, run
+`python tools/publish/make_apps_json.py`, commit `Apps.json` and merge it to
+`main`.
+
 Apps here are for telemetry, timers, announcements and displays only. Nothing
 in this repo may control surfaces, throttle or any flight function. See the
 constitution: [`.specify/memory/constitution.md`](.specify/memory/constitution.md).
