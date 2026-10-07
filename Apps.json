@@ -1,0 +1,3311 @@
+{
+ "applications": [
+  {
+   "id": 0,
+   "version": "0.3.0",
+   "author": "Aaron George (based on DFM Speed Announcer by Dave McQueeney)",
+   "hw": [
+    3866,
+    3867
+   ],
+   "releaseDate": "Mon, 05 Oct 2026 02:12:35 +0000",
+   "name": {
+    "en": "Speed Gauge (DC/DS-24II)"
+   },
+   "description": {
+    "en": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/main/docs/apps/speed-gauge.html"
+   },
+   "previewIcon": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/main/docs/apps/img/speed-gauge-icon.png",
+   "files": [
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa.lua",
+     "destination": "Apps/AG-SpdGa.lua",
+     "hash": "8cb3f664a329a83a75bf4ce07fdd266c01248ac1",
+     "size": 59260
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/CREDITS.txt",
+     "destination": "Apps/AG-SpdGa/CREDITS.txt",
+     "hash": "c01a98a270e0352c90059b7cd535420badbb9aa3",
+     "size": 1542
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/airspeed_alive.wav",
+     "destination": "Apps/AG-SpdGa/airspeed_alive.wav",
+     "hash": "d30b3930971121dcd9ecab23d419bba781e4f5c9",
+     "size": 172422
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/airspeed_cal_factor.wav",
+     "destination": "Apps/AG-SpdGa/airspeed_cal_factor.wav",
+     "hash": "be1daabca880d89e3331ebac04bf60e0e57797a0",
+     "size": 199764
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/dial-150x68.png",
+     "destination": "Apps/AG-SpdGa/dial-150x68.png",
+     "hash": "4120065ea7753a9242a25ac5a078d538b12055c6",
+     "size": 962
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/dial-316x159.png",
+     "destination": "Apps/AG-SpdGa/dial-316x159.png",
+     "hash": "cfe73e327ce36df406c58b2b54b0188e94bb7c90",
+     "size": 2696
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/overspeed.wav",
+     "destination": "Apps/AG-SpdGa/overspeed.wav",
+     "hash": "77226d546d7985d057267859f3181b1a9e00e9df",
+     "size": 416250
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/ring-150x68-1.png",
+     "destination": "Apps/AG-SpdGa/ring-150x68-1.png",
+     "hash": "ae724f9763eeba0bd1ea6eea74f4c6029bd464e9",
+     "size": 1747
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/ring-150x68-2.png",
+     "destination": "Apps/AG-SpdGa/ring-150x68-2.png",
+     "hash": "340e5a86313dea1a948cc75bbe8997b910ae9c15",
+     "size": 1749
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/ring-150x68-3.png",
+     "destination": "Apps/AG-SpdGa/ring-150x68-3.png",
+     "hash": "4140c7b1c9b595eef29a4daa74f4b0287e8aa90b",
+     "size": 1747
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/ring-150x68-4.png",
+     "destination": "Apps/AG-SpdGa/ring-150x68-4.png",
+     "hash": "7086beca3404dfc13e413537343a47d0adf30061",
+     "size": 1750
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/ring-150x68-5.png",
+     "destination": "Apps/AG-SpdGa/ring-150x68-5.png",
+     "hash": "75bd47953266f29870f197af2e6e431ade52086f",
+     "size": 1749
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/ring-150x68-6.png",
+     "destination": "Apps/AG-SpdGa/ring-150x68-6.png",
+     "hash": "51b64e1073fd7ed37f0ae0a1926191dd6dcad5d2",
+     "size": 1749
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/ring-150x68-7.png",
+     "destination": "Apps/AG-SpdGa/ring-150x68-7.png",
+     "hash": "cce8544f15cd37e0e2636067911efd3d09fa53f1",
+     "size": 1749
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/ring-150x68-8.png",
+     "destination": "Apps/AG-SpdGa/ring-150x68-8.png",
+     "hash": "0dfc4ae17e5212ba7f47d74c0c6b1daebbaaf8cd",
+     "size": 1748
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/ring-150x68-9.png",
+     "destination": "Apps/AG-SpdGa/ring-150x68-9.png",
+     "hash": "c952d37771708f36e9c7940980284868465600d5",
+     "size": 1747
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/ring-150x68-o.png",
+     "destination": "Apps/AG-SpdGa/ring-150x68-o.png",
+     "hash": "af48f3b7c61670dc020c63f64dc4f8943272c242",
+     "size": 1746
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/ring-150x68-z.png",
+     "destination": "Apps/AG-SpdGa/ring-150x68-z.png",
+     "hash": "af48f3b7c61670dc020c63f64dc4f8943272c242",
+     "size": 1746
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/ring-316x159-1.png",
+     "destination": "Apps/AG-SpdGa/ring-316x159-1.png",
+     "hash": "812f584fc896e7ac73ea6708028fb60a04d65c2d",
+     "size": 5686
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/ring-316x159-2.png",
+     "destination": "Apps/AG-SpdGa/ring-316x159-2.png",
+     "hash": "1a8ed50d6b5b046b0d8eaef5c52336a30b751f94",
+     "size": 5682
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/ring-316x159-3.png",
+     "destination": "Apps/AG-SpdGa/ring-316x159-3.png",
+     "hash": "f8a655d9e4381a060301a53f47ab0f41e738a574",
+     "size": 5708
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/ring-316x159-4.png",
+     "destination": "Apps/AG-SpdGa/ring-316x159-4.png",
+     "hash": "942093e07368d081b3eeabbf98a0fe7dd48a6a65",
+     "size": 5685
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/ring-316x159-5.png",
+     "destination": "Apps/AG-SpdGa/ring-316x159-5.png",
+     "hash": "b800451e81513bd98cc7b34ca12a8de1a0e8df06",
+     "size": 5685
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/ring-316x159-6.png",
+     "destination": "Apps/AG-SpdGa/ring-316x159-6.png",
+     "hash": "cb48f88091e43d54954c2f2895dbe8cc82241757",
+     "size": 5685
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/ring-316x159-7.png",
+     "destination": "Apps/AG-SpdGa/ring-316x159-7.png",
+     "hash": "9212686ed3d09e9f5e929c0fc3847ba7e13d3313",
+     "size": 5684
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/ring-316x159-8.png",
+     "destination": "Apps/AG-SpdGa/ring-316x159-8.png",
+     "hash": "1970f6c68747ee7676a3cf4a10a4a39ee3c35c60",
+     "size": 5683
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/ring-316x159-9.png",
+     "destination": "Apps/AG-SpdGa/ring-316x159-9.png",
+     "hash": "b712c00ea52f1d5548f821ce05bafad1b3d41f38",
+     "size": 5683
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/ring-316x159-o.png",
+     "destination": "Apps/AG-SpdGa/ring-316x159-o.png",
+     "hash": "79ca135da1192709c13895a7f351f33a84ea43cd",
+     "size": 5681
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/ring-316x159-z.png",
+     "destination": "Apps/AG-SpdGa/ring-316x159-z.png",
+     "hash": "da8ad6c3b06898b58b79abb58145eb1add80c1b8",
+     "size": 5927
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/stall_speed_warning_at.wav",
+     "destination": "Apps/AG-SpdGa/stall_speed_warning_at.wav",
+     "hash": "26f2bb7fdcaacf76c6952103a2de0a417e76b079",
+     "size": 249540
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/stall_warning.wav",
+     "destination": "Apps/AG-SpdGa/stall_warning.wav",
+     "hash": "d96c96b0428d5ec49193a6954dd860d50e6a0762",
+     "size": 304234
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/0.wav",
+     "destination": "Apps/AG-SpdGa/voice/0.wav",
+     "hash": "8c370278f9be431a9d4378093b19d18dba7c1a3f",
+     "size": 20688
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/1.wav",
+     "destination": "Apps/AG-SpdGa/voice/1.wav",
+     "hash": "c23358c88ab31a67d168cc706fed4b0f925e8c65",
+     "size": 15688
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/10.wav",
+     "destination": "Apps/AG-SpdGa/voice/10.wav",
+     "hash": "264082ac9922bebcf8788d1026b2f6ff00804c08",
+     "size": 15468
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/100.wav",
+     "destination": "Apps/AG-SpdGa/voice/100.wav",
+     "hash": "b8377b76dc823aeacd8fc17a2ff7d2a7563bbc7e",
+     "size": 26468
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/101.wav",
+     "destination": "Apps/AG-SpdGa/voice/101.wav",
+     "hash": "b9803e570994a2ca0bded2403de77e25092bbf7d",
+     "size": 35796
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/102.wav",
+     "destination": "Apps/AG-SpdGa/voice/102.wav",
+     "hash": "4a12b2c68c7d46286b70082f4ab2d89ad3143358",
+     "size": 37506
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/103.wav",
+     "destination": "Apps/AG-SpdGa/voice/103.wav",
+     "hash": "138addfe37fafcd8fc2d05e630bb275ec964d565",
+     "size": 38558
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/104.wav",
+     "destination": "Apps/AG-SpdGa/voice/104.wav",
+     "hash": "f82ae8be5f50bd9587df06db42a006e093697b76",
+     "size": 38660
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/105.wav",
+     "destination": "Apps/AG-SpdGa/voice/105.wav",
+     "hash": "3deeb7b6163e204a2c0295ecbdf682a9a58936b3",
+     "size": 39592
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/106.wav",
+     "destination": "Apps/AG-SpdGa/voice/106.wav",
+     "hash": "7fbdcc91ddf787c0df67b6580e6146519c39fffd",
+     "size": 38992
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/107.wav",
+     "destination": "Apps/AG-SpdGa/voice/107.wav",
+     "hash": "fe5ae9af60d89712d91ecb5484998da79962bc50",
+     "size": 39184
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/108.wav",
+     "destination": "Apps/AG-SpdGa/voice/108.wav",
+     "hash": "c85f0555737ae16f020cc2b0789398fe67f073d9",
+     "size": 33918
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/109.wav",
+     "destination": "Apps/AG-SpdGa/voice/109.wav",
+     "hash": "66bbe735b2ac5543df0dbd35273991675788850c",
+     "size": 35356
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/11.wav",
+     "destination": "Apps/AG-SpdGa/voice/11.wav",
+     "hash": "c1ec78c84c2c71be32b63672132a5ee13cda61bb",
+     "size": 21628
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/110.wav",
+     "destination": "Apps/AG-SpdGa/voice/110.wav",
+     "hash": "7fc00cae84e2bee79baf905e4389eb59033210fe",
+     "size": 38932
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/111.wav",
+     "destination": "Apps/AG-SpdGa/voice/111.wav",
+     "hash": "87f148f86f7f1a9fd4a1441f5119a23ec088b438",
+     "size": 39806
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/112.wav",
+     "destination": "Apps/AG-SpdGa/voice/112.wav",
+     "hash": "c9f4b0cb1e845c8ef7a9391d7fa3b2d171179b76",
+     "size": 43272
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/113.wav",
+     "destination": "Apps/AG-SpdGa/voice/113.wav",
+     "hash": "2bdf14d86c7923b2ef8ed71e1fd0b3c0db08c834",
+     "size": 43770
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/114.wav",
+     "destination": "Apps/AG-SpdGa/voice/114.wav",
+     "hash": "b0ab815405fb9def00abdbbb099b71462f4e3a80",
+     "size": 42626
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/115.wav",
+     "destination": "Apps/AG-SpdGa/voice/115.wav",
+     "hash": "f6313990388115f409a0f6dcb858f26bfac05098",
+     "size": 45362
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/116.wav",
+     "destination": "Apps/AG-SpdGa/voice/116.wav",
+     "hash": "b0f1c9a6676ff69185485c4974ff84fb114c70c9",
+     "size": 46326
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/117.wav",
+     "destination": "Apps/AG-SpdGa/voice/117.wav",
+     "hash": "dfe980b2d6dfed1ad1a7a05e76d53168128ea331",
+     "size": 49046
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/118.wav",
+     "destination": "Apps/AG-SpdGa/voice/118.wav",
+     "hash": "90035639d0ab92da085f78e2a1d436c6f9acbc0e",
+     "size": 39746
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/119.wav",
+     "destination": "Apps/AG-SpdGa/voice/119.wav",
+     "hash": "17e79521b68195ec5598064bde1d862efe510081",
+     "size": 43848
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/12.wav",
+     "destination": "Apps/AG-SpdGa/voice/12.wav",
+     "hash": "1da6a16fc04986d27407279b76b44b9c486185d7",
+     "size": 19038
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/120.wav",
+     "destination": "Apps/AG-SpdGa/voice/120.wav",
+     "hash": "e06029c7ad3fa85aeaf1381bac07506e061f7763",
+     "size": 39870
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/121.wav",
+     "destination": "Apps/AG-SpdGa/voice/121.wav",
+     "hash": "7afe6d30a64a2b8b906c9360baf83aef1f4dfcce",
+     "size": 48306
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/122.wav",
+     "destination": "Apps/AG-SpdGa/voice/122.wav",
+     "hash": "8ba637bf285d61334a70c72010fd5517b908d95e",
+     "size": 50502
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/123.wav",
+     "destination": "Apps/AG-SpdGa/voice/123.wav",
+     "hash": "2dec3a05ca86bed998301ce1262081f344e4c5ef",
+     "size": 51432
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/124.wav",
+     "destination": "Apps/AG-SpdGa/voice/124.wav",
+     "hash": "67a80056f49758fc2c8da64179de8560c4d4e2ec",
+     "size": 54044
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/125.wav",
+     "destination": "Apps/AG-SpdGa/voice/125.wav",
+     "hash": "dd6c249cddc1fd411232efc4d6de746cef088b56",
+     "size": 54756
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/126.wav",
+     "destination": "Apps/AG-SpdGa/voice/126.wav",
+     "hash": "7654fba43a72908426fbf6f65de189eb7f453892",
+     "size": 55048
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/127.wav",
+     "destination": "Apps/AG-SpdGa/voice/127.wav",
+     "hash": "92b7a79b38ee6869be8112904e36b31b9d6aa1b1",
+     "size": 54664
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/128.wav",
+     "destination": "Apps/AG-SpdGa/voice/128.wav",
+     "hash": "42e4c290aa6219ac5abed01133508558ec0b2ba8",
+     "size": 50162
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/129.wav",
+     "destination": "Apps/AG-SpdGa/voice/129.wav",
+     "hash": "bf07fbd1595c1ddc1d9e0f4eece0d8f13419a725",
+     "size": 50780
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/13.wav",
+     "destination": "Apps/AG-SpdGa/voice/13.wav",
+     "hash": "56a5ecc93440474f84a22de56d55c6470756abb9",
+     "size": 24390
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/130.wav",
+     "destination": "Apps/AG-SpdGa/voice/130.wav",
+     "hash": "1e2761ed40c3a69a37a1b234a7093b580f718517",
+     "size": 39206
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/131.wav",
+     "destination": "Apps/AG-SpdGa/voice/131.wav",
+     "hash": "5562c01fbbad1406b6d41a2ad81a867fc3c2f149",
+     "size": 48186
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/132.wav",
+     "destination": "Apps/AG-SpdGa/voice/132.wav",
+     "hash": "90870989ab3acd5f57e62e6546ed849eb6bd5be5",
+     "size": 46338
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/133.wav",
+     "destination": "Apps/AG-SpdGa/voice/133.wav",
+     "hash": "7a20db833d1160d7e768f852d6755c46d8c31e3a",
+     "size": 49024
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/134.wav",
+     "destination": "Apps/AG-SpdGa/voice/134.wav",
+     "hash": "9c40579d9db49068f690cf216a32b8f6817215b6",
+     "size": 48462
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/135.wav",
+     "destination": "Apps/AG-SpdGa/voice/135.wav",
+     "hash": "4e8fcc1e54c515a31809524760da1858950ff298",
+     "size": 51584
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/136.wav",
+     "destination": "Apps/AG-SpdGa/voice/136.wav",
+     "hash": "50887783db1727677a478bbfc870da8ac14be5d3",
+     "size": 52578
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/137.wav",
+     "destination": "Apps/AG-SpdGa/voice/137.wav",
+     "hash": "e277d0dd4dfa00aacd36c364f2c42fa9e73ffb2b",
+     "size": 50864
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/138.wav",
+     "destination": "Apps/AG-SpdGa/voice/138.wav",
+     "hash": "4d84b7c980e35c1e2404c068aa433479b77a5611",
+     "size": 48020
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/139.wav",
+     "destination": "Apps/AG-SpdGa/voice/139.wav",
+     "hash": "6a9994b74ade5f2c1fc9b833c3a3c9faf81dcdd8",
+     "size": 48122
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/14.wav",
+     "destination": "Apps/AG-SpdGa/voice/14.wav",
+     "hash": "31a12f9b9bd7318b0fabf571fc1f85883e670d5d",
+     "size": 24342
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/140.wav",
+     "destination": "Apps/AG-SpdGa/voice/140.wav",
+     "hash": "1e6f1df6ddd26c1e344a1e6dc5f93e1ab583bb05",
+     "size": 35906
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/141.wav",
+     "destination": "Apps/AG-SpdGa/voice/141.wav",
+     "hash": "9d23f0eb39fba86c737b2ff2865bf0d945fa118b",
+     "size": 48514
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/142.wav",
+     "destination": "Apps/AG-SpdGa/voice/142.wav",
+     "hash": "37e5ffa6b29580a90fb961fdbc141650e7cdddb3",
+     "size": 45190
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/143.wav",
+     "destination": "Apps/AG-SpdGa/voice/143.wav",
+     "hash": "5b8c550473c2bacc7a183114685543c17cd161f8",
+     "size": 49206
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/144.wav",
+     "destination": "Apps/AG-SpdGa/voice/144.wav",
+     "hash": "c6b2e42d5367f52c8ae30c8d5e2280a5ff1e6162",
+     "size": 51574
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/145.wav",
+     "destination": "Apps/AG-SpdGa/voice/145.wav",
+     "hash": "fb5ce7d1984d1520d2ca0c0823d33efce5282a1a",
+     "size": 51826
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/146.wav",
+     "destination": "Apps/AG-SpdGa/voice/146.wav",
+     "hash": "c5cacfe11927a448d7534aa4bcac5ff83291a8d8",
+     "size": 51622
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/147.wav",
+     "destination": "Apps/AG-SpdGa/voice/147.wav",
+     "hash": "2c4cec9954920da56298f519c76518bfae9cee29",
+     "size": 49798
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/148.wav",
+     "destination": "Apps/AG-SpdGa/voice/148.wav",
+     "hash": "4f07450c0346f8ddc91e68756fbfa3f54d5d4960",
+     "size": 47428
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/149.wav",
+     "destination": "Apps/AG-SpdGa/voice/149.wav",
+     "hash": "907415656158f8d237e348088815f1a0da6dd410",
+     "size": 48510
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/15.wav",
+     "destination": "Apps/AG-SpdGa/voice/15.wav",
+     "hash": "6610b9a7c79d5339dc8af0eb33da035fdfed12a6",
+     "size": 25712
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/150.wav",
+     "destination": "Apps/AG-SpdGa/voice/150.wav",
+     "hash": "cd9613d90ce379e4d3e40325569a1c32bce5dd8f",
+     "size": 41668
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/151.wav",
+     "destination": "Apps/AG-SpdGa/voice/151.wav",
+     "hash": "bf1c08eb6eccfa18c9327dc0e539a8630cad97f2",
+     "size": 50792
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/152.wav",
+     "destination": "Apps/AG-SpdGa/voice/152.wav",
+     "hash": "6f7676ee4c4d8672cd7beb87430a98f2ca39969c",
+     "size": 48666
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/153.wav",
+     "destination": "Apps/AG-SpdGa/voice/153.wav",
+     "hash": "c68400d765c62ac3ccc3ef3faf1788b1e5acc348",
+     "size": 51780
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/154.wav",
+     "destination": "Apps/AG-SpdGa/voice/154.wav",
+     "hash": "d420e8bd4d7d1645f2ada0826518f11f9cebfaf4",
+     "size": 51938
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/155.wav",
+     "destination": "Apps/AG-SpdGa/voice/155.wav",
+     "hash": "b8984c27c00a5600cc7d6fa6fc5e4c8408b3d3e2",
+     "size": 53462
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/156.wav",
+     "destination": "Apps/AG-SpdGa/voice/156.wav",
+     "hash": "ef3b957c73c1006952655357d3256e4bc5e77364",
+     "size": 52876
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/157.wav",
+     "destination": "Apps/AG-SpdGa/voice/157.wav",
+     "hash": "bfb7a622f3c1ca0a6c420622edccae4c8820d7b5",
+     "size": 54434
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/158.wav",
+     "destination": "Apps/AG-SpdGa/voice/158.wav",
+     "hash": "69804948ba49c2b8684a559b3ebcd5c83b6d9641",
+     "size": 50292
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/159.wav",
+     "destination": "Apps/AG-SpdGa/voice/159.wav",
+     "hash": "130f76fe724fdd39dc8bc4999e63774579e76dbc",
+     "size": 49890
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/16.wav",
+     "destination": "Apps/AG-SpdGa/voice/16.wav",
+     "hash": "97f4f4546e61c5aa06993b5fbcca8fc09b11c812",
+     "size": 27698
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/160.wav",
+     "destination": "Apps/AG-SpdGa/voice/160.wav",
+     "hash": "bdae52d3c5317708fd07bef3f38fba7a10a67752",
+     "size": 39548
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/161.wav",
+     "destination": "Apps/AG-SpdGa/voice/161.wav",
+     "hash": "faea4ed48b2c772ba8c784dea5245c08ee7675c0",
+     "size": 49462
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/162.wav",
+     "destination": "Apps/AG-SpdGa/voice/162.wav",
+     "hash": "867eeb414a9cfb970a812ec85cc730fe24ffcb90",
+     "size": 49388
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/163.wav",
+     "destination": "Apps/AG-SpdGa/voice/163.wav",
+     "hash": "1ac6fe26cc85f765558c3bf9d47f8cd38e7ff995",
+     "size": 49874
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/164.wav",
+     "destination": "Apps/AG-SpdGa/voice/164.wav",
+     "hash": "96785a12a1f4e45ca403d0bfb4f2b5ee12a1a817",
+     "size": 53950
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/165.wav",
+     "destination": "Apps/AG-SpdGa/voice/165.wav",
+     "hash": "17dcd65e98cf4eeaed66f8e3d56669477967900a",
+     "size": 55108
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/166.wav",
+     "destination": "Apps/AG-SpdGa/voice/166.wav",
+     "hash": "bd01122ac46884b90510d81b0d9bd3d35ab1b6b6",
+     "size": 52112
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/167.wav",
+     "destination": "Apps/AG-SpdGa/voice/167.wav",
+     "hash": "b42da4a1013af2f9b4566b52e89be3b3fc59bc19",
+     "size": 54940
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/168.wav",
+     "destination": "Apps/AG-SpdGa/voice/168.wav",
+     "hash": "00602bcf09a29617eab1e34ebee4720a33a3b203",
+     "size": 47726
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/169.wav",
+     "destination": "Apps/AG-SpdGa/voice/169.wav",
+     "hash": "28fc38a9d94dc3c06bf8ecb2664a927c1b52da1a",
+     "size": 50282
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/17.wav",
+     "destination": "Apps/AG-SpdGa/voice/17.wav",
+     "hash": "0d0349ded46a5051913f1d093e0bb0f1f0f6a89f",
+     "size": 30536
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/170.wav",
+     "destination": "Apps/AG-SpdGa/voice/170.wav",
+     "hash": "6b8b86cc6e7e5b41639af003bceefeb12873ec46",
+     "size": 43222
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/171.wav",
+     "destination": "Apps/AG-SpdGa/voice/171.wav",
+     "hash": "e83b55e820129debcf7e015d5060990235e72ad2",
+     "size": 49756
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/172.wav",
+     "destination": "Apps/AG-SpdGa/voice/172.wav",
+     "hash": "9484b915d0c63ccc269921170f419be25d0834c0",
+     "size": 51042
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/173.wav",
+     "destination": "Apps/AG-SpdGa/voice/173.wav",
+     "hash": "62c026bde956b43c14741211722352f853089c07",
+     "size": 50840
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/174.wav",
+     "destination": "Apps/AG-SpdGa/voice/174.wav",
+     "hash": "a5a1ebfbcef4920d5aa3e763d9b22445d664c581",
+     "size": 52896
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/175.wav",
+     "destination": "Apps/AG-SpdGa/voice/175.wav",
+     "hash": "343c6245687a42d560d793b6d6ee3de71cf0048d",
+     "size": 55260
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/176.wav",
+     "destination": "Apps/AG-SpdGa/voice/176.wav",
+     "hash": "cffa840b54513bf11243d54f6aeb935c8b566d16",
+     "size": 56436
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/177.wav",
+     "destination": "Apps/AG-SpdGa/voice/177.wav",
+     "hash": "a7d12d10c2206d9a6042a0b5fab0430bd9ebc62a",
+     "size": 55042
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/178.wav",
+     "destination": "Apps/AG-SpdGa/voice/178.wav",
+     "hash": "65626484bb175c2e62b9d492320d48989ca4e2ea",
+     "size": 50832
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/179.wav",
+     "destination": "Apps/AG-SpdGa/voice/179.wav",
+     "hash": "5b58485afcee6ad498cde6f0afcbdd89b4eba7b5",
+     "size": 52684
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/18.wav",
+     "destination": "Apps/AG-SpdGa/voice/18.wav",
+     "hash": "1db6746e9cd3648c9e633d4387c541f095c83af9",
+     "size": 19946
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/180.wav",
+     "destination": "Apps/AG-SpdGa/voice/180.wav",
+     "hash": "0ce4d4af820b5ee897f72fe21d0ded6c6d5257fb",
+     "size": 34312
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/181.wav",
+     "destination": "Apps/AG-SpdGa/voice/181.wav",
+     "hash": "120b3a4d0a42f7e9f504f4b954256cb4088cf2a1",
+     "size": 45098
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/182.wav",
+     "destination": "Apps/AG-SpdGa/voice/182.wav",
+     "hash": "e70ba9f472b1b765799dd56a585604870654a566",
+     "size": 46720
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/183.wav",
+     "destination": "Apps/AG-SpdGa/voice/183.wav",
+     "hash": "b8c7585641a0c5d34da660740cc01cb4bd6ccf3d",
+     "size": 48514
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/184.wav",
+     "destination": "Apps/AG-SpdGa/voice/184.wav",
+     "hash": "b6396fbde0df58457cb973698e72c2226be262c2",
+     "size": 47472
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/185.wav",
+     "destination": "Apps/AG-SpdGa/voice/185.wav",
+     "hash": "6da98a4cfea45d33096c11b2446dd010d063fb2e",
+     "size": 48144
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/186.wav",
+     "destination": "Apps/AG-SpdGa/voice/186.wav",
+     "hash": "6613bd21575732c40ae84f933a3bff7c0a63fe23",
+     "size": 50226
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/187.wav",
+     "destination": "Apps/AG-SpdGa/voice/187.wav",
+     "hash": "7ab6c6954178ed895d8ff7a6219e499dcf32216b",
+     "size": 50246
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/188.wav",
+     "destination": "Apps/AG-SpdGa/voice/188.wav",
+     "hash": "fa9a945edfc97d0a3d2e6931a43cf38c540dd8d6",
+     "size": 44132
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/189.wav",
+     "destination": "Apps/AG-SpdGa/voice/189.wav",
+     "hash": "55f00667e407ab5467b7a84f2c08a240a6c26345",
+     "size": 46140
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/19.wav",
+     "destination": "Apps/AG-SpdGa/voice/19.wav",
+     "hash": "e3886bcb1a355eb66063dbbde5f1f55f0ebfeae1",
+     "size": 25114
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/190.wav",
+     "destination": "Apps/AG-SpdGa/voice/190.wav",
+     "hash": "0b5538c2fd42066249b836e3c67989d8669cf486",
+     "size": 39082
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/191.wav",
+     "destination": "Apps/AG-SpdGa/voice/191.wav",
+     "hash": "a8d1f3cd49e2cb9581ebc393216bbde138264701",
+     "size": 47300
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/192.wav",
+     "destination": "Apps/AG-SpdGa/voice/192.wav",
+     "hash": "e924aa5796277c2f91c5f05d722b9350ded863fd",
+     "size": 49366
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/193.wav",
+     "destination": "Apps/AG-SpdGa/voice/193.wav",
+     "hash": "8d7c1e5df97c660e9c8710924b836a62a4026f7e",
+     "size": 50058
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/194.wav",
+     "destination": "Apps/AG-SpdGa/voice/194.wav",
+     "hash": "c055d324d1a6f512310d83edc52a456f578cef23",
+     "size": 49676
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/195.wav",
+     "destination": "Apps/AG-SpdGa/voice/195.wav",
+     "hash": "a9256f42fd1be7affef3862663ea24d1c471d414",
+     "size": 50238
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/196.wav",
+     "destination": "Apps/AG-SpdGa/voice/196.wav",
+     "hash": "b64e901c431ce9aba24678c64582f1923a25fc95",
+     "size": 54870
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/197.wav",
+     "destination": "Apps/AG-SpdGa/voice/197.wav",
+     "hash": "7899918ff008a9a1cd2508a784d693ceb8dca307",
+     "size": 52788
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/198.wav",
+     "destination": "Apps/AG-SpdGa/voice/198.wav",
+     "hash": "ca54de231eca7b19e1ee78f7339ecfef3dc090c5",
+     "size": 48042
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/199.wav",
+     "destination": "Apps/AG-SpdGa/voice/199.wav",
+     "hash": "7779fbdcea7068f3451ac1e783c8057e10d98dbd",
+     "size": 46440
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/2.wav",
+     "destination": "Apps/AG-SpdGa/voice/2.wav",
+     "hash": "a9bb18f22162804d9ccac5e0b9118b36f840aed1",
+     "size": 12354
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/20.wav",
+     "destination": "Apps/AG-SpdGa/voice/20.wav",
+     "hash": "cff5f2fcb25a28439c6108d974e78a2d5c5b1f78",
+     "size": 17890
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/200.wav",
+     "destination": "Apps/AG-SpdGa/voice/200.wav",
+     "hash": "b2959abc86a9828d1964b7226c36b8add78d6a7c",
+     "size": 26304
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/201.wav",
+     "destination": "Apps/AG-SpdGa/voice/201.wav",
+     "hash": "89dedf982fb502fdca34baaeb01ae1be5b1407bc",
+     "size": 34002
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/202.wav",
+     "destination": "Apps/AG-SpdGa/voice/202.wav",
+     "hash": "c11a9428b2af592ac0a00875ac9e10a3b8661cb8",
+     "size": 36546
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/203.wav",
+     "destination": "Apps/AG-SpdGa/voice/203.wav",
+     "hash": "259b8be0507bffec821cfdeccec075d535c60d83",
+     "size": 36190
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/204.wav",
+     "destination": "Apps/AG-SpdGa/voice/204.wav",
+     "hash": "1993c203ee0c71b0fdfd88279ead17f553d345dd",
+     "size": 35950
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/205.wav",
+     "destination": "Apps/AG-SpdGa/voice/205.wav",
+     "hash": "5ec339184e5794f814ad23965be9bf9c584b9f18",
+     "size": 39150
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/206.wav",
+     "destination": "Apps/AG-SpdGa/voice/206.wav",
+     "hash": "6547600e3541819b05d31c88d80c78126d42b8e5",
+     "size": 38350
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/207.wav",
+     "destination": "Apps/AG-SpdGa/voice/207.wav",
+     "hash": "0af4ff3d6d97150e06f9f4afbdda2e4933ee3e30",
+     "size": 40042
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/208.wav",
+     "destination": "Apps/AG-SpdGa/voice/208.wav",
+     "hash": "1ae951e91a720ce4933bc8eb993d433487378683",
+     "size": 33836
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/209.wav",
+     "destination": "Apps/AG-SpdGa/voice/209.wav",
+     "hash": "672cfbf6fcd28bededbb7c022bc37671f1f594d8",
+     "size": 37194
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/21.wav",
+     "destination": "Apps/AG-SpdGa/voice/21.wav",
+     "hash": "62a2263b357399e0d48b9de3562d1f093f52b306",
+     "size": 27886
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/210.wav",
+     "destination": "Apps/AG-SpdGa/voice/210.wav",
+     "hash": "dc86aa7d7211b2f41a8b6f06a93d3f0eba7ea8b8",
+     "size": 39084
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/211.wav",
+     "destination": "Apps/AG-SpdGa/voice/211.wav",
+     "hash": "9de6a78a63d5de4e74197ad55768ea8c4225e46f",
+     "size": 39152
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/212.wav",
+     "destination": "Apps/AG-SpdGa/voice/212.wav",
+     "hash": "7ccbe1714cc57e1f32321ea603a1a5d570b1de87",
+     "size": 40744
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/213.wav",
+     "destination": "Apps/AG-SpdGa/voice/213.wav",
+     "hash": "3693bc550eea1d66d7f1dd690b58b50a00d2e7bb",
+     "size": 41904
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/214.wav",
+     "destination": "Apps/AG-SpdGa/voice/214.wav",
+     "hash": "11941b9d20f934c72361f001274a0cdb1b5c43ec",
+     "size": 44282
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/215.wav",
+     "destination": "Apps/AG-SpdGa/voice/215.wav",
+     "hash": "8cf8a9a7f8eac68aa8597929cba09a34340f7704",
+     "size": 42596
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/216.wav",
+     "destination": "Apps/AG-SpdGa/voice/216.wav",
+     "hash": "2062976576532010f3539c22b61f41a16449b390",
+     "size": 45796
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/217.wav",
+     "destination": "Apps/AG-SpdGa/voice/217.wav",
+     "hash": "0642bebaf74976eaf3fe24abe2e44dd27a651a0a",
+     "size": 49038
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/218.wav",
+     "destination": "Apps/AG-SpdGa/voice/218.wav",
+     "hash": "276364ffb58cd1c40fd9542ce81d5c796050c3b0",
+     "size": 38244
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/219.wav",
+     "destination": "Apps/AG-SpdGa/voice/219.wav",
+     "hash": "91baa260895db717977faaadccaec09a5beb2292",
+     "size": 40554
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/22.wav",
+     "destination": "Apps/AG-SpdGa/voice/22.wav",
+     "hash": "651c1f51a0b07669042ce17c086e6d9408d2fc98",
+     "size": 31040
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/220.wav",
+     "destination": "Apps/AG-SpdGa/voice/220.wav",
+     "hash": "33a13d5aff223420e333ca4ad20e7fc20557fb04",
+     "size": 38154
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/221.wav",
+     "destination": "Apps/AG-SpdGa/voice/221.wav",
+     "hash": "579190b572c6fedf52988acf1ead9c03282631bb",
+     "size": 48638
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/222.wav",
+     "destination": "Apps/AG-SpdGa/voice/222.wav",
+     "hash": "49f4f38b4766cd173bbe368d7c7eae29ab8cb5d0",
+     "size": 51800
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/223.wav",
+     "destination": "Apps/AG-SpdGa/voice/223.wav",
+     "hash": "a56911eb04540493044c4b94211776d130afbdff",
+     "size": 49630
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/224.wav",
+     "destination": "Apps/AG-SpdGa/voice/224.wav",
+     "hash": "345dfc9c9ea007d3dd25b1f1af45b24250c24e7d",
+     "size": 52046
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/225.wav",
+     "destination": "Apps/AG-SpdGa/voice/225.wav",
+     "hash": "5efd69f161ae500e161f11f0ee51d92506e2af8b",
+     "size": 49746
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/226.wav",
+     "destination": "Apps/AG-SpdGa/voice/226.wav",
+     "hash": "cc520114656a7355889f762ef1ce7d49c6288d3a",
+     "size": 52534
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/227.wav",
+     "destination": "Apps/AG-SpdGa/voice/227.wav",
+     "hash": "0707bff583806c5a1441fcb2f858f36b69c05465",
+     "size": 53122
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/228.wav",
+     "destination": "Apps/AG-SpdGa/voice/228.wav",
+     "hash": "926127c78a471f2dab4be02d434579e410999238",
+     "size": 51244
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/229.wav",
+     "destination": "Apps/AG-SpdGa/voice/229.wav",
+     "hash": "e5adc0a6e58d530a7c2fcdf4dac89996e151e77d",
+     "size": 50838
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/23.wav",
+     "destination": "Apps/AG-SpdGa/voice/23.wav",
+     "hash": "ee5299175b6336417708abcd95cdd4d39f666c71",
+     "size": 29842
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/230.wav",
+     "destination": "Apps/AG-SpdGa/voice/230.wav",
+     "hash": "39faf4804ab17102175bf3bca2c5fe15aea8098b",
+     "size": 37038
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/231.wav",
+     "destination": "Apps/AG-SpdGa/voice/231.wav",
+     "hash": "313902df8b31d488f3a984e0eff06e72040ce3e8",
+     "size": 44512
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/232.wav",
+     "destination": "Apps/AG-SpdGa/voice/232.wav",
+     "hash": "4b4e845003109aedf18b709b68be73f71eec3b39",
+     "size": 46268
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/233.wav",
+     "destination": "Apps/AG-SpdGa/voice/233.wav",
+     "hash": "4022af337fd4f01f34a92bf41950fe80c5846ecf",
+     "size": 49424
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/234.wav",
+     "destination": "Apps/AG-SpdGa/voice/234.wav",
+     "hash": "3ff130db04ad7074f298972b0202b16e9cb94e37",
+     "size": 48242
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/235.wav",
+     "destination": "Apps/AG-SpdGa/voice/235.wav",
+     "hash": "bb051b21579ebd872976f7651eaaffcdcc7558aa",
+     "size": 49356
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/236.wav",
+     "destination": "Apps/AG-SpdGa/voice/236.wav",
+     "hash": "6cc19d295ca4ac615e41f80ade4b6dde8cc65154",
+     "size": 48668
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/237.wav",
+     "destination": "Apps/AG-SpdGa/voice/237.wav",
+     "hash": "49b9969158d4d5b709bf8d002a59a90c31613512",
+     "size": 50658
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/238.wav",
+     "destination": "Apps/AG-SpdGa/voice/238.wav",
+     "hash": "8aae967863eb1f88177f7f61f7c9805c8c468cea",
+     "size": 47148
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/239.wav",
+     "destination": "Apps/AG-SpdGa/voice/239.wav",
+     "hash": "e4b13d808deaf7db011937ee52d5fd877fabc0d8",
+     "size": 47352
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/24.wav",
+     "destination": "Apps/AG-SpdGa/voice/24.wav",
+     "hash": "69785d24538cb9e6d8e94648ab923d96f4e9b80c",
+     "size": 32358
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/240.wav",
+     "destination": "Apps/AG-SpdGa/voice/240.wav",
+     "hash": "eba0c3d7d928c83bf91e6c6a401a4d90817c504d",
+     "size": 37418
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/241.wav",
+     "destination": "Apps/AG-SpdGa/voice/241.wav",
+     "hash": "324820a598eff13d3c2407fe31f57d1d768610da",
+     "size": 46146
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/242.wav",
+     "destination": "Apps/AG-SpdGa/voice/242.wav",
+     "hash": "93248bd0d2f83cdb0ba55eaefae724422135ed86",
+     "size": 47040
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/243.wav",
+     "destination": "Apps/AG-SpdGa/voice/243.wav",
+     "hash": "8402f73e95ef12e2be43991fdc37952c4e1a4fb4",
+     "size": 47332
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/244.wav",
+     "destination": "Apps/AG-SpdGa/voice/244.wav",
+     "hash": "6abc4c9a55aaf0f7309f8fc43f825491d64e66aa",
+     "size": 49170
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/245.wav",
+     "destination": "Apps/AG-SpdGa/voice/245.wav",
+     "hash": "d71557b2447b55611988c4cbd02ec7c83977e166",
+     "size": 49496
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/246.wav",
+     "destination": "Apps/AG-SpdGa/voice/246.wav",
+     "hash": "7061a757ac28df2e2f3afe3c29598bc042cdf292",
+     "size": 49500
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/247.wav",
+     "destination": "Apps/AG-SpdGa/voice/247.wav",
+     "hash": "086c17942877a8f4f056cd1e9743f9c253ece988",
+     "size": 50662
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/248.wav",
+     "destination": "Apps/AG-SpdGa/voice/248.wav",
+     "hash": "c78ed5860156d5002ad9baf5fbba2d9305440885",
+     "size": 51244
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/249.wav",
+     "destination": "Apps/AG-SpdGa/voice/249.wav",
+     "hash": "8ff80204fcd5fc418bbea09dfc2e1f87c71898ee",
+     "size": 47636
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/25.wav",
+     "destination": "Apps/AG-SpdGa/voice/25.wav",
+     "hash": "f8c53e0bb615d38dc0bc253ef11aedcb2b734419",
+     "size": 33802
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/250.wav",
+     "destination": "Apps/AG-SpdGa/voice/250.wav",
+     "hash": "e75d2c96babbb85a1ad36ef9f4925999de4dc1ad",
+     "size": 40310
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/251.wav",
+     "destination": "Apps/AG-SpdGa/voice/251.wav",
+     "hash": "c6e5a7a4b2b35d66ed0fdde2aa8050b6d6f048d2",
+     "size": 48312
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/252.wav",
+     "destination": "Apps/AG-SpdGa/voice/252.wav",
+     "hash": "28668d409c6d0bf5b50fc149d4402ec6c6465c45",
+     "size": 49420
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/253.wav",
+     "destination": "Apps/AG-SpdGa/voice/253.wav",
+     "hash": "45e5a62d06426d777312b6f8ecb00773f3d1e800",
+     "size": 49256
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/254.wav",
+     "destination": "Apps/AG-SpdGa/voice/254.wav",
+     "hash": "7d5244a254f1bf19f87d32019108ce1b1635ebea",
+     "size": 50286
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/255.wav",
+     "destination": "Apps/AG-SpdGa/voice/255.wav",
+     "hash": "48332791aff924c4cb56a8265507ab55522b512f",
+     "size": 50992
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/256.wav",
+     "destination": "Apps/AG-SpdGa/voice/256.wav",
+     "hash": "eb6f8435b2a0ec0ae8af69e5d6fa33b77d26ddd1",
+     "size": 53292
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/257.wav",
+     "destination": "Apps/AG-SpdGa/voice/257.wav",
+     "hash": "e42848246a862805cb4ca0950f82e8eea4093cfc",
+     "size": 53422
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/258.wav",
+     "destination": "Apps/AG-SpdGa/voice/258.wav",
+     "hash": "68daf8146984fb6c4eb0c925d1853ca3a6768c79",
+     "size": 50732
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/259.wav",
+     "destination": "Apps/AG-SpdGa/voice/259.wav",
+     "hash": "50cd873045efd857f54ebc6634f8e1079aad7795",
+     "size": 52016
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/26.wav",
+     "destination": "Apps/AG-SpdGa/voice/26.wav",
+     "hash": "7eece048b795a8814d0ee36c4193c833120b8063",
+     "size": 34016
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/260.wav",
+     "destination": "Apps/AG-SpdGa/voice/260.wav",
+     "hash": "561ffe1b77da862d0bdfcd2761cf5c37d61cd71a",
+     "size": 42262
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/261.wav",
+     "destination": "Apps/AG-SpdGa/voice/261.wav",
+     "hash": "a555dddbf24ddd8ffbaef14ff8d07c94ba3a600a",
+     "size": 49164
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/262.wav",
+     "destination": "Apps/AG-SpdGa/voice/262.wav",
+     "hash": "2e9ad14877902b9feb5405a70103150ed759bf6f",
+     "size": 47286
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/263.wav",
+     "destination": "Apps/AG-SpdGa/voice/263.wav",
+     "hash": "242227056a958e0980d9c238a4a887e4eb584707",
+     "size": 51354
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/264.wav",
+     "destination": "Apps/AG-SpdGa/voice/264.wav",
+     "hash": "921bcdd25debf8c65ec716ea226e2430023d216b",
+     "size": 51540
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/265.wav",
+     "destination": "Apps/AG-SpdGa/voice/265.wav",
+     "hash": "0236f80362404be4ce5db491746d1d86aabe1dd4",
+     "size": 52922
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/266.wav",
+     "destination": "Apps/AG-SpdGa/voice/266.wav",
+     "hash": "c8b0f4e5415fa8f8f3ae9c97064895237e73e487",
+     "size": 54122
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/267.wav",
+     "destination": "Apps/AG-SpdGa/voice/267.wav",
+     "hash": "4c6bc32e7264c21e9a7ae781ce99cead139d4098",
+     "size": 51960
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/268.wav",
+     "destination": "Apps/AG-SpdGa/voice/268.wav",
+     "hash": "051c03a1e404aebcda0f48824e825c72ff2e0fae",
+     "size": 51134
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/269.wav",
+     "destination": "Apps/AG-SpdGa/voice/269.wav",
+     "hash": "55a2928e7a3da32df2b1be472a7e563b44eeaf7c",
+     "size": 54964
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/27.wav",
+     "destination": "Apps/AG-SpdGa/voice/27.wav",
+     "hash": "a82e4e385308794846096e67261db86e4a930ae0",
+     "size": 33760
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/270.wav",
+     "destination": "Apps/AG-SpdGa/voice/270.wav",
+     "hash": "86a3fba144494fb112798cbed0eeb063deacdc9f",
+     "size": 42540
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/271.wav",
+     "destination": "Apps/AG-SpdGa/voice/271.wav",
+     "hash": "463d810e05e0c87c8c938617662fc6861f3a1d33",
+     "size": 49034
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/272.wav",
+     "destination": "Apps/AG-SpdGa/voice/272.wav",
+     "hash": "3d2049b8f3bcbe05626a98f959874898fd9e729e",
+     "size": 51028
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/273.wav",
+     "destination": "Apps/AG-SpdGa/voice/273.wav",
+     "hash": "7eaf336b69eae286518d6fe2069f1507af7fde9c",
+     "size": 51846
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/274.wav",
+     "destination": "Apps/AG-SpdGa/voice/274.wav",
+     "hash": "cfcf1b4fec51a877b7fa42f38550b0861adc684d",
+     "size": 53916
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/275.wav",
+     "destination": "Apps/AG-SpdGa/voice/275.wav",
+     "hash": "1c4c019a83a677b7268e9f1f6eb3f11d9dcf4094",
+     "size": 53354
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/276.wav",
+     "destination": "Apps/AG-SpdGa/voice/276.wav",
+     "hash": "24e6419e1f7e9c86a2cc9263416cf1ca26df922d",
+     "size": 54550
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/277.wav",
+     "destination": "Apps/AG-SpdGa/voice/277.wav",
+     "hash": "69fd84ce7e6d5e327aa561fec5d937d6d2198011",
+     "size": 56188
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/278.wav",
+     "destination": "Apps/AG-SpdGa/voice/278.wav",
+     "hash": "dd1825455dab515ccbf3b237b373c6a51e793dfa",
+     "size": 53292
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/279.wav",
+     "destination": "Apps/AG-SpdGa/voice/279.wav",
+     "hash": "480d62b0a7012c3782ae9c661f8de9b705004dd3",
+     "size": 56392
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/28.wav",
+     "destination": "Apps/AG-SpdGa/voice/28.wav",
+     "hash": "4efc04633d4d7034eeec6a28007f9b944cfcbf54",
+     "size": 31788
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/280.wav",
+     "destination": "Apps/AG-SpdGa/voice/280.wav",
+     "hash": "6815da2f2ef252337d4fc62d63c973b5a326b034",
+     "size": 34872
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/281.wav",
+     "destination": "Apps/AG-SpdGa/voice/281.wav",
+     "hash": "5bd70bba64a9e002b95fbd4d482e5f28b922b60b",
+     "size": 45926
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/282.wav",
+     "destination": "Apps/AG-SpdGa/voice/282.wav",
+     "hash": "0590df440907c3edb280b2086d1953c0000db5e0",
+     "size": 45842
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/283.wav",
+     "destination": "Apps/AG-SpdGa/voice/283.wav",
+     "hash": "fe205569442e0f17444c95572151daa0947b6985",
+     "size": 47842
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/284.wav",
+     "destination": "Apps/AG-SpdGa/voice/284.wav",
+     "hash": "5f1ec0f1658e900ee4a619329ee8905ffefb8663",
+     "size": 46690
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/285.wav",
+     "destination": "Apps/AG-SpdGa/voice/285.wav",
+     "hash": "fbc79d6475fc126b82fb5606c2bf43152d109dd1",
+     "size": 45390
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/286.wav",
+     "destination": "Apps/AG-SpdGa/voice/286.wav",
+     "hash": "342584614d2cb69e13d0d5ad7ef9c4413b9cd50b",
+     "size": 48578
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/287.wav",
+     "destination": "Apps/AG-SpdGa/voice/287.wav",
+     "hash": "75f310d82dcadca5bcbb8ab7ff9c697cb56a3246",
+     "size": 49798
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/288.wav",
+     "destination": "Apps/AG-SpdGa/voice/288.wav",
+     "hash": "97ff2529aded1cdaefa020c4fc8e57dd0647a5a3",
+     "size": 47298
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/289.wav",
+     "destination": "Apps/AG-SpdGa/voice/289.wav",
+     "hash": "e5eb5826a0af92019157dc381c0cd9d93546e5ba",
+     "size": 43452
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/29.wav",
+     "destination": "Apps/AG-SpdGa/voice/29.wav",
+     "hash": "3c14d35e7cde1c19dc5cfd7030a9f073aa8a9157",
+     "size": 30008
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/290.wav",
+     "destination": "Apps/AG-SpdGa/voice/290.wav",
+     "hash": "0bd85505afda6a2dbab9f9b1d585c1cf0333af68",
+     "size": 38996
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/291.wav",
+     "destination": "Apps/AG-SpdGa/voice/291.wav",
+     "hash": "2e68f53f3f94e5411cb6e9e04186cdbbb2f5f9f3",
+     "size": 49242
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/292.wav",
+     "destination": "Apps/AG-SpdGa/voice/292.wav",
+     "hash": "af7d0965b8f1d24bb8d8345bb2ce7d001247bd39",
+     "size": 47864
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/293.wav",
+     "destination": "Apps/AG-SpdGa/voice/293.wav",
+     "hash": "d08411852cf87dea2135153eca7ea4489130b6a4",
+     "size": 48264
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/294.wav",
+     "destination": "Apps/AG-SpdGa/voice/294.wav",
+     "hash": "728d09b2f40e78166059a82f7c28b49b40f510d5",
+     "size": 51306
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/295.wav",
+     "destination": "Apps/AG-SpdGa/voice/295.wav",
+     "hash": "0a720e7366c84df33af2385471b5973142a1a48c",
+     "size": 51292
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/296.wav",
+     "destination": "Apps/AG-SpdGa/voice/296.wav",
+     "hash": "5aa9b4296d4897ff64a2da235f00f561817dcb1e",
+     "size": 49182
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/297.wav",
+     "destination": "Apps/AG-SpdGa/voice/297.wav",
+     "hash": "b0076f7fb9368c26df290f819a9f47122c19381f",
+     "size": 54428
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/298.wav",
+     "destination": "Apps/AG-SpdGa/voice/298.wav",
+     "hash": "82ad8d562f4dee300a6abc9dc704b40c8ffe041d",
+     "size": 48172
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/299.wav",
+     "destination": "Apps/AG-SpdGa/voice/299.wav",
+     "hash": "82d7337e0eefcc84f833fa12a1da3c4a8229db95",
+     "size": 49276
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/3.wav",
+     "destination": "Apps/AG-SpdGa/voice/3.wav",
+     "hash": "69b07eaa02a7a35a553fb899929324ba37b4e596",
+     "size": 17038
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/30.wav",
+     "destination": "Apps/AG-SpdGa/voice/30.wav",
+     "hash": "ce275826be7df2d1e98765cd9758bd04e7ca335b",
+     "size": 16462
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/300.wav",
+     "destination": "Apps/AG-SpdGa/voice/300.wav",
+     "hash": "2e5e005dc5da9110261d9c8ba55bc8b6a9769d71",
+     "size": 31166
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/301.wav",
+     "destination": "Apps/AG-SpdGa/voice/301.wav",
+     "hash": "e1ab93dd2436481ca90295e083fc6d5b9cbce7f9",
+     "size": 38956
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/302.wav",
+     "destination": "Apps/AG-SpdGa/voice/302.wav",
+     "hash": "be2673d82e0f5e50ca6f3cc31070b16b4981b9e6",
+     "size": 40014
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/303.wav",
+     "destination": "Apps/AG-SpdGa/voice/303.wav",
+     "hash": "a7bc98eb47244b98ece7c3e7cff61a098215d0ae",
+     "size": 43918
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/304.wav",
+     "destination": "Apps/AG-SpdGa/voice/304.wav",
+     "hash": "e056d76381457ae721ced6aa1a574e79494add8b",
+     "size": 41304
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/305.wav",
+     "destination": "Apps/AG-SpdGa/voice/305.wav",
+     "hash": "5159adab53cc556f6a64758e87867ea4cd8238ac",
+     "size": 47110
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/306.wav",
+     "destination": "Apps/AG-SpdGa/voice/306.wav",
+     "hash": "c87a00d35bb3691e9ea4a32f16ba76e0086424f4",
+     "size": 44470
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/307.wav",
+     "destination": "Apps/AG-SpdGa/voice/307.wav",
+     "hash": "a1dd373a249de7cc595de0a40e30b89054cc4a87",
+     "size": 44476
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/308.wav",
+     "destination": "Apps/AG-SpdGa/voice/308.wav",
+     "hash": "aaddbaf4340cda284008c95665c6fa48babfd164",
+     "size": 36908
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/309.wav",
+     "destination": "Apps/AG-SpdGa/voice/309.wav",
+     "hash": "964a0277d640061d3cc45b9e872afbef04c08208",
+     "size": 42028
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/31.wav",
+     "destination": "Apps/AG-SpdGa/voice/31.wav",
+     "hash": "358343e31890eb258c4066dfe49bc7063ffb42df",
+     "size": 30404
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/310.wav",
+     "destination": "Apps/AG-SpdGa/voice/310.wav",
+     "hash": "74c731b96371f269389057b7d3ccd89173f2d46d",
+     "size": 39468
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/311.wav",
+     "destination": "Apps/AG-SpdGa/voice/311.wav",
+     "hash": "0dbd051c79f70a55139b20e217f2d5962fc8ad31",
+     "size": 43976
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/312.wav",
+     "destination": "Apps/AG-SpdGa/voice/312.wav",
+     "hash": "d037e7480e5e70419767f50bc8459bbbf0d753c3",
+     "size": 45612
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/313.wav",
+     "destination": "Apps/AG-SpdGa/voice/313.wav",
+     "hash": "3f13ec96568b64f9d19b35a19042a268f7e74cac",
+     "size": 45612
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/314.wav",
+     "destination": "Apps/AG-SpdGa/voice/314.wav",
+     "hash": "f446eda8f5f9ba87c067b7bd9615a1a50c1dc71e",
+     "size": 47982
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/315.wav",
+     "destination": "Apps/AG-SpdGa/voice/315.wav",
+     "hash": "5ef6fac07b71dec2c8e353e75883b7e2dcb835ee",
+     "size": 48058
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/316.wav",
+     "destination": "Apps/AG-SpdGa/voice/316.wav",
+     "hash": "04efd599077985b80c7b18a179166394748564fa",
+     "size": 48710
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/317.wav",
+     "destination": "Apps/AG-SpdGa/voice/317.wav",
+     "hash": "973d5c842b54251c52f91d779fb3e2277466674b",
+     "size": 53764
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/318.wav",
+     "destination": "Apps/AG-SpdGa/voice/318.wav",
+     "hash": "aecabd4647e3d26803c9ada61d896527b4e1691f",
+     "size": 42540
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/319.wav",
+     "destination": "Apps/AG-SpdGa/voice/319.wav",
+     "hash": "444a1193796c19211e52ae74736edb4a038afa19",
+     "size": 48860
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/32.wav",
+     "destination": "Apps/AG-SpdGa/voice/32.wav",
+     "hash": "2bf5423b8360ed1c22401fd21795fc381fc46b0d",
+     "size": 27172
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/320.wav",
+     "destination": "Apps/AG-SpdGa/voice/320.wav",
+     "hash": "a2bc840340d9984b83e9c04727c40d9a49bf2460",
+     "size": 43770
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/321.wav",
+     "destination": "Apps/AG-SpdGa/voice/321.wav",
+     "hash": "4fc5455816bdb8647b44969626b71445a3e3f57b",
+     "size": 51624
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/322.wav",
+     "destination": "Apps/AG-SpdGa/voice/322.wav",
+     "hash": "df22e8c0554cdd9450fd3bdf144d946196bb1c67",
+     "size": 50348
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/323.wav",
+     "destination": "Apps/AG-SpdGa/voice/323.wav",
+     "hash": "7c984904cee1f48a134569e4878dd059a9c72008",
+     "size": 55240
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/324.wav",
+     "destination": "Apps/AG-SpdGa/voice/324.wav",
+     "hash": "4ed2278b8adea26382f2d0aaf785e196e1a825ca",
+     "size": 55890
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/325.wav",
+     "destination": "Apps/AG-SpdGa/voice/325.wav",
+     "hash": "c0ee08fea170dd9ef5fc52d28b8b3b509c736fd6",
+     "size": 55748
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/326.wav",
+     "destination": "Apps/AG-SpdGa/voice/326.wav",
+     "hash": "241d86e421649022c3b7b8acd90fea6b083c3f28",
+     "size": 60972
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/327.wav",
+     "destination": "Apps/AG-SpdGa/voice/327.wav",
+     "hash": "065b22949aa2380187c61011ee3fd3e3b6517183",
+     "size": 59324
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/328.wav",
+     "destination": "Apps/AG-SpdGa/voice/328.wav",
+     "hash": "f5de4b8dbc623f099bac4db72b07bb88d65f771e",
+     "size": 56876
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/329.wav",
+     "destination": "Apps/AG-SpdGa/voice/329.wav",
+     "hash": "248f8a50b192e920a55fe26b0c753d8c5aba2c45",
+     "size": 56876
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/33.wav",
+     "destination": "Apps/AG-SpdGa/voice/33.wav",
+     "hash": "20da05330e6ab6af2c3398200814d0051391c101",
+     "size": 28422
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/330.wav",
+     "destination": "Apps/AG-SpdGa/voice/330.wav",
+     "hash": "3c6c89b9c60149d44d234edc3adcc7ab10f309a1",
+     "size": 42144
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/331.wav",
+     "destination": "Apps/AG-SpdGa/voice/331.wav",
+     "hash": "fee896830d23b79e58ea03f4f532c49f1a210c51",
+     "size": 52268
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/332.wav",
+     "destination": "Apps/AG-SpdGa/voice/332.wav",
+     "hash": "d4ba28d1258e3319c03a6ebbab4f6712087a6aa3",
+     "size": 52406
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/333.wav",
+     "destination": "Apps/AG-SpdGa/voice/333.wav",
+     "hash": "76fca1537728b8ab6d2c1e33f0e65ad270f718d6",
+     "size": 55514
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/334.wav",
+     "destination": "Apps/AG-SpdGa/voice/334.wav",
+     "hash": "9b9872cf29d43c4dc234f55ec4dd4465a6468ace",
+     "size": 55108
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/335.wav",
+     "destination": "Apps/AG-SpdGa/voice/335.wav",
+     "hash": "a6ae69ae08914840549c7af6db5f8c1195bb3461",
+     "size": 54898
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/336.wav",
+     "destination": "Apps/AG-SpdGa/voice/336.wav",
+     "hash": "08f246852fb6bde5a387b40ba78bbe5b7a975443",
+     "size": 55550
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/337.wav",
+     "destination": "Apps/AG-SpdGa/voice/337.wav",
+     "hash": "5051d758b3ccdef1da198549a1bb5f3520e58691",
+     "size": 53970
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/338.wav",
+     "destination": "Apps/AG-SpdGa/voice/338.wav",
+     "hash": "8d6c415a3b32627b0237853787635935f5f011ca",
+     "size": 51756
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/339.wav",
+     "destination": "Apps/AG-SpdGa/voice/339.wav",
+     "hash": "985835c5d464a1431a29f67fff95da54124767b4",
+     "size": 54282
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/34.wav",
+     "destination": "Apps/AG-SpdGa/voice/34.wav",
+     "hash": "da834b414ab86b1fb0448a6e16badff07cbfed59",
+     "size": 31290
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/340.wav",
+     "destination": "Apps/AG-SpdGa/voice/340.wav",
+     "hash": "57c13b7c4f21eddef3668e5cc4a04d6c64249035",
+     "size": 39144
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/341.wav",
+     "destination": "Apps/AG-SpdGa/voice/341.wav",
+     "hash": "c96ca4dd44da8359f37ac7626342326683e35a9c",
+     "size": 51372
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/342.wav",
+     "destination": "Apps/AG-SpdGa/voice/342.wav",
+     "hash": "37fc4f0adf19d422d8391ceea26c055d3219c71b",
+     "size": 50730
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/343.wav",
+     "destination": "Apps/AG-SpdGa/voice/343.wav",
+     "hash": "c56171bfb68f71872327d20ba06371a3f0ee1546",
+     "size": 54860
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/344.wav",
+     "destination": "Apps/AG-SpdGa/voice/344.wav",
+     "hash": "0b7f4cff7ecef11a9debfcbf8e2ca5008498239a",
+     "size": 53294
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/345.wav",
+     "destination": "Apps/AG-SpdGa/voice/345.wav",
+     "hash": "e5b96a8a71c0b3a75ab1ad47c2b027064691a817",
+     "size": 53750
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/346.wav",
+     "destination": "Apps/AG-SpdGa/voice/346.wav",
+     "hash": "7853538cb349bee8acfb857ddfbd016f221b68ab",
+     "size": 55658
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/347.wav",
+     "destination": "Apps/AG-SpdGa/voice/347.wav",
+     "hash": "4591285854c48972ad482591b7089760f6697779",
+     "size": 54490
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/348.wav",
+     "destination": "Apps/AG-SpdGa/voice/348.wav",
+     "hash": "d8016f792e9a4d178cbc0c645616ed533ce36c54",
+     "size": 54828
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/349.wav",
+     "destination": "Apps/AG-SpdGa/voice/349.wav",
+     "hash": "bd91a051d02b664a4498cf964aa4bc7cd831c362",
+     "size": 50220
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/35.wav",
+     "destination": "Apps/AG-SpdGa/voice/35.wav",
+     "hash": "601b71ca5cbc93fca7cf686b2244b5d9643cac6a",
+     "size": 31752
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/350.wav",
+     "destination": "Apps/AG-SpdGa/voice/350.wav",
+     "hash": "c65dcb4c1dc2e5dd83f7f5e9d2dd0e19ec92b105",
+     "size": 44000
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/351.wav",
+     "destination": "Apps/AG-SpdGa/voice/351.wav",
+     "hash": "0c5249e3aa9984a15686d1d63265406a55ac556a",
+     "size": 54130
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/352.wav",
+     "destination": "Apps/AG-SpdGa/voice/352.wav",
+     "hash": "0b504835a08bd53b2f85912bf326f2033ec5a1bc",
+     "size": 56368
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/353.wav",
+     "destination": "Apps/AG-SpdGa/voice/353.wav",
+     "hash": "6b559973920320684c8de7d276ae3fd1b3b1caf4",
+     "size": 61114
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/354.wav",
+     "destination": "Apps/AG-SpdGa/voice/354.wav",
+     "hash": "f63a81f04517f0867cad3bb9f36372448ac2680a",
+     "size": 55762
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/355.wav",
+     "destination": "Apps/AG-SpdGa/voice/355.wav",
+     "hash": "91fc373a62d122495ab6da8c2de6d0e58e64d539",
+     "size": 62704
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/356.wav",
+     "destination": "Apps/AG-SpdGa/voice/356.wav",
+     "hash": "35f90bdeca754a0a5cb996319a63f837791e57f0",
+     "size": 61844
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/357.wav",
+     "destination": "Apps/AG-SpdGa/voice/357.wav",
+     "hash": "87a8089bf92bd5fe86f93244e9b7c4c3f432ef48",
+     "size": 59838
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/358.wav",
+     "destination": "Apps/AG-SpdGa/voice/358.wav",
+     "hash": "6adc2f29d5fb9fbd54b4ae3ac773346428bc4975",
+     "size": 58412
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/359.wav",
+     "destination": "Apps/AG-SpdGa/voice/359.wav",
+     "hash": "ba1fdcb11e22dd54ac5565e96fbb0eecccd05390",
+     "size": 57522
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/36.wav",
+     "destination": "Apps/AG-SpdGa/voice/36.wav",
+     "hash": "9befcbb6116ba20df568ba214c784c72dcc40e5d",
+     "size": 32854
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/360.wav",
+     "destination": "Apps/AG-SpdGa/voice/360.wav",
+     "hash": "bce40be42c83e2aae067ff1f3b6ac99e8bc6984b",
+     "size": 46124
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/361.wav",
+     "destination": "Apps/AG-SpdGa/voice/361.wav",
+     "hash": "f9e9395f02aeb8860ce2440cd5c32a210f5e198a",
+     "size": 51756
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/362.wav",
+     "destination": "Apps/AG-SpdGa/voice/362.wav",
+     "hash": "500010eaead7f7be9b31e1f928052122cf9a2394",
+     "size": 53808
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/363.wav",
+     "destination": "Apps/AG-SpdGa/voice/363.wav",
+     "hash": "3e447db487c22bc0582eced352a9d1fbd5bce776",
+     "size": 56462
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/364.wav",
+     "destination": "Apps/AG-SpdGa/voice/364.wav",
+     "hash": "9882086c95dac254ddc28b0b0dc0d2b97971aecd",
+     "size": 58750
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/365.wav",
+     "destination": "Apps/AG-SpdGa/voice/365.wav",
+     "hash": "91f0fae49392d34ed5520d41b7fde40734ba5a97",
+     "size": 57806
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/366.wav",
+     "destination": "Apps/AG-SpdGa/voice/366.wav",
+     "hash": "4efe9f2f68364e3401d49ef46cdb8dc844aef3a1",
+     "size": 59768
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/367.wav",
+     "destination": "Apps/AG-SpdGa/voice/367.wav",
+     "hash": "0932540300eac8991faf9aa96c0666ff22f0735f",
+     "size": 58550
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/368.wav",
+     "destination": "Apps/AG-SpdGa/voice/368.wav",
+     "hash": "b62a0800d18108de9d9d3c41f73cba75f018d1be",
+     "size": 54828
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/369.wav",
+     "destination": "Apps/AG-SpdGa/voice/369.wav",
+     "hash": "32fc3ba51cb3cf160d0b34ba3f673b5ce893b723",
+     "size": 57900
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/37.wav",
+     "destination": "Apps/AG-SpdGa/voice/37.wav",
+     "hash": "25dc054810af846ea559b2c0c9a0a3f48bc1c449",
+     "size": 30314
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/370.wav",
+     "destination": "Apps/AG-SpdGa/voice/370.wav",
+     "hash": "50acf5ec98f725e55362eda44a62b0be8a40efa7",
+     "size": 45612
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/371.wav",
+     "destination": "Apps/AG-SpdGa/voice/371.wav",
+     "hash": "759dadfc9e4a5c6365956429ad5bed7422c4b344",
+     "size": 54906
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/372.wav",
+     "destination": "Apps/AG-SpdGa/voice/372.wav",
+     "hash": "441ab38ea2ce3ef26458bb01b8b1156c78348945",
+     "size": 57018
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/373.wav",
+     "destination": "Apps/AG-SpdGa/voice/373.wav",
+     "hash": "8c3011e16036df22f81580fbc1585770bc802348",
+     "size": 59658
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/374.wav",
+     "destination": "Apps/AG-SpdGa/voice/374.wav",
+     "hash": "c8a1b4806c541a79fe8498b6f01a2595f4688e26",
+     "size": 61230
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/375.wav",
+     "destination": "Apps/AG-SpdGa/voice/375.wav",
+     "hash": "d80042732b278ae12eeed415ba9c868783b9b9b7",
+     "size": 61250
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/376.wav",
+     "destination": "Apps/AG-SpdGa/voice/376.wav",
+     "hash": "a85d556e4eb57405ce2f71cb8aed2f431455f39f",
+     "size": 61806
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/377.wav",
+     "destination": "Apps/AG-SpdGa/voice/377.wav",
+     "hash": "54150685bddb268cfabc78809740247575c567fa",
+     "size": 60150
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/378.wav",
+     "destination": "Apps/AG-SpdGa/voice/378.wav",
+     "hash": "edb5d2f630b3a22feec24a8c8f4a237788463687",
+     "size": 56566
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/379.wav",
+     "destination": "Apps/AG-SpdGa/voice/379.wav",
+     "hash": "92b66c6e7b3659deb3fbe79ccc4272637714864e",
+     "size": 59032
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/38.wav",
+     "destination": "Apps/AG-SpdGa/voice/38.wav",
+     "hash": "00319ab8b7b526cedba5551e0c6f3891b67a165b",
+     "size": 28712
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/380.wav",
+     "destination": "Apps/AG-SpdGa/voice/380.wav",
+     "hash": "da80f8d14894036ab687d785029ec3ad242458e5",
+     "size": 41396
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/381.wav",
+     "destination": "Apps/AG-SpdGa/voice/381.wav",
+     "hash": "909be600e10cd2a4f5c93be5259d27f0116b10fb",
+     "size": 50732
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/382.wav",
+     "destination": "Apps/AG-SpdGa/voice/382.wav",
+     "hash": "ae10a57904b1bb59ad18ce43c2d676a37d5e67a3",
+     "size": 49360
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/383.wav",
+     "destination": "Apps/AG-SpdGa/voice/383.wav",
+     "hash": "65e568fd33c58c870e7e7b10fd39af4c86f7d762",
+     "size": 53690
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/384.wav",
+     "destination": "Apps/AG-SpdGa/voice/384.wav",
+     "hash": "f5e72c83e058d8e8362b5944c032365c2bc880a9",
+     "size": 53148
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/385.wav",
+     "destination": "Apps/AG-SpdGa/voice/385.wav",
+     "hash": "aaa065ba4e727896e6612e0bf70e752cfbd3464d",
+     "size": 54064
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/386.wav",
+     "destination": "Apps/AG-SpdGa/voice/386.wav",
+     "hash": "19e133516709f3efdb8ab4ad729f76f11441e700",
+     "size": 53242
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/387.wav",
+     "destination": "Apps/AG-SpdGa/voice/387.wav",
+     "hash": "0c47ad2d47d642f5c9583d3df5c95547f4f3eabd",
+     "size": 54070
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/388.wav",
+     "destination": "Apps/AG-SpdGa/voice/388.wav",
+     "hash": "12152c2e63bb403cdbc306cf724a522d1f92ecb8",
+     "size": 52780
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/389.wav",
+     "destination": "Apps/AG-SpdGa/voice/389.wav",
+     "hash": "89b9fa79a48bfa128b6799bffc192ee78a72341c",
+     "size": 53216
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/39.wav",
+     "destination": "Apps/AG-SpdGa/voice/39.wav",
+     "hash": "6f81377c03499ef4e4f681671b133cd166442bce",
+     "size": 29884
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/390.wav",
+     "destination": "Apps/AG-SpdGa/voice/390.wav",
+     "hash": "aad1293a84362c1163648c8f4974d9688f39db15",
+     "size": 43920
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/391.wav",
+     "destination": "Apps/AG-SpdGa/voice/391.wav",
+     "hash": "cf54e39ebae63eedb60118b3b2f4e4405a65c8ae",
+     "size": 53288
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/392.wav",
+     "destination": "Apps/AG-SpdGa/voice/392.wav",
+     "hash": "194b9517c4318deefec1606967c7fad08dce411e",
+     "size": 53756
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/393.wav",
+     "destination": "Apps/AG-SpdGa/voice/393.wav",
+     "hash": "2872ce10b88dd81a16917010888263962e029a06",
+     "size": 57586
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/394.wav",
+     "destination": "Apps/AG-SpdGa/voice/394.wav",
+     "hash": "61e5ac32d87fc38c086dcc0b5041d9552ae81a63",
+     "size": 55402
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/395.wav",
+     "destination": "Apps/AG-SpdGa/voice/395.wav",
+     "hash": "6a8d96922ac18f0009abb046dc7d34eac9ce9e94",
+     "size": 59356
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/396.wav",
+     "destination": "Apps/AG-SpdGa/voice/396.wav",
+     "hash": "ffaf684aa9382d78288225c6a91ab6484e17f8d3",
+     "size": 60118
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/397.wav",
+     "destination": "Apps/AG-SpdGa/voice/397.wav",
+     "hash": "9569a10f729d623e64b23c2be7bde27560e7a316",
+     "size": 59438
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/398.wav",
+     "destination": "Apps/AG-SpdGa/voice/398.wav",
+     "hash": "029f7f5b9ddb650d713128f2598a0b8e555778d0",
+     "size": 52780
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/399.wav",
+     "destination": "Apps/AG-SpdGa/voice/399.wav",
+     "hash": "1ffe6dc00d2277a853a5c3b2ae53a94fa8451b85",
+     "size": 53978
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/4.wav",
+     "destination": "Apps/AG-SpdGa/voice/4.wav",
+     "hash": "79368677061bc33461a464d211621c9d344e57f4",
+     "size": 20124
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/40.wav",
+     "destination": "Apps/AG-SpdGa/voice/40.wav",
+     "hash": "c0138e67c3e417dcaa14dd463c267cb84170932c",
+     "size": 18652
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/400.wav",
+     "destination": "Apps/AG-SpdGa/voice/400.wav",
+     "hash": "74c4c0ed4767c17bc65a66782dfe258c207e0f99",
+     "size": 27400
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/401.wav",
+     "destination": "Apps/AG-SpdGa/voice/401.wav",
+     "hash": "4ebd2ab0ec62566cfb1625b6bacada26441ced1b",
+     "size": 34432
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/402.wav",
+     "destination": "Apps/AG-SpdGa/voice/402.wav",
+     "hash": "bfba8417694304362d69271197da6afd3c73c79e",
+     "size": 38990
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/403.wav",
+     "destination": "Apps/AG-SpdGa/voice/403.wav",
+     "hash": "b33559cddb7c3478a310a0410b498818c97e3cb4",
+     "size": 37914
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/404.wav",
+     "destination": "Apps/AG-SpdGa/voice/404.wav",
+     "hash": "59ef928038b2954010e6f37aa5b8f7f1e6f5a2f1",
+     "size": 39216
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/405.wav",
+     "destination": "Apps/AG-SpdGa/voice/405.wav",
+     "hash": "4d31906bd25a989c3e3fe13fa445156d60c8bd6a",
+     "size": 40454
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/406.wav",
+     "destination": "Apps/AG-SpdGa/voice/406.wav",
+     "hash": "f034d717ff4037d203106124758ed400c8ae1812",
+     "size": 40152
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/407.wav",
+     "destination": "Apps/AG-SpdGa/voice/407.wav",
+     "hash": "001291409b948545be83b60a31d65933455c3958",
+     "size": 40148
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/408.wav",
+     "destination": "Apps/AG-SpdGa/voice/408.wav",
+     "hash": "b0a2f7f6d1829d09029c912449174c6c13e6a43a",
+     "size": 36396
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/409.wav",
+     "destination": "Apps/AG-SpdGa/voice/409.wav",
+     "hash": "6c34bc229da42613382a1e1ea6afc7f122a3435a",
+     "size": 39454
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/41.wav",
+     "destination": "Apps/AG-SpdGa/voice/41.wav",
+     "hash": "225cf1cd5584d83b4321b3f5568ce70012c69551",
+     "size": 27068
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/410.wav",
+     "destination": "Apps/AG-SpdGa/voice/410.wav",
+     "hash": "38518b6cf18d437499dcc7f4160d49cfae2e447e",
+     "size": 40884
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/411.wav",
+     "destination": "Apps/AG-SpdGa/voice/411.wav",
+     "hash": "9e0254433da0444de97c713d57ac372580a02c95",
+     "size": 39030
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/412.wav",
+     "destination": "Apps/AG-SpdGa/voice/412.wav",
+     "hash": "c3ce16fe4f93227b818ba955df2918218b4296d1",
+     "size": 42130
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/413.wav",
+     "destination": "Apps/AG-SpdGa/voice/413.wav",
+     "hash": "1ec9ebf7a111e38bccd2aad8db60f11740f830be",
+     "size": 44158
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/414.wav",
+     "destination": "Apps/AG-SpdGa/voice/414.wav",
+     "hash": "91ebdb5ad63e19a7435c77271184425c15025b7f",
+     "size": 43194
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/415.wav",
+     "destination": "Apps/AG-SpdGa/voice/415.wav",
+     "hash": "238f144cac6ca36a65caaf85ca0553b731322b16",
+     "size": 45088
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/416.wav",
+     "destination": "Apps/AG-SpdGa/voice/416.wav",
+     "hash": "f9622940f41e527cfd000187f8163f44394eaee5",
+     "size": 45254
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/417.wav",
+     "destination": "Apps/AG-SpdGa/voice/417.wav",
+     "hash": "6d40e1e64747bb594e0d5fc505fa928269d50f73",
+     "size": 49726
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/418.wav",
+     "destination": "Apps/AG-SpdGa/voice/418.wav",
+     "hash": "b6e3395af66f4c465c9540180872e08c5494e9b5",
+     "size": 41388
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/419.wav",
+     "destination": "Apps/AG-SpdGa/voice/419.wav",
+     "hash": "df240a6e2cfe0debcca655e2f23e98b3f364d8c0",
+     "size": 44564
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/42.wav",
+     "destination": "Apps/AG-SpdGa/voice/42.wav",
+     "hash": "041bd27e720e3b15379c9de7239c50a15dd5451f",
+     "size": 29162
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/420.wav",
+     "destination": "Apps/AG-SpdGa/voice/420.wav",
+     "hash": "be9f6d33ee514c8ec6fc32e33741006bd37c44d9",
+     "size": 38634
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/421.wav",
+     "destination": "Apps/AG-SpdGa/voice/421.wav",
+     "hash": "d1642c92b2cc8b40d701152ab983fd23eaf502f1",
+     "size": 49076
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/422.wav",
+     "destination": "Apps/AG-SpdGa/voice/422.wav",
+     "hash": "5769b4810da07ba2d3018a91d1eb4958b08d3bd0",
+     "size": 49508
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/423.wav",
+     "destination": "Apps/AG-SpdGa/voice/423.wav",
+     "hash": "c31369dc83c4e710b93da11eabd4faf40cc2654b",
+     "size": 49450
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/424.wav",
+     "destination": "Apps/AG-SpdGa/voice/424.wav",
+     "hash": "d80e47f2c9904bdad25d78ca03307e9b025cf1ab",
+     "size": 53362
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/425.wav",
+     "destination": "Apps/AG-SpdGa/voice/425.wav",
+     "hash": "1f95876b64c851087bad76873a26841f65f4b496",
+     "size": 53262
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/426.wav",
+     "destination": "Apps/AG-SpdGa/voice/426.wav",
+     "hash": "eac1e83aa77c677e6580bd96a32d7bb7520709dc",
+     "size": 55834
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/427.wav",
+     "destination": "Apps/AG-SpdGa/voice/427.wav",
+     "hash": "e67740390b18c845c1e0cc7773d3cdf80dccf3ea",
+     "size": 52660
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/428.wav",
+     "destination": "Apps/AG-SpdGa/voice/428.wav",
+     "hash": "1c27e2f26c4351e825e8e045976a0cffc260805e",
+     "size": 53292
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/429.wav",
+     "destination": "Apps/AG-SpdGa/voice/429.wav",
+     "hash": "0622c264c844ccc14254ec9499b9e76cd6b077fd",
+     "size": 53606
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/43.wav",
+     "destination": "Apps/AG-SpdGa/voice/43.wav",
+     "hash": "6b4525d827342cc599f5a16f73276021de36f468",
+     "size": 29586
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/430.wav",
+     "destination": "Apps/AG-SpdGa/voice/430.wav",
+     "hash": "7aabbad2db303676da134d494fea9cb69cfd9f01",
+     "size": 38488
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/431.wav",
+     "destination": "Apps/AG-SpdGa/voice/431.wav",
+     "hash": "3cb556bccc612676d66c53f8472b55d71f97f713",
+     "size": 49196
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/432.wav",
+     "destination": "Apps/AG-SpdGa/voice/432.wav",
+     "hash": "a31e7d4c95937818802fecadf0656e9959e853bc",
+     "size": 45732
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/433.wav",
+     "destination": "Apps/AG-SpdGa/voice/433.wav",
+     "hash": "1577c023ed382505a29004764ef4a1d28e9e4dc0",
+     "size": 49708
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/434.wav",
+     "destination": "Apps/AG-SpdGa/voice/434.wav",
+     "hash": "c2a8099d78f2d0c2b6b688de8cff9a77160fa4bd",
+     "size": 47356
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/435.wav",
+     "destination": "Apps/AG-SpdGa/voice/435.wav",
+     "hash": "1d49a4beba38c4ca1572682a205935d02fe44fb7",
+     "size": 51998
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/436.wav",
+     "destination": "Apps/AG-SpdGa/voice/436.wav",
+     "hash": "dd40ae1cb0474fa911a190eedc5f606d18c59fb8",
+     "size": 48220
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/437.wav",
+     "destination": "Apps/AG-SpdGa/voice/437.wav",
+     "hash": "12be7ae74b8c8206e83c68724c840a689bfaed11",
+     "size": 51994
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/438.wav",
+     "destination": "Apps/AG-SpdGa/voice/438.wav",
+     "hash": "7c3a075ec50e4d0ed508b68ce32520664bab0196",
+     "size": 48172
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/439.wav",
+     "destination": "Apps/AG-SpdGa/voice/439.wav",
+     "hash": "fe32313ccf3fa70149a3149d06dba384c2d7ad32",
+     "size": 47832
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/44.wav",
+     "destination": "Apps/AG-SpdGa/voice/44.wav",
+     "hash": "66f9a5f3cddc1582dbfbcb1b14c57dd98e4ba3d4",
+     "size": 31266
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/440.wav",
+     "destination": "Apps/AG-SpdGa/voice/440.wav",
+     "hash": "0ec0f87f76620aafc523f9f9b93c9ce188cf86c2",
+     "size": 37878
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/441.wav",
+     "destination": "Apps/AG-SpdGa/voice/441.wav",
+     "hash": "e35f31c97b2a18554b51774ec0bf3dc3e29d7331",
+     "size": 45476
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/442.wav",
+     "destination": "Apps/AG-SpdGa/voice/442.wav",
+     "hash": "f45bc54990fa284c0d13b08f965fc78195ea2044",
+     "size": 48308
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/443.wav",
+     "destination": "Apps/AG-SpdGa/voice/443.wav",
+     "hash": "8fbf23b647a762553d8f73ea995c35c64036b879",
+     "size": 50672
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/444.wav",
+     "destination": "Apps/AG-SpdGa/voice/444.wav",
+     "hash": "fcdd5276225a67a3a96787b50af6307d99c0710f",
+     "size": 47948
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/445.wav",
+     "destination": "Apps/AG-SpdGa/voice/445.wav",
+     "hash": "8f375583fd1425eadba1d614c0d16e9d887cfffe",
+     "size": 52024
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/446.wav",
+     "destination": "Apps/AG-SpdGa/voice/446.wav",
+     "hash": "5ca66140c084a176f20bab3447d17c0c8fabac11",
+     "size": 50716
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/447.wav",
+     "destination": "Apps/AG-SpdGa/voice/447.wav",
+     "hash": "58c0930e8375c0f4d771c06b4767d60db573343b",
+     "size": 53494
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/448.wav",
+     "destination": "Apps/AG-SpdGa/voice/448.wav",
+     "hash": "832aa8d5ed796a3cf05101bcac58fa4eb5a4f89f",
+     "size": 49776
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/449.wav",
+     "destination": "Apps/AG-SpdGa/voice/449.wav",
+     "hash": "ddf2d94e6bafca960610facc6eb742876ef3f4ef",
+     "size": 47612
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/45.wav",
+     "destination": "Apps/AG-SpdGa/voice/45.wav",
+     "hash": "acd1c73644cd36998b0d666ced5a4fdb2e956bc8",
+     "size": 33006
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/450.wav",
+     "destination": "Apps/AG-SpdGa/voice/450.wav",
+     "hash": "c067916ca9a24beac0f9f782fbe6585242824bc6",
+     "size": 40710
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/451.wav",
+     "destination": "Apps/AG-SpdGa/voice/451.wav",
+     "hash": "739fa71ca58601a8a07a4e5ecfbdae0a4b019ef5",
+     "size": 48868
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/452.wav",
+     "destination": "Apps/AG-SpdGa/voice/452.wav",
+     "hash": "6679abe719aafe6e8fe72398face5db02f680ec1",
+     "size": 53746
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/453.wav",
+     "destination": "Apps/AG-SpdGa/voice/453.wav",
+     "hash": "b28ac1f3d6822e2ec1b8eb3cdd24c53aa598d60b",
+     "size": 54484
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/454.wav",
+     "destination": "Apps/AG-SpdGa/voice/454.wav",
+     "hash": "bd324ef49d9ec5c12bd49324bf578e0abba60edd",
+     "size": 52280
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/455.wav",
+     "destination": "Apps/AG-SpdGa/voice/455.wav",
+     "hash": "5540f329ab8f12f83545434bd17dadbbafdf4501",
+     "size": 53476
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/456.wav",
+     "destination": "Apps/AG-SpdGa/voice/456.wav",
+     "hash": "3a04302b7b630b5f38fed8b858a2ac21507e259c",
+     "size": 54300
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/457.wav",
+     "destination": "Apps/AG-SpdGa/voice/457.wav",
+     "hash": "e45fda20bc2bf35a8447b10ff870e09628f24a20",
+     "size": 54754
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/458.wav",
+     "destination": "Apps/AG-SpdGa/voice/458.wav",
+     "hash": "0f8f6b641af256551e1adfb0379c3b8df140abd0",
+     "size": 52592
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/459.wav",
+     "destination": "Apps/AG-SpdGa/voice/459.wav",
+     "hash": "9f27fa1cfeb23c27a6b92e0e7e55e74ce0db044d",
+     "size": 50750
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/46.wav",
+     "destination": "Apps/AG-SpdGa/voice/46.wav",
+     "hash": "9da5f436b3d26682b29ad6dabe180686087f721d",
+     "size": 32352
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/460.wav",
+     "destination": "Apps/AG-SpdGa/voice/460.wav",
+     "hash": "baa8638925855365fa9d24baadf61bdec4fb7dc7",
+     "size": 43052
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/461.wav",
+     "destination": "Apps/AG-SpdGa/voice/461.wav",
+     "hash": "4b49a45ea67545ed046dcff51c356e60c560c4c5",
+     "size": 49880
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/462.wav",
+     "destination": "Apps/AG-SpdGa/voice/462.wav",
+     "hash": "a47b6025dd7ed1ab5a8e1dd1764f3d976cf5ab39",
+     "size": 49326
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/463.wav",
+     "destination": "Apps/AG-SpdGa/voice/463.wav",
+     "hash": "0b71fe5bf3f12158851595c0594690d30b3b229b",
+     "size": 52568
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/464.wav",
+     "destination": "Apps/AG-SpdGa/voice/464.wav",
+     "hash": "5a21949ff3af5765f51b7fde1bf746031eee6e59",
+     "size": 52690
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/465.wav",
+     "destination": "Apps/AG-SpdGa/voice/465.wav",
+     "hash": "5f2a3683d0bfeb052fda0ce8585dd778a76dc5c7",
+     "size": 54122
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/466.wav",
+     "destination": "Apps/AG-SpdGa/voice/466.wav",
+     "hash": "b64133466ef0b7d64e202af74bba56bada590975",
+     "size": 55836
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/467.wav",
+     "destination": "Apps/AG-SpdGa/voice/467.wav",
+     "hash": "9eca8974c1594b1ce59b72d9c2bfdd72006be328",
+     "size": 58136
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/468.wav",
+     "destination": "Apps/AG-SpdGa/voice/468.wav",
+     "hash": "9fae8dd993248b6ec1d7e120e852f46cc40dd7d8",
+     "size": 53804
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/469.wav",
+     "destination": "Apps/AG-SpdGa/voice/469.wav",
+     "hash": "8d35a39972f61de8782498600b07117a90e101c3",
+     "size": 54204
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/47.wav",
+     "destination": "Apps/AG-SpdGa/voice/47.wav",
+     "hash": "d405b744592f375e5b950a9e902feec3ed230e5e",
+     "size": 31746
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/470.wav",
+     "destination": "Apps/AG-SpdGa/voice/470.wav",
+     "hash": "a3bbff87cf756a9853cfa28accc2414c5651c954",
+     "size": 41004
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/471.wav",
+     "destination": "Apps/AG-SpdGa/voice/471.wav",
+     "hash": "70fd033f85462827191ca39e3fe6ff8be6f4246f",
+     "size": 50182
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/472.wav",
+     "destination": "Apps/AG-SpdGa/voice/472.wav",
+     "hash": "ad479f5b2f8a695c5c171f0fd247b444e07f010a",
+     "size": 52018
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/473.wav",
+     "destination": "Apps/AG-SpdGa/voice/473.wav",
+     "hash": "7817aefc249f893fe9bb227afd3cb26f90d20964",
+     "size": 54408
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/474.wav",
+     "destination": "Apps/AG-SpdGa/voice/474.wav",
+     "hash": "1062b594d8841df0ac87679cb1fc645819ac2fb6",
+     "size": 58470
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/475.wav",
+     "destination": "Apps/AG-SpdGa/voice/475.wav",
+     "hash": "6b6e85a3aedeadbe29c04207b1f66a73bab554cc",
+     "size": 54860
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/476.wav",
+     "destination": "Apps/AG-SpdGa/voice/476.wav",
+     "hash": "a7faccce132f25aa7a1528d26a8352bebb5e0d0b",
+     "size": 54410
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/477.wav",
+     "destination": "Apps/AG-SpdGa/voice/477.wav",
+     "hash": "5db59f560e2ea82634a2196edb82e0b7c97fb700",
+     "size": 55088
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/478.wav",
+     "destination": "Apps/AG-SpdGa/voice/478.wav",
+     "hash": "2678aaaf556f5fb034073faaba437b3644d40806",
+     "size": 54316
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/479.wav",
+     "destination": "Apps/AG-SpdGa/voice/479.wav",
+     "hash": "2f1335b59a09b77aad345937b5fe7aec6fbd477e",
+     "size": 54122
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/48.wav",
+     "destination": "Apps/AG-SpdGa/voice/48.wav",
+     "hash": "0dea6bf9b11275d260d063146ce15e1a2bd9fcf0",
+     "size": 29566
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/480.wav",
+     "destination": "Apps/AG-SpdGa/voice/480.wav",
+     "hash": "fd0c98f03be7456ac3ed4c2711ee1004495ed56e",
+     "size": 33196
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/481.wav",
+     "destination": "Apps/AG-SpdGa/voice/481.wav",
+     "hash": "4f530b05eb2d23ffaf536a845cbbfaa4cbe83568",
+     "size": 46114
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/482.wav",
+     "destination": "Apps/AG-SpdGa/voice/482.wav",
+     "hash": "e9560405b5b91cfc030f08363d2008007f0b689f",
+     "size": 45224
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/483.wav",
+     "destination": "Apps/AG-SpdGa/voice/483.wav",
+     "hash": "efffa6276260157efa13ccb1d2378ce87a90a79b",
+     "size": 48980
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/484.wav",
+     "destination": "Apps/AG-SpdGa/voice/484.wav",
+     "hash": "d085af696d20fb02dfe35c6045e7b5c12e299118",
+     "size": 48524
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/485.wav",
+     "destination": "Apps/AG-SpdGa/voice/485.wav",
+     "hash": "504c1d5158267ddcf1cf986f9f9e762c4b8b4fb0",
+     "size": 50068
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/486.wav",
+     "destination": "Apps/AG-SpdGa/voice/486.wav",
+     "hash": "f9d0846e11a996f59abef43d3f7bbd72293f52ee",
+     "size": 49302
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/487.wav",
+     "destination": "Apps/AG-SpdGa/voice/487.wav",
+     "hash": "387e88483d8175b0cca1440a6a242d142f968c9c",
+     "size": 48714
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/488.wav",
+     "destination": "Apps/AG-SpdGa/voice/488.wav",
+     "hash": "0b5668fdea1e7ba1174493832d9626a95764b313",
+     "size": 48068
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/489.wav",
+     "destination": "Apps/AG-SpdGa/voice/489.wav",
+     "hash": "7aad0522d44b5dd31a7d7acdadbbb6e922be8be8",
+     "size": 48248
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/49.wav",
+     "destination": "Apps/AG-SpdGa/voice/49.wav",
+     "hash": "ddee02f7d05c2e5e0478031cbd424202988bb647",
+     "size": 29336
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/490.wav",
+     "destination": "Apps/AG-SpdGa/voice/490.wav",
+     "hash": "3721baa0bc5bb518213355e50181045dbc8168f9",
+     "size": 39494
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/491.wav",
+     "destination": "Apps/AG-SpdGa/voice/491.wav",
+     "hash": "1180e2dfa0f2f2fd17811c1f51902978f1227d4a",
+     "size": 48302
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/492.wav",
+     "destination": "Apps/AG-SpdGa/voice/492.wav",
+     "hash": "db8f2cdf41fdcde1b11211a19febc7bb5448b11a",
+     "size": 48928
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/493.wav",
+     "destination": "Apps/AG-SpdGa/voice/493.wav",
+     "hash": "16fdcf072d2f5df628db18de699924c925a8dc83",
+     "size": 48852
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/494.wav",
+     "destination": "Apps/AG-SpdGa/voice/494.wav",
+     "hash": "c58a2333d75e9c36cf6499e40b29772f3d7a9375",
+     "size": 50812
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/495.wav",
+     "destination": "Apps/AG-SpdGa/voice/495.wav",
+     "hash": "5b315af60efaa49db84382412a52920bef200920",
+     "size": 50254
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/496.wav",
+     "destination": "Apps/AG-SpdGa/voice/496.wav",
+     "hash": "ea42fe2ea3b075ba5db23a636e456bddb4f7cc38",
+     "size": 50714
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/497.wav",
+     "destination": "Apps/AG-SpdGa/voice/497.wav",
+     "hash": "af2bf58ba5c449377582c67dfd80db41ff1e579c",
+     "size": 52706
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/498.wav",
+     "destination": "Apps/AG-SpdGa/voice/498.wav",
+     "hash": "d6a1bfaf7b6723f71d66f7aa9dcab2163b2dbf44",
+     "size": 47502
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/499.wav",
+     "destination": "Apps/AG-SpdGa/voice/499.wav",
+     "hash": "f21450e3c51cf22e21e035602a0ba64e936a3999",
+     "size": 49726
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/5.wav",
+     "destination": "Apps/AG-SpdGa/voice/5.wav",
+     "hash": "08714fbe43afa1d1da5694ebf1841a9b6ae16a82",
+     "size": 20222
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/50.wav",
+     "destination": "Apps/AG-SpdGa/voice/50.wav",
+     "hash": "b5d01f0d4ba61eceb0bc3b01b652e6f8ad861b6d",
+     "size": 20870
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/500.wav",
+     "destination": "Apps/AG-SpdGa/voice/500.wav",
+     "hash": "913e25826ecb0bba57b33d9c599e49a04da530c7",
+     "size": 30236
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/51.wav",
+     "destination": "Apps/AG-SpdGa/voice/51.wav",
+     "hash": "7feadbaf7d7be0c088bb493d2037e31c48bb66e4",
+     "size": 32766
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/52.wav",
+     "destination": "Apps/AG-SpdGa/voice/52.wav",
+     "hash": "c4a2ca6def87428ba98ce42fb7408e88c9d46679",
+     "size": 30528
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/53.wav",
+     "destination": "Apps/AG-SpdGa/voice/53.wav",
+     "hash": "a329f8a02367de749ce5495e1d91cf7a72c51e74",
+     "size": 30596
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/54.wav",
+     "destination": "Apps/AG-SpdGa/voice/54.wav",
+     "hash": "c5b74c6be4668fae49d03e8116884de23ef53e7f",
+     "size": 33190
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/55.wav",
+     "destination": "Apps/AG-SpdGa/voice/55.wav",
+     "hash": "034b3784a6cde5acfeced0a8ea366712cf1501dc",
+     "size": 33534
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/56.wav",
+     "destination": "Apps/AG-SpdGa/voice/56.wav",
+     "hash": "8b96b34a253782fca89698fb856d786acc6b246c",
+     "size": 31894
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/57.wav",
+     "destination": "Apps/AG-SpdGa/voice/57.wav",
+     "hash": "1a4c2f2a6c19839aff3c913c3bc6da596ca17fe5",
+     "size": 36912
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/58.wav",
+     "destination": "Apps/AG-SpdGa/voice/58.wav",
+     "hash": "2bc41bdffed16c2d7c1cd625815f3e204887bdbf",
+     "size": 30490
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/59.wav",
+     "destination": "Apps/AG-SpdGa/voice/59.wav",
+     "hash": "a606c098ca8c24972161e5ba8009090109768403",
+     "size": 34816
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/6.wav",
+     "destination": "Apps/AG-SpdGa/voice/6.wav",
+     "hash": "5bdf17b6c27154e0060eab5dea6223f6309e1618",
+     "size": 19496
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/60.wav",
+     "destination": "Apps/AG-SpdGa/voice/60.wav",
+     "hash": "b15acd18f9092d4d9dc43a5fba051a8d2ac9c75f",
+     "size": 22060
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/61.wav",
+     "destination": "Apps/AG-SpdGa/voice/61.wav",
+     "hash": "81bbd9a4551c741447d6e32275361d69a81b012b",
+     "size": 31276
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/62.wav",
+     "destination": "Apps/AG-SpdGa/voice/62.wav",
+     "hash": "01dada6da1294b240fb74362c5d42dfa8e634d00",
+     "size": 33332
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/63.wav",
+     "destination": "Apps/AG-SpdGa/voice/63.wav",
+     "hash": "3d055e9ccd1e75591b6ccfb076d60619dc38db0f",
+     "size": 31888
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/64.wav",
+     "destination": "Apps/AG-SpdGa/voice/64.wav",
+     "hash": "e0007be81f1519f4e38a19b1c607fcdf4c460394",
+     "size": 34660
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/65.wav",
+     "destination": "Apps/AG-SpdGa/voice/65.wav",
+     "hash": "a1fa6ea5b02fc3b091942a26e7bad4a0f37faa48",
+     "size": 33690
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/66.wav",
+     "destination": "Apps/AG-SpdGa/voice/66.wav",
+     "hash": "cc59811d8ab46eee86d7eba5b46dc23342d03af4",
+     "size": 35450
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/67.wav",
+     "destination": "Apps/AG-SpdGa/voice/67.wav",
+     "hash": "f274e2e92bcbd38ed6c6f19eac5bf0ba6a403cc3",
+     "size": 36610
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/68.wav",
+     "destination": "Apps/AG-SpdGa/voice/68.wav",
+     "hash": "a77837254f071913f6ea683498ab621fa769e655",
+     "size": 33936
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/69.wav",
+     "destination": "Apps/AG-SpdGa/voice/69.wav",
+     "hash": "d78f4f8bf433703f9793c31d2122e06f9cec78fb",
+     "size": 33348
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/7.wav",
+     "destination": "Apps/AG-SpdGa/voice/7.wav",
+     "hash": "dbfec63a3411a3b989ba89d8e18b9d5975dcb5fd",
+     "size": 21958
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/70.wav",
+     "destination": "Apps/AG-SpdGa/voice/70.wav",
+     "hash": "38726e1fc52a786d97209ae9fefc30dce8387e98",
+     "size": 22262
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/71.wav",
+     "destination": "Apps/AG-SpdGa/voice/71.wav",
+     "hash": "768ae77e9b8d035930cdd2ff09b79626c4ef49ba",
+     "size": 35314
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/72.wav",
+     "destination": "Apps/AG-SpdGa/voice/72.wav",
+     "hash": "26e7b594de3703548be7ed1bb0cfe6fab5340402",
+     "size": 31418
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/73.wav",
+     "destination": "Apps/AG-SpdGa/voice/73.wav",
+     "hash": "5c16fcaf0a6d1c3aa70fc83e14b0e9013f0e1e33",
+     "size": 34462
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/74.wav",
+     "destination": "Apps/AG-SpdGa/voice/74.wav",
+     "hash": "9f5e514a8ca63616cca9c0d0ca3e71013779bb63",
+     "size": 36050
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/75.wav",
+     "destination": "Apps/AG-SpdGa/voice/75.wav",
+     "hash": "d7174657365ed1623c38603e6243247a626acdc3",
+     "size": 33896
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/76.wav",
+     "destination": "Apps/AG-SpdGa/voice/76.wav",
+     "hash": "bd79da148ee412097fa02ce82f89eaefab57f11d",
+     "size": 37174
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/77.wav",
+     "destination": "Apps/AG-SpdGa/voice/77.wav",
+     "hash": "538f2dded8237b8437ede6e05b815c32a12435b0",
+     "size": 36874
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/78.wav",
+     "destination": "Apps/AG-SpdGa/voice/78.wav",
+     "hash": "90fd1a00c0beb5899a060383af45d08ca67cd7cd",
+     "size": 35884
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/79.wav",
+     "destination": "Apps/AG-SpdGa/voice/79.wav",
+     "hash": "acba4b618379dbcec2e4e696061419ddef2818b5",
+     "size": 34418
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/8.wav",
+     "destination": "Apps/AG-SpdGa/voice/8.wav",
+     "hash": "163ba6e5dd4e115422064a686334d9062e5c5784",
+     "size": 15588
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/80.wav",
+     "destination": "Apps/AG-SpdGa/voice/80.wav",
+     "hash": "2d06d1f79d9388b1fc561ac0fa23b97cd32f5c42",
+     "size": 15710
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/81.wav",
+     "destination": "Apps/AG-SpdGa/voice/81.wav",
+     "hash": "cddf2d23c2b64e14a9772ba16c96acc6f77869c0",
+     "size": 26806
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/82.wav",
+     "destination": "Apps/AG-SpdGa/voice/82.wav",
+     "hash": "f218f55e422c7152d092a6b4273ca345a83afa6f",
+     "size": 26936
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/83.wav",
+     "destination": "Apps/AG-SpdGa/voice/83.wav",
+     "hash": "29459fe74cf33e9a849bf530794ac72993c47459",
+     "size": 28560
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/84.wav",
+     "destination": "Apps/AG-SpdGa/voice/84.wav",
+     "hash": "130ef2b28deee5fe04c25722ab0f6d6ab9629c50",
+     "size": 29794
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/85.wav",
+     "destination": "Apps/AG-SpdGa/voice/85.wav",
+     "hash": "3c9a0dc5a9ed353d565ea46ef1980653cae1be51",
+     "size": 31778
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/86.wav",
+     "destination": "Apps/AG-SpdGa/voice/86.wav",
+     "hash": "6c6ad1ea7a14886f3723475a1b1013e7ecced1d3",
+     "size": 31566
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/87.wav",
+     "destination": "Apps/AG-SpdGa/voice/87.wav",
+     "hash": "2e0072aa5f8dff3125921314015ef179f0325e70",
+     "size": 29094
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/88.wav",
+     "destination": "Apps/AG-SpdGa/voice/88.wav",
+     "hash": "9f0fd11c0e529100acd85d1875d788b5e246b30c",
+     "size": 28048
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/89.wav",
+     "destination": "Apps/AG-SpdGa/voice/89.wav",
+     "hash": "11aa4430a3c4d91b99b730a92a17056c63bd12ee",
+     "size": 29570
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/9.wav",
+     "destination": "Apps/AG-SpdGa/voice/9.wav",
+     "hash": "a33838710702c066c5a963e750459d0a30b86957",
+     "size": 19312
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/90.wav",
+     "destination": "Apps/AG-SpdGa/voice/90.wav",
+     "hash": "d7a9722712035a6453747b5c67932686b8d11f88",
+     "size": 18614
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/91.wav",
+     "destination": "Apps/AG-SpdGa/voice/91.wav",
+     "hash": "13ca5c3ed5f05b6cae5653ab81507d288734fa65",
+     "size": 31998
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/92.wav",
+     "destination": "Apps/AG-SpdGa/voice/92.wav",
+     "hash": "8cebfafd669761efd9b885af4fc06e4dcac1ee40",
+     "size": 28002
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/93.wav",
+     "destination": "Apps/AG-SpdGa/voice/93.wav",
+     "hash": "9ba7e3a55626a8d3208f1a2a773f07d75a9800bb",
+     "size": 32238
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/94.wav",
+     "destination": "Apps/AG-SpdGa/voice/94.wav",
+     "hash": "37666588260285239121db58b280f7298a85e326",
+     "size": 32392
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/95.wav",
+     "destination": "Apps/AG-SpdGa/voice/95.wav",
+     "hash": "0489638fa7178c683c7ca09127fb151bcd33479d",
+     "size": 33144
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/96.wav",
+     "destination": "Apps/AG-SpdGa/voice/96.wav",
+     "hash": "e5c7f4f119144c49be3419b8ba56270785862c6f",
+     "size": 33924
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/97.wav",
+     "destination": "Apps/AG-SpdGa/voice/97.wav",
+     "hash": "0362a3802ddbb4791939ca36075e12797f9c8d96",
+     "size": 34438
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/98.wav",
+     "destination": "Apps/AG-SpdGa/voice/98.wav",
+     "hash": "14d9d2c397cfdf218bb9b6bbba236191120b399a",
+     "size": 31854
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/99.wav",
+     "destination": "Apps/AG-SpdGa/voice/99.wav",
+     "hash": "a9fe825a827168132f1d9c1bf7c6a0045cc40e8f",
+     "size": 30908
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/CREDITS.txt",
+     "destination": "Apps/AG-SpdGa/voice/CREDITS.txt",
+     "hash": "d7056486077a30c0f865596d67b07e28d8f84b70",
+     "size": 847
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/alive.wav",
+     "destination": "Apps/AG-SpdGa/voice/alive.wav",
+     "hash": "f31085dbcbdcfab47a4a469bcded3167303b3882",
+     "size": 40064
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/cal.wav",
+     "destination": "Apps/AG-SpdGa/voice/cal.wav",
+     "hash": "3e956585f535136a31a4db9e6aff2e87bd0aef05",
+     "size": 49886
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/fts.wav",
+     "destination": "Apps/AG-SpdGa/voice/fts.wav",
+     "hash": "86589281b747f5004a1606a19864e8174f9908e6",
+     "size": 40492
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/index.txt",
+     "destination": "Apps/AG-SpdGa/voice/index.txt",
+     "hash": "7c5deec95d893a88298e6ddbb9448de23e49d291",
+     "size": 54
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/kmh.wav",
+     "destination": "Apps/AG-SpdGa/voice/kmh.wav",
+     "hash": "b85fd7ca815308ab832d6fee845694b357e33e5b",
+     "size": 49494
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/kt.wav",
+     "destination": "Apps/AG-SpdGa/voice/kt.wav",
+     "hash": "effa7590579e047c0fbdee8420624cdb64a59f6f",
+     "size": 20376
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/max.wav",
+     "destination": "Apps/AG-SpdGa/voice/max.wav",
+     "hash": "ce202711a55ab0e9dc73f33bd2508750e8a570b4",
+     "size": 17032
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/mph.wav",
+     "destination": "Apps/AG-SpdGa/voice/mph.wav",
+     "hash": "d14deb430efe90ac2ac0c213197722a504b32308",
+     "size": 43254
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/ms.wav",
+     "destination": "Apps/AG-SpdGa/voice/ms.wav",
+     "hash": "9c47dc0427fb0ab6054e5551a1e0f7b39815d2a3",
+     "size": 43210
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/over.wav",
+     "destination": "Apps/AG-SpdGa/voice/over.wav",
+     "hash": "ad24c72477e8437aa63697e31bad7e2cf908b878",
+     "size": 29116
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/pct.wav",
+     "destination": "Apps/AG-SpdGa/voice/pct.wav",
+     "hash": "37770b3e0e36033664f4e951a75e5338c5a581d3",
+     "size": 21036
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/stall.wav",
+     "destination": "Apps/AG-SpdGa/voice/stall.wav",
+     "hash": "6589fda5fde1c541f96f477c22b549fd60405426",
+     "size": 33800
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/AG-SpdGa/voice/stallat.wav",
+     "destination": "Apps/AG-SpdGa/voice/stallat.wav",
+     "hash": "99740439408c79c3658f6f8ed4f85b0035564e72",
+     "size": 40334
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/lib/ag_dens.lua",
+     "destination": "Apps/lib/ag_dens.lua",
+     "hash": "c6b32e01314a221fd26cfe41825c54c2f7f0e193",
+     "size": 1143
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-SpdGa-v0.3.0/src/Apps/lib/ag_gauge.lua",
+     "destination": "Apps/lib/ag_gauge.lua",
+     "hash": "829a1eca13fc24010cd1719d21878f787793d796",
+     "size": 5683
+    }
+   ]
+  }
+ ]
+}

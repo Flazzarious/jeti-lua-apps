@@ -16,3 +16,6 @@ __pycache__/
 .venv/
 venv/
 
+
+# Local JETI Studio test source (tools/publish/make_apps_json.py --local)
+Apps.local.json
