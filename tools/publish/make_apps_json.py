@@ -24,12 +24,17 @@ merge it to `main`:
 
     python tools/publish/make_apps_json.py
 
+To try it in JETI Studio before publishing, `--local` also writes
+Apps.local.json (gitignored), whose description and icon are the files in
+this working folder; add its file:/// URL under File -> Configuration.
+
 Standard library only.
 """
 
 import hashlib
 import json
 import subprocess
+import sys
 from email.utils import format_datetime
 from datetime import datetime, timezone
 from pathlib import PurePosixPath
@@ -87,7 +92,12 @@ def release_date(tag):
     return format_datetime(datetime.fromtimestamp(stamp, timezone.utc))
 
 
-def entry(app):
+def local_url(path):
+    """file:/// URL of a file in this working folder (for --local)."""
+    return (REPO / path).resolve().as_uri()
+
+
+def entry(app, local=False):
     tag = app["tag"]
     paths = git("ls-tree", "-r", "--name-only", tag, "--", *app["paths"]).split()
     if not paths:
@@ -109,23 +119,32 @@ def entry(app):
         "hw": app["hw"],
         "releaseDate": release_date(tag),
         "name": {"en": app["name"]},
-        "description": {"en": url("main", app["description"])},
-        "previewIcon": url("main", app["previewIcon"]),
+        "description": {"en": local_url(app["description"]) if local
+                        else url("main", app["description"])},
+        "previewIcon": (local_url(app["previewIcon"]) if local
+                        else url("main", app["previewIcon"])),
         "files": files,
     }
 
 
-def main():
-    out = {"applications": [entry(app) for app in APPS]}
-    path = REPO / "Apps.json"
+def write(path, out):
     # open() with newline= (Path.write_text has none before Python 3.10).
     with open(path, "w", encoding="utf-8", newline="\n") as f:
         f.write(json.dumps(out, indent=1, ensure_ascii=False) + "\n")
+    print(f"wrote {path.relative_to(REPO)}")
+
+
+def main():
+    out = {"applications": [entry(app) for app in APPS]}
+    write(REPO / "Apps.json", out)
+    if "--local" in sys.argv:
+        local = REPO / "Apps.local.json"
+        write(local, {"applications": [entry(app, local=True) for app in APPS]})
+        print(f"JETI Studio test source: {local.resolve().as_uri()}")
     for a in out["applications"]:
         total = sum(f["size"] for f in a["files"])
         print(f"{a['name']['en']} {a['version']}: {len(a['files'])} files, "
               f"{total / 1e6:.1f} MB, {a['releaseDate']}")
-    print(f"wrote {path.relative_to(REPO)}")
 
 
 if __name__ == "__main__":
