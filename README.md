@@ -89,7 +89,8 @@ The sounds in `src/Apps/AG-FlmOt/` are generated with
    Studio's Lua app list; select one and install it.
 
 Each app installs exactly its released version (its files come from the
-release tag). Descriptions: [Speed Gauge](docs/apps/speed-gauge.md).
+release tag). Descriptions: [Speed Gauge](docs/apps/speed-gauge.md),
+[Flameout Alarm](docs/apps/flameout-alarm.md) (after its release).
 
 For maintainers: after tagging a release, run
 `python tools/publish/make_apps_json.py`, commit `Apps.json` and merge it to

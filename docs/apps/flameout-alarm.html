@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title>Flameout Alarm</title>
+    </head>
+    <body style="padding:10px;float:left;max-width:500px;">
+        <h1>Flameout Alarm</h1>
+        <p>An urgent, repeating alarm when a turbine flames out, from the
+        engine's RPM telemetry, and an RPM bar for the main screen, for the
+        DS-24 II / DC-24 II.</p>
+        <img src="img/flameout-alarm-armed.png" alt="Flameout Alarm, armed" width="480">
+        <ul>
+            <li><b>Flameout alarm:</b> "Flameout! Flameout! Flameout!" and a
+            rapid lock tone every 5 seconds, with stick vibration. It cuts in
+            over other apps' speech.</li>
+            <li><b>No false alarms on the ground:</b> arms only once the
+            engine has run at idle, ignores the start sequence and throttle
+            chops, and disarms silently on the throttle cut switch.</li>
+            <li><b>Auto-restart aware:</b> the alarm keeps going during an ECU
+            restart and clears once the engine holds idle again.</li>
+            <li><b>Telemetry loss is not a flameout:</b> you hear "Engine
+            telemetry lost" instead.</li>
+            <li><b>RPM window:</b> a segmented RPM bar with an idle marker and
+            the RPM number; a red FLAMEOUT banner on a flameout.</li>
+            <li><b>Test alarm switch</b> to hear the real alarm on the
+            ground.</li>
+        </ul>
+        <img src="img/flameout-alarm-flameout.png" alt="Flameout Alarm during a flameout" width="480">
+        <p><b>Advisory only.</b> It never controls the model or the engine,
+        and does not replace the ECU's failsafe, shutdown or auto-restart
+        logic, or your own monitoring.</p>
+        <p><b>Needs a turbine whose RPM reaches the transmitter as a normal
+        telemetry sensor:</b> JetCat, Xicoy and KingTech through their Jeti
+        telemetry adapters or a VSpeak/Digitech converter, Swiwin through
+        VSpeak's converter. JetCentral, Enjet and Swiwin's direct connection
+        are unconfirmed.</p>
+        <h3>Setting up</h3>
+        <ol>
+            <li>Add <b>Flameout Alarm</b> in <i>Applications - User Applications</i>.</li>
+            <li>In its settings choose the <b>RPM sensor</b> (check <i>Live
+            RPM</i>; set <i>Sensor scale</i> if it's off by 10x or 1000x),
+            enter <b>Idle RPM</b> in thousands from your ECU's setup (35.0 =
+            35,000 RPM), assign the <b>Cut switch</b> in its Cut position, then
+            tick <b>Monitoring</b>.</li>
+            <li>Put <b>Flameout Alarm</b> at double size on a page in
+            <i>Timers/Sensors - Displayed telemetry</i>.</li>
+            <li>Optional: assign a <b>Test alarm</b> switch to hear the
+            alarm.</li>
+        </ol>
+        <p>Defaults: arms at 90% of idle held for 3 s, alarms below 70% of
+        idle for 1 s, "telemetry lost" after 2 s.</p>
+        <p>Version: <b>0.1.0</b></p>
+        <p>Compatibility: <b>DC/DS-24II</b>, firmware 6.x</p>
+        <p>Voice: Piper text-to-speech with the "Amy" voice by Mycroft /
+        Rhasspy; the sound files are licensed CC BY-SA 4.0. Flameout Alarm: MIT
+        license, Copyright (c) 2026 Aaron George.</p>
+        <p>Source and full credits:
+        <a href="https://github.com/Flazzarious/jeti-lua-apps">github.com/Flazzarious/jeti-lua-apps</a></p>
+    </body>
+</html>
