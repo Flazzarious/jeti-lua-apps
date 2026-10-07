@@ -136,7 +136,7 @@ built and checked on its own.
 **Independent Test**: `SIM` profile 4 and quickstart scenarios 10–11 (SC-011).
 
 - [X] T032 [US4] Fill `stepFlameout(now)` in `src/Apps/AG-FlmOt.lua` (row 5, FR-017, FR-018): `rpm >= armRpm` sets `armSince = armSince or now`; when `now - armSince >= armMs`: `stopAlarm()`, `state = ARMED`, `armSince = nil`, `lowSince = nil`, then play `SND.relit` with `AUDIO_QUEUE` if `sayRel == 1` and `fileOk.relit`. `rpm < armRpm` (the startup range) clears `armSince` and starts nothing new
-- [ ] T033 [US4] MANUAL: Emulator, `SIM` profile 4: the failed attempt doesn't clear the alarm and no second event starts; the relight clears within 3.5 s of holding 31,500 and stays clear through the decay to 35,000. Without `SIM`: quickstart scenarios 10 and 11
+- [X] T033 [US4] MANUAL: Emulator, `SIM` profile 4: the failed attempt doesn't clear the alarm and no second event starts; the relight clears within 3.5 s of holding 31,500 and stays clear through the decay to 35,000. Without `SIM`: quickstart scenarios 10 and 11
 
 ---
 
@@ -160,7 +160,7 @@ built and checked on its own.
 - [X] T036 [US6] Fill `onInvalid(now)` in `src/Apps/AG-FlmOt.lua` (row 2, FR-020, FR-020a): `invalidSince = invalidSince or now`; clear `armSince` and `lowSince`; `rpm = nil`; when `now - invalidSince >= lossMs` and not `lost`: `lost = true`; if `state == ARMED` and `fileOk.tlost`, play `SND.tlost` with `AUDIO_IMMEDIATE`; if `state == FLAMEOUT` set `tlPending = true`. Nothing happens while DISARMED besides the display
 - [X] T037 [US6] In `stepCycle` in `src/Apps/AG-FlmOt.lua`, play `SND.cycletl` instead of `SND.cycle` when `tlPending`, then clear `tlPending` (research R4). With `audioOk` false the beeps continue unchanged
 - [X] T038 [US6] In the frame of `loop()` in `src/Apps/AG-FlmOt.lua`, confirm that a valid sample after a loss resumes from the current RPM (FR-021): ARMED stays ARMED when `rpm >= flRpm`, and detection restarts from zero otherwise (`lowSince` was cleared). In `printRpm`'s text layout show NO SENSOR when `not sensorFound`, NO TELEMETRY when `lost` (not FLAMEOUT), and "NO TELEMETRY" as the second line under FLAMEOUT when both
-- [ ] T039 [US6] MANUAL: Emulator, quickstart scenarios 13–16 (slider fully down = invalid; sensor removed from `sensors.json`)
+- [X] T039 [US6] MANUAL: Emulator, quickstart scenarios 13–16 (slider fully down = invalid; sensor removed from `sensors.json`)
 
 ---
 

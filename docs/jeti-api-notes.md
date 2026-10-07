@@ -159,6 +159,9 @@ the emulator's numbers above:
 - It also replaces `system.playFile`, `playNumber`, `playBeep`,
   `playSystemSound` and `vibration` with `print`: in the emulator, audio and
   vibration appear as lines in the Lua console instead of sound.
+  `system.stopPlayback` is **not** replaced, so a stop leaves no console
+  line; it shows only as the repeating lines ending (Flameout Alarm,
+  2026-10-06).
 - **`io.open` in the emulator needs a relative path** (JETI Studio 6.04,
   2026-10-05, Flameout Alarm): `io.open("/Apps/AG-FlmOt/cycle.wav", "r")`
   returns nil, while `io.open("Apps/AG-FlmOt/cycle.wav", "r")` works ("r"
