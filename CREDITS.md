@@ -80,6 +80,29 @@ Amy model was trained on is undocumented. They were generated with
 [`tools/voice/`](tools/voice/README.md), which can regenerate them (the
 user chose to commit them, 2026-10-03; spec FR-035).
 
+## Flameout Alarm sounds — Piper and the "Amy" voice
+
+Flameout Alarm (`AG-FlmOt`) is original work; no code comes from another
+app. Its alarm sounds use the same **Piper** engine and **"Amy"**
+(`en_US-amy-medium`) voice model by **Mycroft / Rhasspy** as Speed Gauge's
+voice, credited above:
+
+- the urgent "Flameout!" callout, sped up, pitch-shifted, equalized and
+  compressed by [`tools/voice/make_flameout.py`](tools/voice/README.md);
+- "Engine telemetry lost", "Flameout alarm armed" and "Engine relit".
+
+The lock tone is synthesized by the same script and contains no voice.
+
+The generated files are in
+[`src/Apps/AG-FlmOt/`](src/Apps/AG-FlmOt/) and are licensed **CC BY-SA 4.0**
+(Amy model), not MIT; that folder's `CREDITS.txt` carries the attribution.
+No Piper code is part of this repository or of the app.
+
+The ECU telemetry facts behind the app (spec 003, research R1) come partly
+from Thomas Ekdahl's Jeti ECU telemetry app
+([thomasekdahlN/jeti](https://github.com/thomasekdahlN/jeti)), which was
+studied for facts only; none of its code is used.
+
 ## JETI model official demos
 
 [`docs/examples/jeti-demos/`](docs/examples/jeti-demos/) holds unmodified demos

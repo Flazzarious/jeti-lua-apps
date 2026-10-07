@@ -1,15 +1,19 @@
-"""make_icon.py - draw Speed Gauge's app icon for JETI Studio.
+"""make_icon.py - draw the app icons for JETI Studio.
 
 Copyright (c) 2026 Aaron George
 SPDX-License-Identifier: MIT
 
-A 64 x 64 PNG (the size of JETI's own app icons) in the gauge's style: a
-dark face, the grey track, a cyan speed arc, the orange overspeed zone and
-a yellow max mark, with "AG" (Aaron George) in the center; smoothed by
-sampling each pixel 8 x 8.
+64 x 64 PNGs (the size of JETI's own app icons), smoothed by sampling each
+pixel 8 x 8, with "AG" (Aaron George) drawn as strokes:
 
-    python tools/publish/make_icon.py            # docs/apps/img/speed-gauge-icon.png
-    python tools/publish/make_icon.py --preview  # also all variants, enlarged
+- Speed Gauge: a dark face, the grey track, a cyan speed arc, the orange
+  overspeed zone and a yellow max mark, "AG" in the center.
+- Flameout Alarm (--app flameout): the window's rising segmented RPM sweep,
+  lit cyan up to past a yellow idle marker, "AG" at the upper left.
+
+    python tools/publish/make_icon.py                  # docs/apps/img/speed-gauge-icon.png
+    python tools/publish/make_icon.py --app flameout   # docs/apps/img/flameout-alarm-icon.png
+    python tools/publish/make_icon.py --preview DIR    # also Speed Gauge's variants
 
 Standard library only.
 """
@@ -140,6 +144,52 @@ def shade(x, y, variant):
     return col
 
 
+UNLIT = (34, 38, 44)
+EDGE = (70, 78, 90)
+
+# Flameout Alarm's sweep, scaled from the window (design/mockup.py): segments
+# from x0 to x1, bottom edge rising and flattening to the right, growing taller.
+FLM = {"n": 6, "x0": 7.0, "x1": 57.0, "gap": 2.5, "base": 37.0, "rise": 17.0,
+       "curve": 2.2, "h0": 8.0, "dh": 13.0, "lit": 3, "idle": 0.36,
+       "ag": (-10.0, -17.0)}   # monogram offset from the tile center
+
+
+def shade_flameout(x, y):
+    """Color of one sample point in Flameout Alarm's icon."""
+    c = SIZE / 2
+    dx, dy = x - c, y - c
+    r_corner = 12
+    qx, qy = max(abs(dx) - (c - r_corner), 0), max(abs(dy) - (c - r_corner), 0)
+    if math.hypot(qx, qy) > r_corner:
+        return None
+    col = BG
+    n, x0, x1, gap = FLM["n"], FLM["x0"], FLM["x1"], FLM["gap"]
+    seg_w = (x1 - x0 - gap * (n - 1)) / n
+    if x0 <= x <= x1:
+        t = (x - x0) / (x1 - x0)
+        bottom = FLM["base"] + FLM["rise"] * (1 - t) ** FLM["curve"]
+        top = bottom - (FLM["h0"] + FLM["dh"] * t)
+        k = int((x - x0) // (seg_w + gap))
+        in_seg = (x - x0) - k * (seg_w + gap) <= seg_w
+        if in_seg and top <= y <= bottom:
+            if k < FLM["lit"]:
+                col = CYAN
+            else:
+                edge = min(y - top, bottom - y) < 0.8 or \
+                    min((x - x0) - k * (seg_w + gap), seg_w - ((x - x0) - k * (seg_w + gap))) < 0.8
+                col = EDGE if edge else UNLIT
+        # Idle marker: a yellow bar across the sweep.
+        xi = x0 + FLM["idle"] * (x1 - x0)
+        bi = FLM["base"] + FLM["rise"] * (1 - FLM["idle"]) ** FLM["curve"]
+        ti = bi - (FLM["h0"] + FLM["dh"] * FLM["idle"])
+        if abs(x - xi) <= 1.1 and ti - 3 <= y <= bi + 3:
+            col = YELLOW
+    ox, oy = FLM["ag"]
+    if monogram(x - ox, y - oy, c):
+        col = WHITE
+    return col
+
+
 def render(variant, size=SIZE):
     rows = []
     step = 1 / SS
@@ -150,8 +200,12 @@ def render(variant, size=SIZE):
             acc = [0.0, 0.0, 0.0, 0.0]
             for sy in range(SS):
                 for sx in range(SS):
-                    col = shade((px + (sx + 0.5) * step) * scale,
-                                (py + (sy + 0.5) * step) * scale, variant)
+                    sxp = (px + (sx + 0.5) * step) * scale
+                    syp = (py + (sy + 0.5) * step) * scale
+                    if variant == "flameout":
+                        col = shade_flameout(sxp, syp)
+                    else:
+                        col = shade(sxp, syp, variant)
                     if col is not None:
                         acc[0] += col[0]
                         acc[1] += col[1]
@@ -182,6 +236,11 @@ def write_png(path, size, rows):
 
 
 def main():
+    if "--app" in sys.argv and sys.argv[sys.argv.index("--app") + 1] == "flameout":
+        out = REPO / "docs" / "apps" / "img" / "flameout-alarm-icon.png"
+        write_png(out, SIZE, render("flameout"))
+        print(f"wrote {out.relative_to(REPO)}")
+        return
     write_png(OUT, SIZE, render("arc"))
     print(f"wrote {OUT.relative_to(REPO)}")
     if "--preview" in sys.argv:

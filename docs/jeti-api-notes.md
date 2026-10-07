@@ -137,6 +137,10 @@ the emulator's numbers above:
 - To see live per-call numbers, call `system.getCPU()` at the end of `loop()`
   and of the print function and log them (Speed Gauge was measured this way:
   init 24, loop 0–1, small/double draw 12–18, full-screen draw 27–43).
+- Flameout Alarm's double-size window (12 opaque renderer polygons, 12
+  thin opaque outlines, three texts) measured **5–6%** per call on the
+  DS-24 II (2026-10-06, `DEBUG_CPU`): 5% armed, 6% with the FLAMEOUT
+  banner. Opaque fills and outlines are cheap, as below.
 - Cost follows semi-transparent anti-aliased drawing (renderer polylines with
   alpha, e.g. glow bands) far more than plain fills: removing a full-window
   `drawFilledRectangle` and the filled face polygon changed nothing, while
@@ -159,6 +163,17 @@ the emulator's numbers above:
 - It also replaces `system.playFile`, `playNumber`, `playBeep`,
   `playSystemSound` and `vibration` with `print`: in the emulator, audio and
   vibration appear as lines in the Lua console instead of sound.
+  `system.stopPlayback` is **not** replaced, so a stop leaves no console
+  line; it shows only as the repeating lines ending (Flameout Alarm,
+  2026-10-06).
+- **`io.open` in the emulator needs a relative path** (JETI Studio 6.04,
+  2026-10-05, Flameout Alarm): `io.open("/Apps/AG-FlmOt/cycle.wav", "r")`
+  returns nil, while `io.open("Apps/AG-FlmOt/cycle.wav", "r")` works ("r"
+  and "rb" alike). The transmitter opens the absolute path (Speed Gauge's
+  voice check passes there). A file-existence check should try the
+  absolute path, then the same path without its leading "/". Playback keeps
+  the absolute path. Speed Gauge 0.3.0's check doesn't do this yet, so in
+  the emulator it always falls back to DFM's sounds and `playNumber`.
 - **The emulator plays no Lua audio even without that app** (JETI Studio,
   firmware 6.04, observed 2026-10-03: `playFile` with the telemetry app
   removed was silent). Anything that must be heard, such as WAV formats and

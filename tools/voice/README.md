@@ -67,12 +67,44 @@ The normal deploy copies the voice with the app's asset folder (see
 Copy-Item src\Apps\AG-SpdGa $dst -Recurse -Force
 ```
 
+## Flameout Alarm sounds
+
+`make_flameout.py` generates Flameout Alarm's sounds (spec 003, FR-026 to
+FR-028; research R5) into `src/Apps/AG-FlmOt/`, using the same Amy model
+and this script's helpers (it doesn't change `make_voice.py`):
+
+| File | Content |
+| --- | --- |
+| `cycle.wav` | Urgent "Flameout!" ×3, then the lock tone; exactly 5.000 s (one alarm cycle) |
+| `cycletl.wav` | The same with "Engine telemetry lost" after the callout; exactly 5.000 s |
+| `tlost.wav` | "Engine telemetry lost" |
+| `armed.wav` | "Flameout alarm armed" |
+| `relit.wav` | "Engine relit" |
+
+```powershell
+python tools/voice/make_flameout.py --model C:\path\to\en_US-amy-medium.onnx
+```
+
+Options: `--out` (default `src/Apps/AG-FlmOt`) and `--rate` (default 22050).
+
+The urgent callout is made in Python, without ffmpeg: Piper length scale
+0.749 (0.70 × 1.07), noise scale 0.5, then resampled so it plays 7% faster
+and about one semitone higher, a 150 Hz high-pass, +4 dB at 3 kHz and
+compression (−18 dB threshold, ratio 4, 3 ms attack, 60 ms release, +4 dB
+makeup). The other phrases use Speed Gauge's normal pace (1.5). The lock
+tone is 1800 Hz plus a 3600 Hz overtone, 45 ms on and 35 ms off.
+
+The self-check exits 1 if a file is missing, a cycle file isn't exactly
+5.000 s, the callout runs over 2.5 s, or the voice part of `cycletl.wav`
+runs over 4.0 s. The files are committed, under CC BY-SA 4.0.
+
 ## Licensing
 
 - **Voice model:** "Amy" (`en_US-amy-medium`) by Mycroft / Rhasspy is
   licensed CC BY-SA 4.0, and the license of the recordings it was trained on
-  is undocumented. The committed set in `src/Apps/AG-SpdGa/voice/` is
-  therefore CC BY-SA 4.0, not MIT; keep its `CREDITS.txt` with it.
+  is undocumented. The committed sets in `src/Apps/AG-SpdGa/voice/` and
+  `src/Apps/AG-FlmOt/` are therefore CC BY-SA 4.0, not MIT; keep their
+  `CREDITS.txt` with them.
 - **Piper:** the `piper-tts` package is GPL-3.0-or-later
   ([OHF-Voice/piper1-gpl](https://github.com/OHF-Voice/piper1-gpl)),
   continuing the original MIT-licensed

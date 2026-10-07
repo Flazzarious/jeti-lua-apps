@@ -1,0 +1,48 @@
+<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 330 200' width='990' height='600'>
+<rect width='330' height='200' fill='rgb(235,235,235)'/>
+<text x='10' y='16' font-family='Arial, Helvetica, sans-serif' font-weight='bold' font-size='9' fill='rgb(170,170,170)'>Double size: armed</text>
+<rect x='10' y='20' width='150' height='68' fill='rgb(18,20,24)'/>
+<polygon points='14.0,82.0 24.0,76.1 24.0,69.2 14.0,76.0' fill='rgb(0,190,255)'/>
+<polygon points='26.0,74.9 36.0,69.6 36.0,61.8 26.0,67.9' fill='rgb(0,190,255)'/>
+<polygon points='38.0,68.6 48.0,63.9 48.0,55.0 38.0,60.6' fill='rgb(0,190,255)'/>
+<polygon points='50.0,63.0 60.0,58.9 60.0,49.0 50.0,54.0' fill='rgb(0,190,255)'/>
+<polygon points='62.0,58.1 72.0,54.6 72.0,43.7 62.0,48.1' fill='rgb(0,190,255)'/>
+<polygon points='74.0,54.0 84.0,51.0 84.0,39.1 74.0,42.9' fill='rgb(0,190,255)'/>
+<polygon points='86.0,50.4 96.0,48.0 96.0,35.1 86.0,38.4' fill='rgb(0,190,255)'/>
+<polygon points='98.0,47.6 108.0,45.7 108.0,31.7 98.0,34.5' fill='rgb(0,190,255)'/>
+<polygon points='110.0,45.4 120.0,44.0 120.0,29.0 110.0,31.2' fill='rgb(0,190,255)'/>
+<polygon points='122.0,43.7 132.0,42.8 132.0,26.8 122.0,28.6' fill='rgb(0,190,255)'/>
+<polygon points='134.0,42.7 144.0,42.2 144.0,25.2 134.0,26.5' fill='rgb(34,38,44)' stroke='rgb(70,74,80)' stroke-width='0.6'/>
+<polygon points='146.0,42.1 156.0,42.0 156.0,24.0 146.0,25.0' fill='rgb(34,38,44)' stroke='rgb(70,74,80)' stroke-width='0.6'/>
+<line x1='49.5' y1='66.2' x2='49.5' y2='51.2' stroke='rgb(255,225,0)' stroke-width='2'/>
+<text x='14' y='33' font-family='Arial, Helvetica, sans-serif' font-weight='bold' font-size='12' fill='rgb(0,190,255)'>ARMED</text>
+<text x='156' y='72' font-family='Arial, Helvetica, sans-serif' font-weight='bold' font-size='22' fill='rgb(255,255,255)' text-anchor='end'>112,400</text>
+<text x='156' y='84' font-family='Arial, Helvetica, sans-serif' font-weight='bold' font-size='9' fill='rgb(170,170,170)' text-anchor='end'>RPM</text>
+<text x='170' y='16' font-family='Arial, Helvetica, sans-serif' font-weight='bold' font-size='9' fill='rgb(170,170,170)'>Double size: flameout</text>
+<rect x='170' y='20' width='150' height='68' fill='rgb(18,20,24)'/>
+<polygon points='174.0,82.0 184.0,76.1 184.0,69.2 174.0,76.0' fill='rgb(34,38,44)' stroke='rgb(70,74,80)' stroke-width='0.6'/>
+<polygon points='186.0,74.9 196.0,69.6 196.0,61.8 186.0,67.9' fill='rgb(34,38,44)' stroke='rgb(70,74,80)' stroke-width='0.6'/>
+<polygon points='198.0,68.6 208.0,63.9 208.0,55.0 198.0,60.6' fill='rgb(34,38,44)' stroke='rgb(70,74,80)' stroke-width='0.6'/>
+<polygon points='210.0,63.0 220.0,58.9 220.0,49.0 210.0,54.0' fill='rgb(34,38,44)' stroke='rgb(70,74,80)' stroke-width='0.6'/>
+<polygon points='222.0,58.1 232.0,54.6 232.0,43.7 222.0,48.1' fill='rgb(34,38,44)' stroke='rgb(70,74,80)' stroke-width='0.6'/>
+<polygon points='234.0,54.0 244.0,51.0 244.0,39.1 234.0,42.9' fill='rgb(34,38,44)' stroke='rgb(70,74,80)' stroke-width='0.6'/>
+<polygon points='246.0,50.4 256.0,48.0 256.0,35.1 246.0,38.4' fill='rgb(34,38,44)' stroke='rgb(70,74,80)' stroke-width='0.6'/>
+<polygon points='258.0,47.6 268.0,45.7 268.0,31.7 258.0,34.5' fill='rgb(34,38,44)' stroke='rgb(70,74,80)' stroke-width='0.6'/>
+<polygon points='270.0,45.4 280.0,44.0 280.0,29.0 270.0,31.2' fill='rgb(34,38,44)' stroke='rgb(70,74,80)' stroke-width='0.6'/>
+<polygon points='282.0,43.7 292.0,42.8 292.0,26.8 282.0,28.6' fill='rgb(34,38,44)' stroke='rgb(70,74,80)' stroke-width='0.6'/>
+<polygon points='294.0,42.7 304.0,42.2 304.0,25.2 294.0,26.5' fill='rgb(34,38,44)' stroke='rgb(70,74,80)' stroke-width='0.6'/>
+<polygon points='306.0,42.1 316.0,42.0 316.0,24.0 306.0,25.0' fill='rgb(34,38,44)' stroke='rgb(70,74,80)' stroke-width='0.6'/>
+<line x1='209.5' y1='66.2' x2='209.5' y2='51.2' stroke='rgb(255,225,0)' stroke-width='2'/>
+<rect x='174' y='22' width='142' height='24' fill='rgb(255,45,30)'/>
+<text x='245' y='41' font-family='Arial, Helvetica, sans-serif' font-weight='bold' font-size='20' fill='rgb(255,255,255)' text-anchor='middle'>FLAMEOUT</text>
+<text x='316' y='72' font-family='Arial, Helvetica, sans-serif' font-weight='bold' font-size='22' fill='rgb(255,255,255)' text-anchor='end'>4,800</text>
+<text x='316' y='84' font-family='Arial, Helvetica, sans-serif' font-weight='bold' font-size='9' fill='rgb(170,170,170)' text-anchor='end'>RPM</text>
+<text x='10' y='116' font-family='Arial, Helvetica, sans-serif' font-weight='bold' font-size='9' fill='rgb(170,170,170)'>Single size: armed</text>
+<rect x='10' y='120' width='150' height='23' fill='rgb(18,20,24)'/>
+<rect x='14' y='128' width='84' height='8' fill='rgb(34,38,44)' stroke='rgb(70,74,80)' stroke-width='0.6'/>
+<rect x='14' y='128' width='67.4' height='8' fill='rgb(0,190,255)'/>
+<line x1='35.0' y1='125' x2='35.0' y2='139' stroke='rgb(255,225,0)' stroke-width='2'/>
+<text x='156' y='133' font-family='Arial, Helvetica, sans-serif' font-weight='bold' font-size='13' fill='rgb(255,255,255)' text-anchor='end'>112,400</text>
+<text x='156' y='141' font-family='Arial, Helvetica, sans-serif' font-weight='bold' font-size='7' fill='rgb(0,190,255)' text-anchor='end'>ARMED</text>
+<text x='170' y='130' font-family='Arial, Helvetica, sans-serif' font-weight='bold' font-size='7' fill='rgb(120,120,120)'>Mockup in Lua coordinates (150 x 68 / 150 x 23).</text><text x='170' y='140' font-family='Arial, Helvetica, sans-serif' font-weight='bold' font-size='7' fill='rgb(120,120,120)'>Fonts approximate FONT_BIG / FONT_MINI.</text><text x='170' y='150' font-family='Arial, Helvetica, sans-serif' font-weight='bold' font-size='7' fill='rgb(120,120,120)'>Yellow bar = idle RPM. Full scale = 4 x idle.</text>
+</svg>

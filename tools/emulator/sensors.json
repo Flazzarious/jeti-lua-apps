@@ -52,5 +52,26 @@
         "lowerBound": 0,
         "upperBound": 83.3,
         "input": "P6"
+    },
+    {
+        "id": 3,
+        "param": 0,
+        "decimals": 0,
+        "type": 1,
+        "label": "Turbine",
+        "unit": "",
+        "sensorName": "Turbine"
+    },
+    {
+        "id": 3,
+        "param": 1,
+        "decimals": 0,
+        "type": 1,
+        "label": "RPM",
+        "unit": "rpm",
+        "sensorName": "Turbine",
+        "lowerBound": 0,
+        "upperBound": 160000,
+        "input": "P8"
     }
 ]
