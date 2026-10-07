@@ -330,7 +330,12 @@ filled `lcd.renderer()` polygons at full opacity (one renderer reused, as
 Speed Gauge does) and the idle marker as a filled rectangle. Unlit segments
 get a dim fill plus a 1 px outline polyline.
 
-**Cost:** Speed Gauge measured that opaque fills are cheap and
+**Measured (2026-10-06, DS-24 II, `DEBUG_CPU`):** 5–6% of the per-call
+budget for the double-size window (5% armed, 6% with the FLAMEOUT banner),
+less than half of Speed Gauge's double-size dial. No fallback needed. Both
+window sizes confirmed on the transmitter by screenshot.
+
+**Cost (planning estimate):** Speed Gauge measured that opaque fills are cheap and
 semi-transparent anti-aliased polylines are what cost CPU. 12 polygons and
 12 thin opaque outlines should stay far below Speed Gauge's double-size
 14–18%. Measured with a `DEBUG_CPU` flag (off for release), as in Speed

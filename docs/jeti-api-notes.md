@@ -137,6 +137,10 @@ the emulator's numbers above:
 - To see live per-call numbers, call `system.getCPU()` at the end of `loop()`
   and of the print function and log them (Speed Gauge was measured this way:
   init 24, loop 0–1, small/double draw 12–18, full-screen draw 27–43).
+- Flameout Alarm's double-size window (12 opaque renderer polygons, 12
+  thin opaque outlines, three texts) measured **5–6%** per call on the
+  DS-24 II (2026-10-06, `DEBUG_CPU`): 5% armed, 6% with the FLAMEOUT
+  banner. Opaque fills and outlines are cheap, as below.
 - Cost follows semi-transparent anti-aliased drawing (renderer polylines with
   alpha, e.g. glow bands) far more than plain fills: removing a full-window
   `drawFilledRectangle` and the filled face polygon changed nothing, while
