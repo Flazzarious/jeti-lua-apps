@@ -3306,6 +3306,67 @@
      "size": 5683
     }
    ]
+  },
+  {
+   "id": 0,
+   "version": "0.1.0",
+   "author": "Aaron George",
+   "hw": [
+    3866,
+    3867
+   ],
+   "releaseDate": "Wed, 07 Oct 2026 02:45:01 +0000",
+   "name": {
+    "en": "Flameout Alarm (DC/DS-24II)"
+   },
+   "description": {
+    "en": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/main/docs/apps/flameout-alarm.html"
+   },
+   "previewIcon": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/main/docs/apps/img/flameout-alarm-icon.png",
+   "files": [
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-FlmOt-v0.1.0/src/Apps/AG-FlmOt.lua",
+     "destination": "Apps/AG-FlmOt.lua",
+     "hash": "f3362599a9cdb53d28248691fbd8d8588a94fef7",
+     "size": 34889
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-FlmOt-v0.1.0/src/Apps/AG-FlmOt/CREDITS.txt",
+     "destination": "Apps/AG-FlmOt/CREDITS.txt",
+     "hash": "f035c1fc9ae8ee3039a58473756f5fb4095b83bf",
+     "size": 958
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-FlmOt-v0.1.0/src/Apps/AG-FlmOt/armed.wav",
+     "destination": "Apps/AG-FlmOt/armed.wav",
+     "hash": "a3c33f0d40081ab65a8c0ebba28e340c4243960c",
+     "size": 56876
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-FlmOt-v0.1.0/src/Apps/AG-FlmOt/cycle.wav",
+     "destination": "Apps/AG-FlmOt/cycle.wav",
+     "hash": "a889cfeb6a244c44fa0df11320dcc0e7a27d088a",
+     "size": 220544
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-FlmOt-v0.1.0/src/Apps/AG-FlmOt/cycletl.wav",
+     "destination": "Apps/AG-FlmOt/cycletl.wav",
+     "hash": "40bae7cb86080d64b61922bdfb44b0ba99edf4b3",
+     "size": 220544
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-FlmOt-v0.1.0/src/Apps/AG-FlmOt/relit.wav",
+     "destination": "Apps/AG-FlmOt/relit.wav",
+     "hash": "3f6e0e3ebb93557d69bfab818d33d1623e08c064",
+     "size": 28308
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-FlmOt-v0.1.0/src/Apps/AG-FlmOt/tlost.wav",
+     "destination": "Apps/AG-FlmOt/tlost.wav",
+     "hash": "bc1d8c0c5f80eef617f69aaee288eb5cd74ff876",
+     "size": 53860
+    }
+   ]
   }
  ]
 }
