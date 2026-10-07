@@ -20,6 +20,7 @@ gauge for the JETI **DS-24 II / DC-24 II**.
   (double size) or a full-screen dial with stall, overspeed, air density,
   elevation, temperature and raw sensor speed.
 
+  ![Speed Gauge double size, on the main screen](https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/main/docs/apps/img/speed-gauge-double.png)
   ![Speed Gauge single size, on the main screen](https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/main/docs/apps/img/speed-gauge-single.png)
 - **Air density correction** (optional) shows true airspeed from your field
   elevation and the temperature: standard, entered by hand, or read live
