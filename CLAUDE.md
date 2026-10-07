@@ -5,6 +5,13 @@ built spec-first with GitHub Spec Kit (`/speckit-specify`, `/speckit-plan`,
 `/speckit-tasks`, `/speckit-implement`). Each feature gets its own
 `specs/NNN-name/`. A feature may create a new app or change an existing one.
 
+## Open to-dos for Aaron
+
+At the start of a session, remind Aaron of any items here before starting
+other work. Remove an item once he says it's done.
+
+- Install and set up RTK to help with console commands.
+
 ## Apps in this repo
 
 | App (menu name) | Script | Spec | Based on |
