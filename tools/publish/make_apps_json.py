@@ -3,41 +3,57 @@
 Copyright (c) 2026 Aaron George
 SPDX-License-Identifier: MIT
 
-JETI Studio (and the Jeti App Manager) install Lua apps from a JSON source
-file that users add under File -> Configuration, one URL per line. For each
-app it lists the author, version, a preview image, a Markdown description,
-the minimum firmware, and every file with the transmitter folder it goes to.
-Format: https://github.com/nightflyer88/JetiAppManager#source-file
+JETI Studio installs Lua apps from JSON source files that users add under
+File -> Configuration. This writes one in JETI's own format, the format of
+JETI's catalog (http://support.jetimodel.cz/files/update-dcds/apps.json)
+and of JETI Studio's AppGenerator:
 
-Each app's files are read from its release tag, and their download links
-point at that tag, so users always install exactly the released version.
-The description and preview image come from `main`. Run from the repo root
-after tagging a release, then commit Apps.json and merge it to `main`:
+    {"applications": [{"id": 0, "version": ..., "author": ...,
+      "hw": [transmitter type IDs], "releaseDate": RFC 2822 date,
+      "name": {"en": ...}, "description": {"en": URL of an HTML page},
+      "previewIcon": URL, "files": [{"url", "destination", "hash", "size"}]}]}
+
+`destination` is relative to the SD card (e.g. "Apps/AG-SpdGa.lua"),
+`hash` is the file's SHA-1 and `size` its length in bytes. Each app's files
+are read from its release tag, and their download links point at that tag,
+so users always install exactly the released version. The description page
+and icon come from `main`.
+
+Run from the repo root after tagging a release, then commit Apps.json and
+merge it to `main`:
 
     python tools/publish/make_apps_json.py
 
 Standard library only.
 """
 
+import hashlib
 import json
 import subprocess
-from pathlib import Path
+from email.utils import format_datetime
+from datetime import datetime, timezone
+from pathlib import PurePosixPath
 from urllib.parse import quote
+from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[2]
 RAW = "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps"
+
+# Transmitter type IDs ("hw") in JETI's catalog: every "(DC/DS-24II)" app
+# there uses exactly 3866 and 3867 (the DS-24 II and DC-24 II).
+HW_DCDS24_II = [3866, 3867]
 
 # One entry per published app. "tag" is its release tag; "paths" are the
 # repo paths (files or folders) that make up the app on the transmitter.
 APPS = [
     {
-        "name": "Speed Gauge",
+        "name": "Speed Gauge (DC/DS-24II)",
         "script": "AG-SpdGa",
         "tag": "AG-SpdGa-v0.3.0",
         "author": "Aaron George (based on DFM Speed Announcer by Dave McQueeney)",
-        "requiredFirmware": 6.0,
-        "description": "docs/apps/speed-gauge.md",
-        "previewImg": "docs/apps/img/speed-gauge.png",
+        "hw": HW_DCDS24_II,
+        "description": "docs/apps/speed-gauge.html",
+        "previewIcon": "docs/apps/img/speed-gauge-icon.png",
         "paths": [
             "src/Apps/AG-SpdGa.lua",
             "src/Apps/AG-SpdGa",
@@ -48,9 +64,9 @@ APPS = [
 ]
 
 
-def git(*args):
+def git(*args, text=True):
     return subprocess.run(["git", *args], cwd=REPO, check=True,
-                          capture_output=True, text=True).stdout
+                          capture_output=True, text=text).stdout
 
 
 def url(ref, path):
@@ -58,44 +74,57 @@ def url(ref, path):
 
 
 def app_version(tag, script):
-    """APP_VERSION from the app's source at its tag, e.g. "V0.3.0"."""
+    """APP_VERSION from the app's source at its tag, e.g. "0.3.0"."""
     for line in git("show", f"{tag}:src/Apps/{script}.lua").splitlines():
         if line.startswith("local APP_VERSION"):
-            return "V" + line.split('"')[1]
+            return line.split('"')[1]
     raise SystemExit(f"APP_VERSION not found in {script}.lua at {tag}")
+
+
+def release_date(tag):
+    """The tag's date as RFC 2822, e.g. "Sun, 04 Oct 2026 12:00:00 +0000"."""
+    stamp = int(git("log", "-1", "--format=%ct", tag).strip())
+    return format_datetime(datetime.fromtimestamp(stamp, timezone.utc))
 
 
 def entry(app):
     tag = app["tag"]
-    files = git("ls-tree", "-r", "--name-only", tag, "--", *app["paths"]).split()
-    if not files:
+    paths = git("ls-tree", "-r", "--name-only", tag, "--", *app["paths"]).split()
+    if not paths:
         raise SystemExit(f"no files for {app['name']} at {tag}")
-    sources, dests = [], []
-    for f in sorted(files):
-        # src/Apps mirrors /Apps on the transmitter's SD card.
-        dest = "/" + str(Path(f).parent.relative_to("src")).replace("\\", "/")
-        sources.append(url(tag, f))
-        dests.append(dest)
+    files = []
+    for p in sorted(paths):
+        data = git("show", f"{tag}:{p}", text=False)
+        files.append({
+            "url": url(tag, p),
+            # src/Apps mirrors Apps on the transmitter's SD card.
+            "destination": str(PurePosixPath(p).relative_to("src")),
+            "hash": hashlib.sha1(data).hexdigest(),
+            "size": len(data),
+        })
     return {
-        "author": app["author"],
+        "id": 0,
         "version": app_version(tag, app["script"]),
-        "previewImg": url("main", app["previewImg"]),
-        "description": url("main", app["description"]),
-        "requiredFirmware": app["requiredFirmware"],
-        # DC/DS-24 family only: the gauge targets the DS-24 II.
-        "sourceFile24": sources,
-        "destinationPath": dests,
+        "author": app["author"],
+        "hw": app["hw"],
+        "releaseDate": release_date(tag),
+        "name": {"en": app["name"]},
+        "description": {"en": url("main", app["description"])},
+        "previewIcon": url("main", app["previewIcon"]),
+        "files": files,
     }
 
 
 def main():
-    out = {app["name"]: entry(app) for app in APPS}
+    out = {"applications": [entry(app) for app in APPS]}
     path = REPO / "Apps.json"
     # open() with newline= (Path.write_text has none before Python 3.10).
     with open(path, "w", encoding="utf-8", newline="\n") as f:
-        f.write(json.dumps(out, indent=2, ensure_ascii=False) + "\n")
-    for name, e in out.items():
-        print(f"{name} {e['version']}: {len(e['sourceFile24'])} files")
+        f.write(json.dumps(out, indent=1, ensure_ascii=False) + "\n")
+    for a in out["applications"]:
+        total = sum(f["size"] for f in a["files"])
+        print(f"{a['name']['en']} {a['version']}: {len(a['files'])} files, "
+              f"{total / 1e6:.1f} MB, {a['releaseDate']}")
     print(f"wrote {path.relative_to(REPO)}")
 
 

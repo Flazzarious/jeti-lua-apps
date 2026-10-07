@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title>Speed Gauge</title>
+    </head>
+    <body style="padding:10px;float:left;max-width:500px;">
+        <h1>Speed Gauge</h1>
+        <p>Spoken airspeed callouts, stall and overspeed warnings, and a
+        speedometer gauge for the DS-24 II / DC-24 II.</p>
+        <img src="img/speed-gauge.png" alt="Speed Gauge full screen" width="480">
+        <ul>
+            <li><b>Speed callouts</b> in a clear voice: more often when the
+            speed changes, every few seconds below landing speed, or a fast
+            number-only mode on a switch.</li>
+            <li>Callouts wait until the model first passes <i>Callouts start
+            above</i> (default 30 mph), and are never spoken below 5 mph.</li>
+            <li><b>Max speed callout</b> shortly after each new peak.</li>
+            <li><b>Warnings:</b> stall (at most twice per slowdown), overspeed
+            and "airspeed alive", with stick vibration.</li>
+            <li><b>Gauge:</b> a speed bar (single size), a small dial (double
+            size) or a full-screen dial with stall, overspeed, air density,
+            elevation, temperature and raw sensor speed.</li>
+            <li><b>Air density correction</b> (optional): true airspeed from
+            field elevation and the temperature: standard, entered by hand,
+            or live from a sensor such as the MSpeed's.</li>
+            <li>Works with a pitot airspeed sensor (e.g. JETI MSpeed) or GPS
+            speed.</li>
+        </ul>
+        <img src="img/speed-gauge-single.png" alt="Speed Gauge single size" width="480">
+        <h3>Setting up</h3>
+        <ol>
+            <li>Add <b>Speed Gauge</b> in <i>Applications - User Applications</i>.</li>
+            <li>In its settings choose the speed sensor and units, assign a
+            callouts switch, and set your model's landing, stall and
+            overspeed speeds. Set <i>Gauge max limit</i> to your sensor's top
+            speed (MSpeed: 350 km/h / 215 mph; MSpeed 450 EX: 450 km/h /
+            280 mph).</li>
+            <li>Put <b>Speed Gauge</b> or <b>Speed Gauge (full screen)</b> on
+            a page in <i>Timers/Sensors - Displayed telemetry</i>.</li>
+        </ol>
+        <p>Version: <b>0.3.0</b></p>
+        <p>Compatibility: <b>DC/DS-24II</b>, firmware 6.x</p>
+        <p>Based on <b>DFM Speed Announcer</b> by DFM (Dave McQueeney), MIT
+        license. Voice: Piper text-to-speech with the "Amy" voice by Mycroft /
+        Rhasspy; the voice files are licensed CC BY-SA 4.0. Speed Gauge: MIT
+        license, Copyright (c) 2026 Aaron George.</p>
+        <p>Source and full credits:
+        <a href="https://github.com/Flazzarious/jeti-lua-apps">github.com/Flazzarious/jeti-lua-apps</a></p>
+    </body>
+</html>
