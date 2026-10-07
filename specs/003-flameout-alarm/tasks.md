@@ -203,6 +203,10 @@ built and checked on its own.
 - [ ] T054 MANUAL: Transmitter checks 27–28 (telemetry-loss timing with the receiver off; install on a card with no other AG- apps, SC-007) and quickstart section 4 bench test with a real ECU (start overshoot never drops below the arming threshold, Cut shutdown silent, sensor label and unit). Record a Jeti log of a start and shutdown for future defaults
 - [ ] T055 Record the transmitter findings from T046, T049 and T054 in `docs/jeti-api-notes.md` (gap between `playBeep` repeats, firmware telemetry "valid" timeout, sweep CPU figure, whether `stopPlayback(AUDIO_IMMEDIATE)` cuts mid-file cleanly) and in `specs/003-flameout-alarm/research.md` where they settle an open point
 
+- [ ] T056 [P] Add the JETI Studio description page for Flameout Alarm, following Speed Gauge's: `docs/apps/flameout-alarm.md` and `docs/apps/flameout-alarm.html` (what it does, advisory note, ECU support, setup, test alarm switch, CC BY-SA 4.0 sounds), with transmitter screenshots of the double and single windows in `docs/apps/img/` (from T046). Link it from the README's "Install with JETI Studio" section
+- [ ] T057 [P] Make the app icon `docs/apps/img/flameout-alarm-icon.png` with `tools/publish/make_icon.py` (add an option or constant for the output path and design rather than overwriting Speed Gauge's icon; keep the "AG" monogram style)
+- [ ] T058 After the release tag `AG-FlmOt-v0.1.0` exists (CLAUDE.md branch rules), add a Flameout Alarm entry to `APPS` in `tools/publish/make_apps_json.py` (script `AG-FlmOt`, files `src/Apps/AG-FlmOt.lua` and `src/Apps/AG-FlmOt`, description and icon from T056/T057), run it, and commit `Apps.json` for the merge to `main`. Try it first with `--local` in JETI Studio
+
 ---
 
 ## Dependencies & Execution Order
