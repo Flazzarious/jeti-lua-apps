@@ -747,7 +747,8 @@ local C = {
 
 -- Sweep geometry (design/mockup.py), in transmitter window coordinates
 -- (150 x 68). Iterate these on the transmitter (T046).
-local SW = { n = 12, x0 = 4, x1 = 146, gap = 2, base = 22, rise = 40, curve = 2.2, h0 = 6, dh = 12 }
+local SW = { n = 12, x0 = 4, x1 = 146, gap = 2, base = 22, rise = 40, curve = 2.2, h0 = 6, dh = 12,
+  labelMaxW = 70 }            -- widest bold state label that clears the sweep (y 2-19)
 SW.segW = (SW.x1 - SW.x0 - SW.gap * (SW.n - 1)) / SW.n
 
 -- Bottom edge and height of the sweep at fraction t (0 left .. 1 right).
@@ -860,8 +861,16 @@ local function drawDouble(r, ox)
     local tw = lcd.getTextWidth(FONT_BIG, TXT.flameout)
     lcd.drawText(ox + 75 - tw // 2, 4, TXT.flameout, FONT_BIG)
   else
+    -- Bold where it stays clear of the rising sweep (ARMED, DISARMED, OFF,
+    -- TEST); the long labels (NO TELEMETRY, NO SENSOR) would run into it,
+    -- so they stay small (user feedback 2026-10-06).
+    local text = stateText()
+    local font = FONT_BOLD
+    if lcd.getTextWidth(font, text) > SW.labelMaxW then
+      font = FONT_MINI
+    end
     setColor(stateColor())
-    lcd.drawText(ox + 4, 2, stateText(), FONT_MINI)
+    lcd.drawText(ox + 4, 2, text, font)
   end
   setColor(C.num)
   drawRight(st.rpmText, ox + 146, 32, FONT_BIG)
