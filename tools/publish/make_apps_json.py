@@ -66,6 +66,19 @@ APPS = [
             "src/Apps/lib/ag_gauge.lua",
         ],
     },
+    {
+        "name": "Flameout Alarm (DC/DS-24II)",
+        "script": "AG-FlmOt",
+        "tag": "AG-FlmOt-v0.1.0",
+        "author": "Aaron George",
+        "hw": HW_DCDS24_II,
+        "description": "docs/apps/flameout-alarm.html",
+        "previewIcon": "docs/apps/img/flameout-alarm-icon.png",
+        "paths": [
+            "src/Apps/AG-FlmOt.lua",
+            "src/Apps/AG-FlmOt",
+        ],
+    },
 ]
 
 
