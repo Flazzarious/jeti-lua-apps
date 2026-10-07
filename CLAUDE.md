@@ -17,6 +17,7 @@ other work. Remove an item once he says it's done.
 | App (menu name) | Script | Spec | Based on |
 | --- | --- | --- | --- |
 | Speed Gauge | `src/Apps/AG-SpdGa.lua` | `specs/001-speed-gauge/` | DFM Speed Announcer (Dave McQueeney, MIT) |
+| Flameout Alarm | `src/Apps/AG-FlmOt.lua` | `specs/003-flameout-alarm/` | original |
 
 Keep this table current when an app is added.
 

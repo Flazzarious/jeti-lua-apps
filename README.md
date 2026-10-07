@@ -8,11 +8,73 @@ spec-driven workflow (GitHub Spec Kit + Claude Code) in VS Code.
 | App | Script | Status | Spec | Based on |
 | --- | --- | --- | --- | --- |
 | Speed Gauge | [`AG-SpdGa.lua`](src/Apps/AG-SpdGa.lua) | Released (0.3.0) | [001](specs/001-speed-gauge/spec.md) | DFM Speed Announcer by Dave McQueeney (MIT) |
+| Flameout Alarm | [`AG-FlmOt.lua`](src/Apps/AG-FlmOt.lua) | In development (0.1.0) | [003](specs/003-flameout-alarm/spec.md) | Original |
 
 Speed Gauge speaks in its own voice (Piper "Amy"), in
 `src/Apps/AG-SpdGa/voice/`. Those files are licensed CC BY-SA 4.0, not MIT
 (see [CREDITS.md](CREDITS.md)); [`tools/voice/`](tools/voice/README.md)
 regenerates them. Without them the app works in the transmitter's voice.
+
+### Flameout Alarm
+
+Watches a turbine's RPM telemetry and sounds an urgent, repeating alarm
+("Flameout! Flameout! Flameout!" and a lock tone every 5 seconds, with stick
+vibration) when the engine spools down after it has been running. A
+double-size window shows RPM as a segmented bar with an idle marker.
+
+**It is advisory only.** It never controls the model or the engine. It does
+not replace the ECU's own failsafe, shutdown or auto-restart logic, or the
+pilot's own monitoring.
+
+**It only works if the turbine's RPM reaches the transmitter as a normal
+telemetry sensor**, i.e. you can pick it in the transmitter's sensor list.
+What is known per ECU brand ([research](specs/003-flameout-alarm/research.md#r1-how-ecus-deliver-rpm-to-a-jeti-transmitter)):
+
+| ECU | RPM as a telemetry sensor |
+| --- | --- |
+| JetCat | Yes, through JetCat's, VSpeak's, Digitech's or CB-Electroniks' Jeti converter |
+| Xicoy (V6/V10, also JetsMunt) | Yes, through the Xicoy telemetry adapter (sensor group "Turbine") |
+| KingTech | Yes, through the KingTech telemetry unit or a VSpeak/Digitech converter |
+| Swiwin | Yes, through VSpeak's Swiwin converter. Direct connection: unconfirmed |
+| JetCentral | Unconfirmed: the Telemetry Adapter V2 uses its own Lua app |
+| Enjet Power | Unconfirmed |
+
+RPM shown only on a JetiBox screen, or only inside another maker's Lua app,
+can't be used. Swiwin users: set the receiver's output period to 11-13 ms,
+not "Auto" (a known Swiwin ECU issue, unrelated to this app).
+
+**Setup** (Applications → Flameout Alarm). Monitoring stays off until three
+things are set:
+
+- **RPM sensor.** If the ECU sends RPM in units other than RPM (e.g.
+  thousands), set **Sensor scale** so **Live RPM** reads true engine RPM.
+- **Idle RPM**, typed from the ECU's setup, in thousands (35.0 = 35,000
+  RPM). Compare it with **Live RPM** at idle. Too high, and the app arms only
+  on a run-up and a relight won't clear the alarm until you open the
+  throttle. Too low, and the alarm comes later and a restart clears it
+  sooner.
+- **Cut switch**, assigned in its Cut (engine off) position. Moving it to Cut
+  disarms the app silently and is the only way to silence an alarm.
+
+How it decides:
+
+- A turbine start overshoots idle and slowly settles back down, so the app
+  arms on an **arming threshold** below idle (default 90%) held for the
+  arming time (3 s). The arming threshold must stay above any RPM the engine
+  reaches before it runs on its own; raise the percentage if your engine's
+  start or auto-restart comes close to it.
+- RPM below the **flameout threshold** (default 70% of idle) for the
+  detection delay (1 s) starts the alarm. A throttle chop to idle stays
+  above it.
+- During an ECU auto-restart the alarm keeps going; it clears once RPM holds
+  the arming threshold for the arming time.
+- If telemetry stops for the telemetry-loss delay (2 s), the app says "Engine
+  telemetry lost" instead of alarming.
+
+A **Test alarm** switch plays the real alarm on the ground (not while armed).
+The sounds in `src/Apps/AG-FlmOt/` are generated with
+[`tools/voice/make_flameout.py`](tools/voice/README.md) and licensed CC BY-SA
+4.0, not MIT. Install = `AG-FlmOt.lua` plus the `AG-FlmOt/` folder.
 
 ## Install with JETI Studio
 
