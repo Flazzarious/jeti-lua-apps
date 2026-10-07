@@ -105,7 +105,7 @@ built and checked on its own.
 - [X] T021 [US2] Fill `onCut(now)` in `src/Apps/AG-FlmOt.lua` (row 1, FR-016): if `state == FLAMEOUT` call `stopAlarm()`; set `state = DISARMED`; clear `armSince`, `lowSince`, `invalidSince`, `tlPending`, `lost`. Silent: no sound of its own. Re-arming then needs the switch out of Cut and row 3 again
 - [X] T022 [US2] In `stepDisarmed` in `src/Apps/AG-FlmOt.lua`, after the switch to ARMED, play `SND.armed` with `AUDIO_QUEUE` when `sayArm == 1` and `fileOk.armed` (FR-009)
 - [X] T023 [US2] Add the `SIM` debug mode in `src/Apps/AG-FlmOt.lua` (research R12): when `SIM` is true, the sensor read in the `loop()` frame is replaced by a value from one `SIMP` table of profiles, each a list of `{ms, rpm}` points with linear interpolation and `rpm = -1` meaning invalid. Profiles: (1) normal flight: 0 → startup range 0–20,000 over 20 s, overshoot to 45,000, decay to 35,000 over 8 s, idle, run-ups to 120,000, chops to 35,000, landing, idle; (2) failed start: rises to 25,000 and falls to 0; (3) flameout: armed at 60,000 then falls to 0 over 3 s; (4) auto-restart: flameout, then 10,000 → 28,000 → 8,000 (failed attempt), then → 45,000 overshoot → 35,000; (5) dropouts: armed at 35,000 with invalid gaps of 0.5 s and 3 s. Select the profile with an extra selectbox row shown only when `SIM` is true, and restart the profile when selected. With `SIM` false none of this runs and the row isn't added
-- [ ] T024 [US2] MANUAL: Emulator with `SIM` on: profile 1 and 2 give zero alarms (SC-002, SC-003); profile 3 alarms within 1.5 s of crossing 24,500. Without `SIM`: quickstart scenario 7 (chop to 30,000: no alarm) and Cut during ARMED (silent DISARMED). Set `SIM = false` afterwards
+- [X] T024 [US2] MANUAL: Emulator with `SIM` on: profile 1 and 2 give zero alarms (SC-002, SC-003); profile 3 alarms within 1.5 s of crossing 24,500. Without `SIM`: quickstart scenario 7 (chop to 30,000: no alarm) and Cut during ARMED (silent DISARMED). Set `SIM = false` afterwards
 
 **Checkpoint**: The alarm fires on a flameout and stays silent in normal operation.
 
@@ -147,7 +147,7 @@ built and checked on its own.
 **Independent Test**: Quickstart scenario 12.
 
 - [X] T034 [US5] Check in `src/Apps/AG-FlmOt.lua` that `onCut` (T021) runs before any other row on the same tick, that it stops both the voice/tone file and pending fallback beeps (`beepAt`), and that after Cut the app stays DISARMED with low RPM and re-arms only after leaving Cut and holding `armRpm` for `armMs` (User Story 5 scenarios 1–3). Fix anything that doesn't
-- [ ] T035 [US5] MANUAL: Emulator, quickstart scenario 12, including Cut during the 2.5 s fallback beep wait (rename `cycle.wav` for that part)
+- [X] T035 [US5] MANUAL: Emulator, quickstart scenario 12, including Cut during the 2.5 s fallback beep wait (rename `cycle.wav` for that part)
 
 ---
 
