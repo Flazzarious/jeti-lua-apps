@@ -205,7 +205,7 @@ built and checked on its own.
 
 - [X] T056 [P] Add the JETI Studio description page for Flameout Alarm, following Speed Gauge's: `docs/apps/flameout-alarm.md` and `docs/apps/flameout-alarm.html` (what it does, advisory note, ECU support, setup, test alarm switch, CC BY-SA 4.0 sounds), with transmitter screenshots of the double and single windows in `docs/apps/img/` (from T046). Link it from the README's "Install with JETI Studio" section
 - [X] T057 [P] Make the app icon `docs/apps/img/flameout-alarm-icon.png` with `tools/publish/make_icon.py` (add an option or constant for the output path and design rather than overwriting Speed Gauge's icon; keep the "AG" monogram style)
-- [ ] T058 After the release tag `AG-FlmOt-v0.1.0` exists (CLAUDE.md branch rules), add a Flameout Alarm entry to `APPS` in `tools/publish/make_apps_json.py` (script `AG-FlmOt`, files `src/Apps/AG-FlmOt.lua` and `src/Apps/AG-FlmOt`, description and icon from T056/T057), run it, and commit `Apps.json` for the merge to `main`. Try it first with `--local` in JETI Studio
+- [X] T058 After the release tag `AG-FlmOt-v0.1.0` exists (CLAUDE.md branch rules), add a Flameout Alarm entry to `APPS` in `tools/publish/make_apps_json.py` (script `AG-FlmOt`, files `src/Apps/AG-FlmOt.lua` and `src/Apps/AG-FlmOt`, description and icon from T056/T057), run it, and commit `Apps.json` for the merge to `main`. Try it first with `--local` in JETI Studio
 
 ---
 
