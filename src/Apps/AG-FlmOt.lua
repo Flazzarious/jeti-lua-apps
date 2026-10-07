@@ -110,6 +110,7 @@ local d = {
   kScale = 1,               -- sensor value -> RPM
   idleRpm = 0, armRpm = 0, flRpm = 0, fullRpm = 1,
   armMs = 3000, detMs = 1000, lossMs = 2000,
+  ver = 0,                  -- bumped on every recompute; the window follows it
 }
 
 local function recompute()
@@ -126,6 +127,7 @@ local function recompute()
   d.armMs = cfg.armT * 100
   d.detMs = cfg.detT * 100
   d.lossMs = cfg.lossT * 100
+  d.ver = d.ver + 1
 end
 
 ------------------------------------------------------------------------------
@@ -736,22 +738,214 @@ local function stateText()
   return TXT.disarmed
 end
 
--- Text layout: any window size, theme colors.
+-- Colors: Speed Gauge's palette (its research R8). Red only for FLAMEOUT
+-- (FR-031a).
+local C = {
+  bg = { 8, 10, 14 }, lit = { 0, 190, 255 }, unlit = { 34, 38, 44 }, edge = { 70, 78, 90 },
+  idle = { 255, 225, 0 }, num = { 255, 255, 255 }, label = { 170, 170, 170 }, alarm = { 255, 45, 30 },
+}
+
+-- Sweep geometry (design/mockup.py), in transmitter window coordinates
+-- (150 x 68). Iterate these on the transmitter (T046).
+local SW = { n = 12, x0 = 4, x1 = 146, gap = 2, base = 22, rise = 40, curve = 2.2, h0 = 6, dh = 12 }
+SW.segW = (SW.x1 - SW.x0 - SW.gap * (SW.n - 1)) / SW.n
+
+-- Bottom edge and height of the sweep at fraction t (0 left .. 1 right).
+local function sweepAt(t)
+  return SW.base + SW.rise * (1 - t) ^ SW.curve, SW.h0 + SW.dh * t
+end
+
+local seg = {}                -- per segment: 8 integers, x/y of four corners
+local marker = { x = 0, y = 0, h = 0, ver = -1 }   -- idle marker, from recomputeMarker()
+local rend = nil ---@type Renderer|nil  -- one renderer, reused (Speed Gauge, verified)
+local cpuWorst = 0            -- DEBUG_CPU only
+local isDs24 = false          -- set in init(): the sweep needs a DS-24 II (R11)
+
+-- Segment corners, once in init(): no trig or allocation per frame (R11).
+local function buildSweep()
+  for i = 1, SW.n do
+    local xa = SW.x0 + (i - 1) * (SW.segW + SW.gap)
+    local xb = xa + SW.segW
+    local ya, ha = sweepAt((xa - SW.x0) / (SW.x1 - SW.x0))
+    local yb, hb = sweepAt((xb - SW.x0) / (SW.x1 - SW.x0))
+    seg[i] = {
+      math.floor(xa + 0.5), math.floor(ya + 0.5), math.floor(xb + 0.5), math.floor(yb + 0.5),
+      math.floor(xb + 0.5), math.floor(yb - hb + 0.5), math.floor(xa + 0.5), math.floor(ya - ha + 0.5),
+    }
+  end
+end
+
+-- Idle marker position. Recomputed when the settings change (d.ver), checked
+-- by the print function, so recompute() doesn't need to know about drawing.
+local function recomputeMarker()
+  if marker.ver == d.ver then
+    return
+  end
+  marker.ver = d.ver
+  local t = 0
+  if d.fullRpm > 0 then
+    t = math.min(1, d.idleRpm / d.fullRpm)
+  end
+  local y, h = sweepAt(t)
+  marker.x = math.floor(SW.x0 + t * (SW.x1 - SW.x0) + 0.5)
+  marker.y = math.floor(y - h + 0.5)
+  marker.h = math.floor(h + 0.5)
+end
+
+local function setColor(c)
+  lcd.setColor(c[1], c[2], c[3])
+end
+
+local function litCount()
+  if st.rpm == nil or st.rpm <= 0 then
+    return 0
+  end
+  return math.min(SW.n, math.ceil(SW.n * st.rpm / d.fullRpm))
+end
+
+-- State label color (contracts/telemetry-window.md).
+local function stateColor()
+  if st.state == S.ARMED and not st.lost and not st.testOn then
+    return C.lit
+  elseif st.state == S.OFF or (st.state == S.DISARMED and not st.testOn) then
+    return C.label
+  end
+  return C.num                -- TEST, NO SENSOR, NO TELEMETRY
+end
+
+local function drawRight(text, x, y, font)
+  lcd.drawText(x - lcd.getTextWidth(font, text), y, text, font)
+end
+
+-- One segment's four corners into the renderer; close = repeat the first
+-- for an outline.
+local function addQuad(r, p, ox, close)
+  r:reset()
+  r:addPoint(ox + p[1], p[2])
+  r:addPoint(ox + p[3], p[4])
+  r:addPoint(ox + p[5], p[6])
+  r:addPoint(ox + p[7], p[8])
+  if close then
+    r:addPoint(ox + p[1], p[2])
+  end
+end
+
+-- Double size (150 x 68): the segmented sweep of design/rpm-window-mockup.svg.
+-- Opaque fills and thin opaque outlines only: the cheap kind of drawing (R11).
+local function drawDouble(r, ox)
+  local lit = litCount()
+  for i = 1, SW.n do
+    local p = seg[i]
+    addQuad(r, p, ox, false)
+    if i <= lit then
+      setColor(C.lit)
+      r:renderPolygon()
+    else
+      setColor(C.unlit)
+      r:renderPolygon()
+      addQuad(r, p, ox, true)
+      setColor(C.edge)
+      r:renderPolyline(1)
+    end
+  end
+  if d.idleRpm > 0 then
+    setColor(C.idle)
+    lcd.drawFilledRectangle(ox + marker.x - 1, marker.y - 3, 2, marker.h + 6)
+  end
+
+  if st.state == S.FLAMEOUT then
+    setColor(C.alarm)
+    lcd.drawFilledRectangle(ox + 4, 2, 142, 24)
+    setColor(C.num)
+    local tw = lcd.getTextWidth(FONT_BIG, TXT.flameout)
+    lcd.drawText(ox + 75 - tw // 2, 4, TXT.flameout, FONT_BIG)
+  else
+    setColor(stateColor())
+    lcd.drawText(ox + 4, 2, stateText(), FONT_MINI)
+  end
+  setColor(C.num)
+  drawRight(st.rpmText, ox + 146, 32, FONT_BIG)
+  setColor(C.label)
+  drawRight((st.state == S.FLAMEOUT and st.lost) and TXT.noTel or "RPM", ox + 146, 54, FONT_MINI)
+end
+
+-- Single size (150 x 23): straight bar, idle marker, number (FR-031c).
+-- Bar on top, state label under it, number on the right clear of the bar.
+local BAR = { x = 4, y = 2, w = 76, h = 7 }
+
+local function drawSingle(ox)
+  if st.state == S.FLAMEOUT then
+    setColor(C.alarm)
+    lcd.drawFilledRectangle(ox, 0, 150, 23)
+    setColor(C.num)
+    lcd.drawText(ox + 4, 3, TXT.flameout, FONT_NORMAL)
+    -- "---" without data: "NO TELEMETRY" doesn't fit beside FLAMEOUT here.
+    drawRight(st.rpmText, ox + 146, 3, FONT_NORMAL)
+    return
+  end
+  setColor(C.unlit)
+  lcd.drawFilledRectangle(ox + BAR.x, BAR.y, BAR.w, BAR.h)
+  local fill = 0
+  if st.rpm ~= nil and st.rpm > 0 then
+    fill = math.min(BAR.w, math.floor(BAR.w * st.rpm / d.fullRpm + 0.5))
+  end
+  if fill > 0 then
+    setColor(C.lit)
+    lcd.drawFilledRectangle(ox + BAR.x, BAR.y, fill, BAR.h)
+  end
+  if d.idleRpm > 0 then
+    setColor(C.idle)
+    local x = ox + BAR.x + math.floor(BAR.w * math.min(1, d.idleRpm / d.fullRpm) + 0.5)
+    lcd.drawFilledRectangle(x - 1, 0, 2, BAR.y + BAR.h + 2)
+  end
+  setColor(stateColor())
+  lcd.drawText(ox + 4, 11, stateText(), FONT_MINI)
+  setColor(C.num)
+  drawRight(st.rpmText, ox + 146, 3, FONT_NORMAL)
+end
+
+-- Not a DS-24 II: text only, theme colors (the alarm works everywhere).
 local function drawText(w)
   local r, g, b = lcd.getFgColor()
   lcd.setColor(r, g, b)
   if st.state == S.FLAMEOUT then
     lcd.drawText(4, 2, TXT.flameout, FONT_BIG)   -- dominant (FR-031)
-    local note = st.lost and TXT.noTel or st.rpmText  -- FR-020a: "no telemetry" note
-    lcd.drawText(w - 4 - lcd.getTextWidth(FONT_MINI, note), 24, note, FONT_MINI)
+    drawRight(st.lost and TXT.noTel or st.rpmText, w - 4, 24, FONT_MINI)
     return
   end
   lcd.drawText(4, 2, stateText(), FONT_MINI)
-  lcd.drawText(w - 4 - lcd.getTextWidth(FONT_NORMAL, st.rpmText), 2, st.rpmText, FONT_NORMAL)
+  drawRight(st.rpmText, w - 4, 2, FONT_NORMAL)
 end
 
 local function printRpm(w, h)
-  drawText(w)
+  if not isDs24 then
+    drawText(w)
+    return
+  end
+  local r = rend
+  if not r then
+    r = lcd.renderer()
+    rend = r
+  end
+  recomputeMarker()
+  local ox = 0
+  if w == 157 then            -- emulator: title inside the window (TITLE_H)
+    h = h - TITLE_H
+    ox = 3
+  end
+  setColor(C.bg)
+  lcd.drawFilledRectangle(0, 0, w, h)
+  if h >= 45 then
+    drawDouble(r, ox)
+    if DEBUG_CPU then
+      local cpu = system.getCPU()
+      cpuWorst = math.max(cpuWorst, cpu)
+      setColor(C.label)
+      lcd.drawText(ox + 4, 54, string.format("CPU %d/%d", cpu, cpuWorst), FONT_MINI)
+    end
+  else
+    drawSingle(ox)
+  end
 end
 
 ------------------------------------------------------------------------------
@@ -763,6 +957,8 @@ local function init()
   recompute()
   resetSession()
   checkAudio()                -- once: five file opens (R6)
+  buildSweep()
+  isDs24 = string.find(system.getDeviceType() or "", "24 II", 1, true) ~= nil
 
   system.registerForm(1, MENU_APPS, APP_NAME, initForm, nil, nil, closeForm)
   system.registerTelemetry(1, APP_NAME, 0, printRpm)
