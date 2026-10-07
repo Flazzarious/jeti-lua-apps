@@ -267,7 +267,23 @@ local function onCut()
   st.tlPending, st.lost = false, false
 end
 
-local function onInvalid(now)           -- row 2 (US6)
+-- Row 2 (FR-020, FR-020a): no valid data. Timers that could complete an
+-- arming, a flameout or a relight are cleared, so a loss never causes one.
+-- After the telemetry-loss delay: "Engine telemetry lost" once while ARMED,
+-- or once inside the next alarm cycle while FLAMEOUT (R4).
+local function onInvalid(now)
+  st.invalidSince = st.invalidSince or now
+  st.armSince, st.lowSince = nil, nil
+  if not st.lost and now - st.invalidSince >= d.lossMs then
+    st.lost = true
+    if st.state == S.ARMED then
+      if audio.tlost then
+        system.playFile(SND.tlost, AUDIO_IMMEDIATE)
+      end
+    elseif st.state == S.FLAMEOUT then
+      st.tlPending = true
+    end
+  end
 end
 
 -- Row 3 (FR-014): arms once RPM has held the arming threshold for the
@@ -333,7 +349,12 @@ local function stepCycle(now)
     if now - st.cycleAt >= CYCLE_MS then
       st.cycleAt = now          -- fell more than a cycle behind: restart the rhythm
     end
-    playCycle(now, SND.cycle)
+    if st.tlPending then        -- "Engine telemetry lost" inside this cycle, once (R4)
+      st.tlPending = false
+      playCycle(now, SND.cycletl)
+    else
+      playCycle(now, SND.cycle)
+    end
   end
 end
 
@@ -721,7 +742,8 @@ local function drawText(w)
   lcd.setColor(r, g, b)
   if st.state == S.FLAMEOUT then
     lcd.drawText(4, 2, TXT.flameout, FONT_BIG)   -- dominant (FR-031)
-    lcd.drawText(w - 4 - lcd.getTextWidth(FONT_MINI, st.rpmText), 24, st.rpmText, FONT_MINI)
+    local note = st.lost and TXT.noTel or st.rpmText  -- FR-020a: "no telemetry" note
+    lcd.drawText(w - 4 - lcd.getTextWidth(FONT_MINI, note), 24, note, FONT_MINI)
     return
   end
   lcd.drawText(4, 2, stateText(), FONT_MINI)

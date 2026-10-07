@@ -123,7 +123,7 @@ built and checked on its own.
 - [X] T028 [US3] Add rows 16–18 in `src/Apps/AG-FlmOt.lua`: "Arming time (s)" `armT` 10–100 step 5; "Detection delay (s)" `detT` 3–50 step 1; "Telemetry loss after (s)" `lossT` 5–100 step 5; all 1 decimal (FR-008)
 - [X] T029 [US3] Add rows 21–24 in `src/Apps/AG-FlmOt.lua`: heading "Announcements"; checkboxes Say "armed" (`sayArm`) and Say "relit" (`sayRel`); hint row 24 "Voice files missing: alarm uses beeps." when not `audioOk` (FR-029). Extend the footer with a second line "Voice: Piper, Amy (CC BY-SA 4.0)." (FR-028)
 - [X] T030 [US3] Review the enable rule in `src/Apps/AG-FlmOt.lua` across all rows: turning monitoring on with any requirement missing is refused and row 3 names the missing items; removing a requirement while enabled sets `en = 0`, calls `recompute()` (alarm stops if sounding, state OFF) and shows row 3 (FR-003, FR-012)
-- [ ] T031 [US3] MANUAL: Emulator, quickstart scenarios 1–5, 16 and 17 (default OFF, enable blocked, no-sensors hint, full setup in under 3 minutes, threshold refusals, sensor not found, per-model settings across restart)
+- [X] T031 [US3] MANUAL: Emulator, quickstart scenarios 1–5, 16 and 17 (default OFF, enable blocked, no-sensors hint, full setup in under 3 minutes, threshold refusals, sensor not found, per-model settings across restart)
 
 **Checkpoint**: All three P1 stories work: the MVP.
 
@@ -146,7 +146,7 @@ built and checked on its own.
 
 **Independent Test**: Quickstart scenario 12.
 
-- [ ] T034 [US5] Check in `src/Apps/AG-FlmOt.lua` that `onCut` (T021) runs before any other row on the same tick, that it stops both the voice/tone file and pending fallback beeps (`beepAt`), and that after Cut the app stays DISARMED with low RPM and re-arms only after leaving Cut and holding `armRpm` for `armMs` (User Story 5 scenarios 1–3). Fix anything that doesn't
+- [X] T034 [US5] Check in `src/Apps/AG-FlmOt.lua` that `onCut` (T021) runs before any other row on the same tick, that it stops both the voice/tone file and pending fallback beeps (`beepAt`), and that after Cut the app stays DISARMED with low RPM and re-arms only after leaving Cut and holding `armRpm` for `armMs` (User Story 5 scenarios 1–3). Fix anything that doesn't
 - [ ] T035 [US5] MANUAL: Emulator, quickstart scenario 12, including Cut during the 2.5 s fallback beep wait (rename `cycle.wav` for that part)
 
 ---
@@ -157,9 +157,9 @@ built and checked on its own.
 
 **Independent Test**: Quickstart scenarios 13–16 (SC-004).
 
-- [ ] T036 [US6] Fill `onInvalid(now)` in `src/Apps/AG-FlmOt.lua` (row 2, FR-020, FR-020a): `invalidSince = invalidSince or now`; clear `armSince` and `lowSince`; `rpm = nil`; when `now - invalidSince >= lossMs` and not `lost`: `lost = true`; if `state == ARMED` and `fileOk.tlost`, play `SND.tlost` with `AUDIO_IMMEDIATE`; if `state == FLAMEOUT` set `tlPending = true`. Nothing happens while DISARMED besides the display
-- [ ] T037 [US6] In `stepCycle` in `src/Apps/AG-FlmOt.lua`, play `SND.cycletl` instead of `SND.cycle` when `tlPending`, then clear `tlPending` (research R4). With `audioOk` false the beeps continue unchanged
-- [ ] T038 [US6] In the frame of `loop()` in `src/Apps/AG-FlmOt.lua`, confirm that a valid sample after a loss resumes from the current RPM (FR-021): ARMED stays ARMED when `rpm >= flRpm`, and detection restarts from zero otherwise (`lowSince` was cleared). In `printRpm`'s text layout show NO SENSOR when `not sensorFound`, NO TELEMETRY when `lost` (not FLAMEOUT), and "NO TELEMETRY" as the second line under FLAMEOUT when both
+- [X] T036 [US6] Fill `onInvalid(now)` in `src/Apps/AG-FlmOt.lua` (row 2, FR-020, FR-020a): `invalidSince = invalidSince or now`; clear `armSince` and `lowSince`; `rpm = nil`; when `now - invalidSince >= lossMs` and not `lost`: `lost = true`; if `state == ARMED` and `fileOk.tlost`, play `SND.tlost` with `AUDIO_IMMEDIATE`; if `state == FLAMEOUT` set `tlPending = true`. Nothing happens while DISARMED besides the display
+- [X] T037 [US6] In `stepCycle` in `src/Apps/AG-FlmOt.lua`, play `SND.cycletl` instead of `SND.cycle` when `tlPending`, then clear `tlPending` (research R4). With `audioOk` false the beeps continue unchanged
+- [X] T038 [US6] In the frame of `loop()` in `src/Apps/AG-FlmOt.lua`, confirm that a valid sample after a loss resumes from the current RPM (FR-021): ARMED stays ARMED when `rpm >= flRpm`, and detection restarts from zero otherwise (`lowSince` was cleared). In `printRpm`'s text layout show NO SENSOR when `not sensorFound`, NO TELEMETRY when `lost` (not FLAMEOUT), and "NO TELEMETRY" as the second line under FLAMEOUT when both
 - [ ] T039 [US6] MANUAL: Emulator, quickstart scenarios 13–16 (slider fully down = invalid; sensor removed from `sensors.json`)
 
 ---
