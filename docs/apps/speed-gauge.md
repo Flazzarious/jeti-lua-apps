@@ -33,6 +33,12 @@ gauge for the JETI **DS-24 II / DC-24 II**.
   a notice instead.
 - A telemetry sensor that reports speed.
 
+## Installing
+
+Installing takes a while: Speed Gauge brings its own voice, about 550
+files (24 MB), mostly short audio clips, and copying them to the
+transmitter is slow. Let JETI Studio finish before disconnecting.
+
 ## Setting up
 
 1. Add **Speed Gauge** in *Applications → User Applications*.
