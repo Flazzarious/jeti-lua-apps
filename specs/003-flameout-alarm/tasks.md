@@ -186,8 +186,8 @@ built and checked on its own.
 
 **Independent Test**: Quickstart 19a in the emulator; transmitter checks 23–26.
 
-- [ ] T047 [US8] Add form row 23a in `src/Apps/AG-FlmOt.lua`: "Test alarm" `form.addInputbox(swTest, false, ...)` with hint "Plays the alarm while on. Not while armed." (FR-030a); saving `swTest` needs no recompute
-- [ ] T048 [US8] Fill `stepTest(now)` in `src/Apps/AG-FlmOt.lua` per the "Test alarm" table in data-model.md (research R13): `T = swTest ~= nil and system.getInputsVal(swTest) > 0.5`; T1: `T and not testPrev`, `state` is OFF or DISARMED (OFF also when not `active`), not `testOn` → `testOn = true`, `cycleAt = now`, `playCycle(now, SND.cycle)`; T2: `testOn` and `now - cycleAt >= CYCLE_MS` → next cycle as in `stepCycle` (also fire a pending `beepAt`); T3: `testOn` and (not `T`, or `state` is ARMED or FLAMEOUT) → `testOn = false`, `stopAlarm()`; always `testPrev = T`. Runs before the `active` check so it works with monitoring off. In both window layouts show TEST (white) when `testOn`
+- [X] T047 [US8] Add form row 23a in `src/Apps/AG-FlmOt.lua`: "Test alarm" `form.addInputbox(swTest, false, ...)` with hint "Plays the alarm while on. Not while armed." (FR-030a); saving `swTest` needs no recompute
+- [X] T048 [US8] Fill `stepTest(now)` in `src/Apps/AG-FlmOt.lua` per the "Test alarm" table in data-model.md (research R13): `T = swTest ~= nil and system.getInputsVal(swTest) > 0.5`; T1: `T and not testPrev`, `state` is OFF or DISARMED (OFF also when not `active`), not `testOn` → `testOn = true`, `cycleAt = now`, `playCycle(now, SND.cycle)`; T2: `testOn` and `now - cycleAt >= CYCLE_MS` → next cycle as in `stepCycle` (also fire a pending `beepAt`); T3: `testOn` and (not `T`, or `state` is ARMED or FLAMEOUT) → `testOn = false`, `stopAlarm()`; always `testPrev = T`. Runs before the `active` check so it works with monitoring off. In both window layouts show TEST (white) when `testOn`
 - [ ] T049 [US8] MANUAL: Emulator, quickstart 19a. Transmitter, checks 23–26: hold the test switch for the alarm sound and rhythm, Speed Gauge pre-emption, instant stop, fallback beeps (note the beep gap)
 
 ---

@@ -255,9 +255,6 @@ local function switchOn(item)
   return v ~= nil and v > 0.5
 end
 
-local function stepTest(now)            -- test alarm, rows T1-T3 (US8)
-end
-
 -- Row 1 (FR-016): Cut disarms at once and silently from any state. Arming
 -- again needs the switch out of Cut and row 3 (User Story 5).
 local function onCut()
@@ -358,6 +355,30 @@ local function stepCycle(now)
       playCycle(now, SND.cycle)
     end
   end
+end
+
+-- Test alarm, rows T1-T3 (FR-030a, R13): the real alarm while the test
+-- switch is on, through the same cycle code. Starts only on the switch's
+-- off-to-on change and only while OFF or DISARMED, so it can't mask or
+-- imitate a real alarm, and stops as soon as the app arms. Runs before the
+-- OFF check in loop(): it works with monitoring off.
+local function stepTest(now)
+  local on = switchOn(cfg.swTest)
+  local quiet = st.state ~= S.ARMED and st.state ~= S.FLAMEOUT
+  if st.testOn then
+    if not on or not quiet then
+      st.testOn = false         -- T3
+      stopAlarm()
+    else
+      stepCycle(now)            -- T2: next cycle every 5 s, fallback beeps
+    end
+  elseif on and not st.testPrev and quiet then
+    st.testOn = true            -- T1
+    st.tlPending = false
+    st.cycleAt = now
+    playCycle(now, SND.cycle)
+  end
+  st.testPrev = on
 end
 
 -- Whole RPM with a thousands separator: 112400 -> "112,400".
@@ -697,6 +718,10 @@ local function initForm()
   heading("Announcements")
   addCheck("Say \"armed\"", "sayArm")
   addCheck("Say \"relit\"", "sayRel")
+  form.addRow(2)
+  form.addLabel({ label = "Test alarm", width = LABEL_W })
+  form.addInputbox(cfg.swTest, false, function(v) save("swTest", v) end)
+  hint("Plays the alarm while on. Not while armed.")
   hint("Voice files missing: alarm uses beeps.", not audio.ok)
 
   form.addRow(1)
