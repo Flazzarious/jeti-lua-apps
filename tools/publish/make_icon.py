@@ -5,7 +5,8 @@ SPDX-License-Identifier: MIT
 
 A 64 x 64 PNG (the size of JETI's own app icons) in the gauge's style: a
 dark face, the grey track, a cyan speed arc, the orange overspeed zone and
-a yellow max mark, smoothed by sampling each pixel 8 x 8.
+a yellow max mark, with "AG" (Aaron George) in the center; smoothed by
+sampling each pixel 8 x 8.
 
     python tools/publish/make_icon.py            # docs/apps/img/speed-gauge-icon.png
     python tools/publish/make_icon.py --preview  # also all variants, enlarged
@@ -54,6 +55,32 @@ def on_seg(px, py, ax, ay, bx, by, half):
     return math.hypot(px - ax - t * vx, py - ay - t * vy) <= half
 
 
+MONO_H = 7.0       # half the letter height, px
+MONO_STROKE = 1.35  # half the stroke width, px
+
+
+def monogram(x, y, c):
+    """True on the strokes of "AG", centered on (c, c)."""
+    h, w = MONO_H, MONO_STROKE
+    top, bot = c - h, c + h
+    # A: apex, two feet, a crossbar a third of the way up.
+    ax0, ax1, apex = c - 12.5, c - 1.0, c - 6.75
+    if on_seg(x, y, apex, top, ax0, bot, w) or on_seg(x, y, apex, top, ax1, bot, w):
+        return True
+    yb = c + h / 3
+    t = (yb - top) / (bot - top)
+    if on_seg(x, y, apex + (ax0 - apex) * t, yb, apex + (ax1 - apex) * t, yb, w):
+        return True
+    # G: a ring open between 0 and 50 degrees, plus a bar from its middle
+    # to the right edge at 0 degrees.
+    gx, gr = c + 7.25, h - w
+    d = math.hypot(x - gx, y - c)
+    a = math.degrees(math.atan2(-(y - c), x - gx)) % 360
+    if abs(d - gr) <= w and not 0 < a < 50:
+        return True
+    return on_seg(x, y, gx + 0.5, c, gx + gr + w * 0.6, c, w)
+
+
 VARIANTS = {
     # name: (value fraction, max fraction, overspeed fraction, needle?, glow?)
     "arc": (0.62, 0.74, 0.84, False, True),
@@ -97,6 +124,12 @@ def shade(x, y, variant):
     if on_seg(x, y, c + ux * (arc_r - 5), c + uy * (arc_r - 5),
               c + ux * (arc_r + 5), c + uy * (arc_r + 5), 1.6):
         col = YELLOW
+    # "AG" (Aaron George) in the center, drawn as strokes so no font is
+    # needed: A from two legs and a crossbar, G as an arc open at the upper
+    # right with a bar into the middle.
+    ag = monogram(x, y, c)
+    if ag:
+        col = WHITE
     if needle:
         a = math.radians(ang(value))
         ux, uy = math.cos(a), -math.sin(a)
