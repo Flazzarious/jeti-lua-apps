@@ -150,6 +150,7 @@ local function resetSession()
   st.rpmText = TXT.noData
   st.rpmHundreds = -1
   st.lastTick = system.getTimeCounter()
+  st.liveAt = 0             -- last Live RPM row update (form open only)
 end
 
 ------------------------------------------------------------------------------
@@ -336,6 +337,14 @@ local function stepCycle(now)
   end
 end
 
+-- Whole RPM with a thousands separator: 112400 -> "112,400".
+local function fmtRpm(r)
+  if r >= 1000 then
+    return string.format("%d,%03d", r // 1000, r % 1000)
+  end
+  return tostring(r)
+end
+
 -- "112,400" for the window, rebuilt only when RPM / 100 changes.
 local function updateRpmText()
   local h = -1
@@ -348,10 +357,8 @@ local function updateRpmText()
   st.rpmHundreds = h
   if h < 0 then
     st.rpmText = TXT.noData
-  elseif h >= 10 then
-    st.rpmText = string.format("%d,%03d", h // 10, (h % 10) * 100)
   else
-    st.rpmText = tostring(h * 100)
+    st.rpmText = fmtRpm(h * 100)
   end
 end
 
@@ -359,7 +366,7 @@ end
 -- Settings form (contracts/settings-form.md)
 ------------------------------------------------------------------------------
 
-local sensorLabels, sensorIds, sensorPars = {}, {}, {}
+local sensorLabels, sensorIds, sensorPars, sensorUnits = {}, {}, {}, {}
 local notFoundIdx = 0
 local formOpen = false      -- loop may touch form rows only while true (R10)
 local idx = {}              -- component indices of rows updated after creation
@@ -416,7 +423,7 @@ end
 -- Every sensor except date/time and GPS, as "Device / Label"; a saved sensor
 -- that isn't present is shown as "<label> (not found)" (FR-022).
 local function buildSensorList()
-  sensorLabels, sensorIds, sensorPars = { "(none)" }, { 0 }, { 0 }
+  sensorLabels, sensorIds, sensorPars, sensorUnits = { "(none)" }, { 0 }, { 0 }, { "" }
   notFoundIdx = 0
   local selected = 1
   local parent = ""
@@ -426,7 +433,7 @@ local function buildSensorList()
     elseif s.type ~= 5 and s.type ~= 9 then
       local n = #sensorLabels + 1
       sensorLabels[n] = (parent ~= "") and (parent .. " / " .. s.label) or s.label
-      sensorIds[n], sensorPars[n] = s.id, s.param
+      sensorIds[n], sensorPars[n], sensorUnits[n] = s.id, s.param, s.unit or ""
       if s.id == cfg.sId and s.param == cfg.sPar then
         selected = n
       end
@@ -435,10 +442,90 @@ local function buildSensorList()
   if cfg.sId ~= 0 and selected == 1 then
     notFoundIdx = #sensorLabels + 1
     sensorLabels[notFoundIdx] = cfg.sLbl .. " (not found)"
-    sensorIds[notFoundIdx], sensorPars[notFoundIdx] = cfg.sId, cfg.sPar
+    sensorIds[notFoundIdx], sensorPars[notFoundIdx], sensorUnits[notFoundIdx] = cfg.sId, cfg.sPar, ""
     selected = notFoundIdx
   end
   return selected
+end
+
+-- Units that read as RPM (R9): "rpm", and "U/min" / "1/min" from German
+-- converters, ignoring case.
+local RPM_UNITS = { ["rpm"] = true, ["u/min"] = true, ["1/min"] = true }
+
+-- Row 7 (FR-010): warn when the chosen sensor's unit isn't RPM-like.
+local function updateUnitHint(i)
+  if idx.unit then
+    local u = sensorUnits[i] or ""
+    local bad = i ~= 1 and i ~= notFoundIdx and not RPM_UNITS[string.lower(u)]
+    form.setProperties(idx.unit, {
+      label = "Unit is '" .. u .. "', not RPM. Check the sensor, or set Sensor scale.",
+      visible = bad,
+    })
+  end
+end
+
+-- "= 31.5k" next to a threshold percentage.
+local function kText(rpm)
+  return string.format("= %.1fk RPM", rpm / 1000)
+end
+
+local function updateThresholdLabels()
+  if idx.armK then
+    form.setProperties(idx.armK, { label = kText(d.armRpm) })
+  end
+  if idx.flK then
+    form.setProperties(idx.flK, { label = kText(d.flRpm) })
+  end
+  if idx.maxHint then
+    local text = "0.0 = auto (4 x idle)"
+    if cfg.maxR == 0 and d.idleRpm > 0 then
+      text = text .. ": " .. string.format("%.1fk", d.fullRpm / 1000)
+    end
+    form.setProperties(idx.maxHint, { label = text })
+  end
+end
+
+-- Live RPM row (FR-010), from loop() while the form is open, every 500 ms.
+-- Reads the sensor itself: setup happens before monitoring is on.
+local function updateLive(now)
+  if not formOpen or not idx.live or now - st.liveAt < 500 then
+    return
+  end
+  st.liveAt = now
+  local text = TXT.noData
+  if cfg.sId ~= 0 then
+    local s = system.getSensorValueByID(cfg.sId, cfg.sPar)
+    if s ~= nil and s.valid then
+      text = fmtRpm(math.floor(s.value * d.kScale + 0.5))
+    end
+  end
+  form.setProperties(idx.live, { label = text })
+end
+
+-- An intbox for a setting stored in tenths or hundreds, shown with 1 decimal.
+local function addInt(label, key, step, after)
+  form.addRow(2)
+  form.addLabel({ label = label, width = LABEL_W })
+  return form.addIntbox(cfg[key], RANGES[key][1], RANGES[key][2], DEFAULTS[key] --[[@as integer]], 1, step, function(value)
+    save(key, value)
+    recompute()
+    if after then
+      after()
+    end
+  end)
+end
+
+local function addCheck(label, key)
+  form.addRow(2)
+  form.addLabel({ label = label, width = LABEL_W })
+  local i
+  i = form.addCheckbox(cfg[key] == 1, function(value)
+    local on = not value      -- the callback gets the old state
+    if i then
+      form.setValue(i, on)
+    end
+    save(key, on and 1 or 0)
+  end)
 end
 
 local function initForm()
@@ -481,16 +568,99 @@ local function initForm()
     elseif i ~= notFoundIdx then
       save("sLbl", string.sub(sensorLabels[i], 1, 63))
     end
+    updateUnitHint(i)
     onRequirementChanged()
   end, { width = 200 })
+  hint("No telemetry yet. The ECU must send RPM and the receiver", #sensorLabels == 1)
+  hint("must be on. Some adapters take up to a minute.", #sensorLabels == 1)
+  idx.unit = hint("", false)
+  updateUnitHint(selected)
 
+  form.addRow(2)
+  form.addLabel({ label = "Sensor scale", width = LABEL_W })
+  form.addSelectbox({ "x1", "x10", "x100", "x1000" }, cfg.scl, false, function(i)
+    save("scl", i)
+    recompute()
+    st.liveAt = 0             -- show the rescaled value at once
+  end)
+
+  form.addRow(2)
+  form.addLabel({ label = "Live RPM", width = LABEL_W })
+  idx.live = form.addLabel({ label = TXT.noData, alignRight = true })
+
+  local idxMax
+  local function keepMax()    -- max RPM must stay above idle (FR-031b)
+    if cfg.maxR ~= 0 and cfg.maxR <= cfg.idle then
+      save("maxR", 0)
+      recompute()
+      if idxMax then
+        form.setValue(idxMax, 0)
+      end
+    end
+    updateThresholdLabels()
+  end
   form.addRow(2)
   form.addLabel({ label = "Idle RPM (x1000)", width = LABEL_W })
   form.addIntbox(cfg.idle, RANGES.idle[1], RANGES.idle[2], 0, 1, 1, function(value)
     save("idle", value)
     onRequirementChanged()
+    keepMax()
   end)
   hint("From the ECU setup. Check against Live RPM at idle.")
+
+  form.addRow(2)
+  form.addLabel({ label = "Max RPM (x1000)", width = LABEL_W })
+  idxMax = form.addIntbox(cfg.maxR, RANGES.maxR[1], RANGES.maxR[2], 0, 1, 1, function(value)
+    if value ~= 0 and value <= cfg.idle then
+      if idxMax then
+        form.setValue(idxMax, cfg.maxR) -- refused
+      end
+      form.setProperties(idx.maxHint, { label = "Max RPM must be above idle." })
+      return
+    end
+    save("maxR", value)
+    recompute()
+    updateThresholdLabels()
+  end)
+  idx.maxHint = hint("")
+
+  heading("Thresholds")
+  local idxArm, idxFl
+  local function refuse(box, old)
+    if box then
+      form.setValue(box, old)
+    end
+    form.setProperties(idx.thrHint, { visible = true })
+  end
+  form.addRow(2)
+  form.addLabel({ label = "Arming at % of idle", width = LABEL_W })
+  idxArm = form.addIntbox(cfg.armP, RANGES.armP[1], RANGES.armP[2], DEFAULTS.armP, 0, 1, function(value)
+    if cfg.flP >= value then
+      refuse(idxArm, cfg.armP)
+      return
+    end
+    save("armP", value)
+    recompute()
+    updateThresholdLabels()
+  end)
+  idx.armK = hint("")
+  form.addRow(2)
+  form.addLabel({ label = "Flameout below % of idle", width = LABEL_W })
+  idxFl = form.addIntbox(cfg.flP, RANGES.flP[1], RANGES.flP[2], DEFAULTS.flP, 0, 1, function(value)
+    if value >= cfg.armP then
+      refuse(idxFl, cfg.flP)
+      return
+    end
+    save("flP", value)
+    recompute()
+    updateThresholdLabels()
+  end)
+  idx.flK = hint("")
+  idx.thrHint = hint("Flameout must be below arming, and arming below idle.", false)
+
+  addInt("Arming time (s)", "armT", 5)
+  addInt("Detection delay (s)", "detT", 1)
+  addInt("Telemetry loss after (s)", "lossT", 5)
 
   heading("Throttle cut")
   form.addRow(2)
@@ -501,11 +671,20 @@ local function initForm()
   end)
   hint("Assign with the switch in the Cut (engine off) position.")
 
+  heading("Announcements")
+  addCheck("Say \"armed\"", "sayArm")
+  addCheck("Say \"relit\"", "sayRel")
+  hint("Voice files missing: alarm uses beeps.", not audio.ok)
+
   form.addRow(1)
   form.addLabel({ label = APP_NAME .. " " .. APP_VERSION .. ". Advisory only; does not replace the ECU's failsafe.",
     font = FONT_MINI, alignRight = true })
+  form.addRow(1)
+  form.addLabel({ label = "Voice: Piper, Amy (CC BY-SA 4.0).", font = FONT_MINI, alignRight = true })
 
   updateNeeds()
+  updateThresholdLabels()
+  st.liveAt = 0
 end
 
 -- The form is gone: drop its indices so nothing calls form.* on them (R10).
@@ -575,6 +754,7 @@ local function loop()
   st.lastTick = now
 
   stepTest(now)               -- before the OFF check: tests work with monitoring off (R13)
+  updateLive(now)             -- settings form's Live RPM row, also while OFF
 
   -- Row 0: off or not fully configured (FR-012, FR-034).
   if not d.active then
