@@ -10,6 +10,22 @@ spec-driven workflow (GitHub Spec Kit + Claude Code) in VS Code.
 | Speed Gauge | [`AG-SpdGa.lua`](src/Apps/AG-SpdGa.lua) | Released (0.3.0) | [001](specs/001-speed-gauge/spec.md) | DFM Speed Announcer by Dave McQueeney (MIT) |
 | Flameout Alarm | [`AG-FlmOt.lua`](src/Apps/AG-FlmOt.lua) | Released (0.1.0) | [003](specs/003-flameout-alarm/spec.md) | Original |
 
+### Screenshots
+
+Taken on a DS-24 II transmitter.
+
+**Speed Gauge:** full screen at 121 mph, double size, single size
+
+<img src="docs/apps/img/speed-gauge.png" width="200" alt="Speed Gauge full screen: dial at 121 mph, max 140, with stall, overspeed, air density and temperature rows">
+<img src="docs/apps/img/speed-gauge-double.png" width="200" alt="Speed Gauge double-size dial at 105 mph on the main screen">
+<img src="docs/apps/img/speed-gauge-single.png" width="200" alt="Speed Gauge single-size speed bar at 98 mph on the main screen">
+
+**Flameout Alarm:** armed at 60,000 RPM, flameout alarm, disarmed
+
+<img src="docs/apps/img/flameout-alarm-armed.png" width="200" alt="Flameout Alarm armed, RPM bar at 60,000">
+<img src="docs/apps/img/flameout-alarm-flameout.png" width="200" alt="Flameout Alarm showing the red FLAMEOUT alarm at 0 RPM">
+<img src="docs/apps/img/flameout-alarm-disarmed.png" width="200" alt="Flameout Alarm disarmed at 35,000 RPM">
+
 Speed Gauge speaks in its own voice (Piper "Amy"), in
 `src/Apps/AG-SpdGa/voice/`. Those files are licensed CC BY-SA 4.0, not MIT
 (see [CREDITS.md](CREDITS.md)); [`tools/voice/`](tools/voice/README.md)
