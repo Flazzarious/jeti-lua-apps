@@ -26,10 +26,105 @@ Taken on a DS-24 II transmitter.
 <img src="docs/apps/img/flameout-alarm-flameout.png" width="200" alt="Flameout Alarm showing the red FLAMEOUT alarm at 0 RPM">
 <img src="docs/apps/img/flameout-alarm-disarmed.png" width="200" alt="Flameout Alarm disarmed at 35,000 RPM">
 
-Speed Gauge speaks in its own voice (Piper "Amy"), in
+### Speed Gauge
+
+Speaks your model's airspeed, warns of stall and overspeed, and shows a
+speedometer on the main screen. It is based on Dave McQueeney's DFM Speed
+Announcer, with its callout timing and warnings kept and a gauge, air density
+correction and a new voice added. It only listens and informs: it never
+controls the model.
+
+It works with a pitot airspeed sensor such as the JETI MSpeed (anything that
+reports speed as a telemetry value), or with GPS speed. With GPS the warnings
+use ground speed, so wind shifts them, and there is no air density
+correction.
+
+**Setup** (Applications → Speed Gauge):
+
+- **Speed sensor**, **sensor type** (airspeed or GPS) and **units** (mph,
+  km/h, knots, m/s or ft/s). Every speed setting follows the units, and
+  changing them converts the values.
+- A **callouts on/off switch**, and optionally a **continuous callouts
+  switch**. Either switch also turns on the warnings; with both off the app
+  is silent, but the gauge and max speed keep working.
+- Your model's **landing**, **stall** and **overspeed** speeds, entered as
+  the model's sea-level values. The settings flag an illogical order (stall
+  must be below landing, landing below overspeed).
+- **Gauge max limit**: the top of the dial. Set it to your sensor's top
+  speed to use its whole range (MSpeed: 350 km/h / 215 mph; MSpeed 450 EX:
+  450 km/h / 280 mph). 0 = auto: overspeed + 15%.
+
+Callouts:
+
+- In a clear voice ("eighty five miles per hour"). The interval runs from
+  the **shortest** (default 2 s) to the **longest** time (default 40 s) and
+  gets shorter the more the speed has changed since the last callout,
+  relative to the **callout sensitivity** (default 10 mph): a steady speed
+  is spoken every 40 s, a 10 mph change after about 20 s.
+- Nothing is spoken until the model first passes **Callouts start above**
+  (default 30 mph). After that callouts stay on for the session, so they
+  continue on approach. No callout is ever spoken below 5 mph.
+- **Landing speed callouts** (on by default): once the model has been above
+  landing speed, slowing below it gives short number-only callouts every
+  shortest time.
+- The **continuous switch** gives number-only callouts every shortest time
+  while above "Callouts start above", with or without the on/off switch.
+- **Max speed** ("max 201 miles per hour") is called about 1 s after each
+  new peak, if it beats the last announced max by at least the callout
+  sensitivity. The max resets at every start-up and with **Reset max
+  speed**.
+- A callout never starts while another is still playing.
+
+Warnings, with stick vibration:
+
+- **Stall** when the speed drops to the stall setting, but only after the
+  model has first exceeded landing speed (so not on the ground). At most
+  twice per slowdown; it re-arms above landing speed, e.g. after a
+  go-around.
+- **Overspeed** once each time the speed passes the overspeed setting.
+- **"Airspeed alive"** once, when the model first passes "Callouts start
+  above".
+
+The gauge:
+
+- **Single size:** current speed, max, and a speed bar with the overspeed
+  zone. **Double size:** a small dial beside the speed and max. **Full
+  screen** ("Speed Gauge (full screen)"): a large dial with a numbered
+  scale, max in the dial, and rows for stall, overspeed, air density,
+  elevation, temperature and the uncorrected sensor speed.
+- The dial's arc shows the current speed (overspeed color past the limit);
+  a yellow marker stays at the session max. The colors can be changed.
+- The gauge is drawn for the DS-24 II / DC-24 II. On other DC/DS-24
+  transmitters the callouts and warnings work, and the window shows a
+  notice instead.
+
+**Air density correction** (optional, airspeed sensors only). A pitot
+reads low where the air is thin: about 8% at 5,000 ft on a standard day,
+more when it's hot. With correction on, the shown and spoken speed, the max
+and the overspeed check use true airspeed, from your **field elevation** and
+the **temperature**:
+
+- **Standard**: the standard temperature for that elevation;
+- **Manual**: today's temperature, typed in;
+- **Sensor**: read live from a telemetry temperature, such as the MSpeed's.
+  If the reading is lost or out of range (e.g. a sensor heat-soaked in the
+  sun), it falls back to standard and the gauge shows "SENSOR OUT"; it
+  switches back about 10 s after a good reading returns. A sensor inside a
+  warm fuselage can read higher than the outside air.
+
+Stall, landing and "airspeed alive" keep using the sensor's own speed,
+because those limits depend on air pressure, not true speed. Leave
+correction off if your sensor already corrects for air density.
+
+**Voice.** Speed Gauge speaks in its own voice (Piper "Amy"), in
 `src/Apps/AG-SpdGa/voice/`. Those files are licensed CC BY-SA 4.0, not MIT
 (see [CREDITS.md](CREDITS.md)); [`tools/voice/`](tools/voice/README.md)
-regenerates them. Without them the app works in the transmitter's voice.
+regenerates them. The **Voice** setting switches to the transmitter's own
+voice, and without the voice files the app uses that automatically.
+
+Install = `AG-SpdGa.lua`, the `AG-SpdGa/` folder, and `lib/ag_dens.lua` and
+`lib/ag_gauge.lua`. Details in [spec 001](specs/001-speed-gauge/spec.md) and
+the [description page](docs/apps/speed-gauge.md).
 
 ### Flameout Alarm
 
