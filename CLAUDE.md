@@ -5,11 +5,19 @@ built spec-first with GitHub Spec Kit (`/speckit-specify`, `/speckit-plan`,
 `/speckit-tasks`, `/speckit-implement`). Each feature gets its own
 `specs/NNN-name/`. A feature may create a new app or change an existing one.
 
+## Open to-dos for Aaron
+
+At the start of a session, remind Aaron of any items here before starting
+other work. Remove an item once he says it's done.
+
+- Install and set up RTK to help with console commands.
+
 ## Apps in this repo
 
 | App (menu name) | Script | Spec | Based on |
 | --- | --- | --- | --- |
-| Speed Gauge | `src/Apps/AG-SpdGa.lua` (planned) | `specs/001-speed-gauge/` | DFM Speed Announcer (Dave McQueeney, MIT) |
+| Speed Gauge | `src/Apps/AG-SpdGa.lua` | `specs/001-speed-gauge/` | DFM Speed Announcer (Dave McQueeney, MIT) |
+| Flameout Alarm | `src/Apps/AG-FlmOt.lua` | `specs/003-flameout-alarm/` | original |
 
 Keep this table current when an app is added.
 
@@ -76,6 +84,22 @@ src/Apps/lib/ag_xxxxx.lua  shared module, loaded with require("ag_xxxxx")
 - `loop()` runs every 20-30 ms: rate-limit with `system.getTimeCounter()`, and
   don't format strings or build tables per call.
 
+## Branches
+
+- `main` is updated **only** by a pull request from `develop`. Never commit
+  or push to `main` directly, and never open a PR into `main` from any other
+  branch. GitHub enforces this (a ruleset on `main` plus the
+  `PR source is develop` check in `.github/workflows/main-pr-source.yml`).
+- Feature work goes on `feature/NNN-name`, branched from `develop`, with the
+  same `NNN-name` as the spec folder, and is merged back into `develop` by
+  pull request. Never commit directly to `develop` either.
+- When `develop` is ready to release, open a PR from `develop` into `main`.
+  After it merges, tag the release `<script>-v<version>` (e.g.
+  `AG-SpdGa-v0.3.0`).
+- Spec Kit finds the feature via `.specify/feature.json`, not the branch
+  name, so the `feature/` prefix is fine.
+- Ask before pushing, opening or merging pull requests, or tagging.
+
 ## Checking work
 
 - `python tools/check.py` must pass (syntax, forbidden APIs, AG- naming, UTF-8,
@@ -85,6 +109,16 @@ src/Apps/lib/ag_xxxxx.lua  shared module, loaded with require("ag_xxxxx")
   model instead of claiming the app works.
 
 ## Environment
+
+- **Target:** DS-24 II / DC-24 II only for anything drawn on screen. Design
+  for the Lua window sizes measured **on the transmitter**, not the panel's
+  480 × 480 or the emulator's: small 150 × 23, large 150 × 68, full screen
+  316 × 159, all visible, with the title drawn above the window. The JETI
+  Studio emulator (firmware 6.04) reports 157 × 60 / 157 × 127 / 320 × 260
+  with a title bar inside. Details, scaling and drawing limits are in
+  `docs/jeti-api-notes.md`; measure more with `tools/probe/PROBE.lua`. The
+  emulator plays no Lua audio, so voice can only be tested on the
+  transmitter.
 
 - Windows, PowerShell. Spec Kit scripts are the PowerShell variants.
 - The deploy target is `/Apps` on the transmitter's SD card; `src/Apps/` mirrors

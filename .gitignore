@@ -9,3 +9,13 @@ docs/vendor/
 .DS_Store
 Thumbs.db
 *.swp
+
+# Python bytecode and virtual environments from tools/
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+
+# Local JETI Studio test source (tools/publish/make_apps_json.py --local)
+Apps.local.json
