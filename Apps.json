@@ -3367,6 +3367,49 @@
      "size": 53860
     }
    ]
+  },
+  {
+   "id": 0,
+   "version": "0.1.0",
+   "author": "Aaron George",
+   "hw": [
+    3866,
+    3867
+   ],
+   "releaseDate": "Sun, 11 Oct 2026 05:04:08 +0000",
+   "name": {
+    "en": "Throttle Setup Wizard (DC/DS-24II)"
+   },
+   "description": {
+    "en": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/main/docs/apps/throttle-setup-wizard.html"
+   },
+   "previewIcon": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/main/docs/apps/img/throttle-setup-wizard-icon.png",
+   "files": [
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-TrbSt-v0.1.0/src/Apps/AG-TrbSt.lua",
+     "destination": "Apps/AG-TrbSt.lua",
+     "hash": "f62dfd90f9559e3fbdf2e575265021c3e6652f4d",
+     "size": 41305
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-TrbSt-v0.1.0/src/Apps/AG-TrbSt/CREDITS.txt",
+     "destination": "Apps/AG-TrbSt/CREDITS.txt",
+     "hash": "2b1378f3d5c4af976a64093330a5396ae07850c9",
+     "size": 870
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-TrbSt-v0.1.0/src/Apps/AG-TrbSt/TurbOff.wav",
+     "destination": "Apps/AG-TrbSt/TurbOff.wav",
+     "hash": "0e4698c5d0283cabd28d97f79443562481b7e811",
+     "size": 40492
+    },
+    {
+     "url": "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/AG-TrbSt-v0.1.0/src/Apps/AG-TrbSt/TurbOn.wav",
+     "destination": "Apps/AG-TrbSt/TurbOn.wav",
+     "hash": "8da4ffec6253b155548e1040a87464ebdec16a5c",
+     "size": 38510
+    }
+   ]
   }
  ]
 }
