@@ -395,8 +395,9 @@ is tested.
 `src/Apps/AG-TrbSt/TurbOff.wav` ("Turbine off"), `TurbOn.wav` ("Turbine
 on") and `CREDITS.txt`. It reuses `make_voice.py`'s helpers (`synthesize`,
 `trim`, `normalize`, `resample`, `write_wav`, `write_text`) without
-changing them, exactly as `make_flameout.py` does, at Flameout's calm pace
-(speed 1.5, no effects): mono, 16-bit, 22.05 kHz, peak −1 dBFS, which the
+changing them, exactly as `make_flameout.py` does, at speed **1.15**, a
+little slower than Flameout's calm 1.5 (Aaron chose it by ear from 1.5,
+1.3, 1.15 and 1.0, 2026-10-10), no effects: mono, 16-bit, 22.05 kHz, peak −1 dBFS, which the
 DS-24 II is known to play (Speed Gauge, 2026-10-03). Self-check: both files
 exist and each is ≤ 1.5 s. The files are committed (CC BY-SA 4.0, credited
 in `CREDITS.txt`, `CREDITS.md`, the README and the app's Voice callouts

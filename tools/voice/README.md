@@ -108,8 +108,9 @@ to `src/Apps/AG-TrbSt/` (spec 002, FR-026; research R14):
 | `TurbOff.wav` | "Turbine off" | safety switch to CUT |
 | `TurbOn.wav` | "Turbine on" | safety switch to RUN |
 
-Same voice and calm pace as Flameout Alarm's announcements (speed 1.5, no
-effects), plus `CREDITS.txt`. The files are committed. The app never plays
+Same voice as Flameout Alarm's announcements, a little slower (speed 1.15,
+no effects; Aaron compared 1.5, 1.3, 1.15 and 1.0 by ear on 2026-10-10),
+plus `CREDITS.txt`. The files are committed. The app never plays
 them: it copies them to the transmitter's `/Audio` folder on request, and
 the pilot assigns them in *Sounds on event*.
 
@@ -117,9 +118,9 @@ the pilot assigns them in *Sounds on event*.
 python tools/voice/make_turbine.py --model C:\path\to\en_US-amy-medium.onnx
 ```
 
-Options: `--out`, `--rate` (default 22050) and `--speed` (default 1.5).
-The self-check fails if a file is missing or longer than 1.5 s (first run,
-2026-10-10: 0.75 s and 0.70 s).
+Options: `--out`, `--rate` (default 22050) and `--speed` (default 1.15).
+The self-check fails if a file is missing or longer than 1.5 s (committed
+files, speed 1.15: 0.92 s and 0.87 s).
 
 For a new app's voice, follow the `jeti-voice` skill
 (`.claude/skills/jeti-voice/`).

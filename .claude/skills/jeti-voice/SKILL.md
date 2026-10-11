@@ -24,8 +24,11 @@ For each callout, settle:
   the pilot will pick the file in a transmitter menu, the name should say
   what it is.
 - **The delivery**:
-  - *Calm* (announcements, confirmations): speed 1.5, no effects. Example:
-    `make_turbine.py`.
+  - *Calm* (announcements, confirmations): no effects. Speed 1.5 suits
+    timed callouts that must be short (Speed Gauge's numbers, Flameout's
+    announcements); for single switch callouts Aaron preferred **1.15**
+    (`make_turbine.py`). When in doubt, generate a few speeds into a
+    scratch folder and let the user pick by ear.
   - *Urgent* (alarms): pitch-up, presence boost and compression, optionally
     with a lock tone and fixed-length cycles. Example: `make_flameout.py`.
 - **A length limit** for the self-check, from how the app uses it (e.g. a

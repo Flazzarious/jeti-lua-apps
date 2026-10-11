@@ -12,8 +12,9 @@ FR-026 and FR-029; research R14 in specs/002-turbine-throttle-setup/research.md)
     python tools/voice/make_turbine.py --model <path>/en_US-amy-medium.onnx
 
 The pilot assigns them in the transmitter's Sounds on event; the app only
-copies them to /Audio. Same voice and pace as Speed Gauge and Flameout
-Alarm's calm phrases. Reuses make_voice.py's helpers without changing it.
+copies them to /Audio. Same voice as Speed Gauge and Flameout Alarm, a
+little slower than their calm phrases (speed 1.15, chosen by ear).
+Reuses make_voice.py's helpers without changing it.
 Exits 1 if a file is missing or longer than MAX_S.
 """
 
@@ -89,8 +90,8 @@ def main() -> int:
                     help="output folder (default: src/Apps/AG-TrbSt)")
     ap.add_argument("--rate", type=int, choices=(16000, 22050, 44100), default=22050,
                     help="output sample rate (default 22050, Amy's own)")
-    ap.add_argument("--speed", type=float, default=1.5,
-                    help="speaking speed relative to Piper's pace (default 1.5, as the other apps)")
+    ap.add_argument("--speed", type=float, default=1.15,
+                    help="speaking speed relative to Piper's pace (default 1.15, chosen by ear 2026-10-10)")
     args = ap.parse_args()
 
     if not args.model.is_file():
