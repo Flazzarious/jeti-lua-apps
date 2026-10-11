@@ -12,9 +12,24 @@ Covers FR-013 to FR-019, User Story 2 and research R7/R8.
 | 3 | Idle | RUN | idle | idle target |
 | 4 | Full | RUN | full | full target |
 
-Each prompt names the required position, e.g. "Switch CUT, stick at
-FULL". The prompt line shows "Waiting...", "Hold steady..." or
-"Measuring..." as the phase moves on.
+The screen keeps the question apart from the live positions (Aaron,
+2026-10-10), in four labelled rows:
+
+| Row | Shows | Example |
+| --- | --- | --- |
+| Test | which test, bold | "2 of 4: Cut override" |
+| Set | the switch and stick it needs (two lines) | "Switch: CUT (engine off)" / "Stick: FULL (up)" |
+| Now | live switch and stick positions | "switch RUN, stick idle" |
+| Do | what to do next, bold (two lines) | "Safety switch to CUT" / "(cut: engine off)" |
+
+Do lines: "Safety switch to RUN" / "(not cut: engine may run)", "Safety switch
+to CUT" / "(cut: engine off)", "Move the stick fully DOWN" / "(idle) and
+hold it there.", "Move the stick fully UP" / "(full) and hold it there.",
+"Hold still...", "Measuring...", "Press Start to begin.", "All four
+passed." / "Press Next.", "All passed after a retry." / "Restart for a
+clean run.", "Failed: reason below." / "Fix it, then press Retry.". All
+are constant strings; only the Now line is rebuilt, when a position
+changes.
 
 ## Position and steadiness (R8)
 
