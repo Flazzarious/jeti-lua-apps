@@ -56,7 +56,7 @@ firmware 6.x in task 1 (spec research item 3) and changed here if needed.
 | 1 Endpoints | `:servoSetup` | "Servo Setup > Servo No.:" / "your throttle output." / "Max negative: -80%" / "Max positive: 80%" / "Leave the limits at -125/125%." |
 | 2 Throttle Cut | `:otherProps` | "Other Model Options >" / "Throttle Cut" / "Throttle-Cut switch: choose it" / "and move the switch to CUT." / "Throttle-Cut output value: -100%" ("-125%" for Xicoy, with "(Xicoy)") |
 | 3 Throttle Idle | `:otherProps` | "Other Model Options >" / "Throttle Idle" / "Throttle-Idle switch: same" / "switch, moved to RUN." / "Throttle-Idle offset: 20%" / "Check: in RUN, Idle shows a" / "tick and Cut a cross." |
-| 4 Failsafe | `:devExplorer` | "Device Explorer > receiver >" / "Failsafe: enabled. Throttle" / "output: Off (no pulse)." / "Never Hold: the engine would" / "stay at its last throttle." / "Save it to the receiver." / "Test it by hand at the end." (FR-010) |
+| 4 Failsafe | `:devExplorer` | "Device Explorer > receiver >" / "Configuration > Fail-Safe:" / "Fail-Safe: Enabled, 1.5s." / "Throttle OutPin mode: Out OFF." / "Never Hold: the engine would" / "stay at its last throttle." / "Test it by hand at the end." (FR-010) |
 | 5 Safety switch | none | "Use a JETI 2-position locking" / "switch: pull the lever to flip," / "so it can't be bumped." / "Fit it within easy reach." / "Don't use it for anything else." (FR-011) |
 
 - The step is saved to `gStep` on every change (FR-009).

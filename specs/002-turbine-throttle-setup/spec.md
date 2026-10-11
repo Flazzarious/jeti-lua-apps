@@ -348,8 +348,9 @@ confirm it and check that the summary shows "Setup complete".
   MUST offer an "Open menu" action that opens that menu.
 - **FR-009**: The wizard MUST keep its current step and choices when the
   pilot leaves for a menu and comes back, and when the app is reopened.
-- **FR-010**: The failsafe step MUST tell the pilot to set throttle failsafe
-  to OFF (no pulse) or to a value that gives about 1000 µs, and explain why.
+- **FR-010**: The failsafe step MUST tell the pilot to set the throttle
+  output's receiver failsafe mode to **Out OFF** (no pulse), never Hold, and
+  explain why (Device Explorer → receiver → Configuration → Fail-Safe).
 - **FR-011**: The app MUST recommend a locking two-position safety switch in
   an easy-to-reach position.
 - **FR-012**: The pilot MUST be able to skip the instruction steps and go

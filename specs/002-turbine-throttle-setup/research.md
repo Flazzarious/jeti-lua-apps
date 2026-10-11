@@ -57,8 +57,15 @@ stored position). For a turbine throttle, **Off** is the simplest and
 safest: the ECU sees no signal and runs its own shutdown. Fail Safe works
 only with a position at or below cut. Hold must never be used. Save or
 store the failsafe settings before leaving the Device Explorer menu.
-Exact on-screen labels on 6.x are still to be checked against a
-screenshot. Sources: [RCU Forums, "Where do you set the throttle fail
+**Confirmed on the transmitter (Aaron, 2026-10-10, `Screen011–016.png`,
+REX12A receiver):** *Model → Device Explorer → REX12A → Configuration →
+Fail-Safe*. The screen "REX12A Fail-Safe" has "Fail-Safe: Enabled",
+"Fail-Safe Delay: 1.5s", "» Set fail-safe positions now...", and a table
+"Output pin / Mode / Value / Speed" with one row per "OutPin n". Modes seen:
+"Out OFF", "Hold", "Fail-Safe" (with Value and Speed). Fail-Safe mode with
+Value 0% would give mid-throttle, so the guide recommends Out OFF only.
+The receiver's Configuration menu also has Quick Wizard, Advanced
+Properties, Alternative Pin Config and Receiver Outputs. Sources: [RCU Forums, "Where do you set the throttle fail
 safe?"](https://www.rcuniverse.com/forum/rc-jets-120/11655078-where-do-you-set-throttle-fail-safe.html),
 [JETI FAQ](https://www.jetimodel.com/support/faq/), [JETI DS-12 manual
 (failsafe via Device Explorer)](https://www.jetimodel.com/uloz/-3.pdf/).

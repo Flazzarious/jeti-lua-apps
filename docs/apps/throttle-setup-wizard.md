@@ -161,20 +161,25 @@ transmitter battery, interference), it must not keep the throttle where it
 was. The ECU has to see the signal disappear, so it can shut the engine
 down.
 
-*Model → Device Explorer → your receiver → Failsafe*:
+*Model → Device Explorer → your receiver (e.g. REX12A) → Configuration →
+Fail-Safe*:
 
-1. Make sure **Failsafe** is **enabled**, and leave the failsafe delay at
-   its default (about 1.5 s) unless your ECU's manual says otherwise.
-2. Find the **throttle output** (the same output number as in Servo
-   Setup, e.g. output 1).
-3. Set its mode to **Off** (no pulse). This is the simplest and safest
-   choice for a turbine: with no signal, the ECU runs its own shutdown.
-   *Never leave the throttle on **Hold**:* the engine would stay at
-   whatever throttle it had when the link was lost.
-   (Alternative: **Fail Safe** with the position at or below cut, e.g. the
-   stick down with the safety switch at CUT.)
-4. Save or store the failsafe settings to the receiver before you leave
-   the menu.
+1. **Fail-Safe**: **Enabled**. Leave **Fail-Safe Delay** at **1.5s** unless
+   your ECU's manual says otherwise.
+2. Find the **OutPin** your ECU's throttle lead is plugged into (usually
+   the same number as the throttle output, e.g. **OutPin 1**).
+3. Set its **Mode** to **Out OFF** (no pulse). With no signal, the ECU
+   runs its own shutdown. This is the simplest and safest choice.
+   - *Never leave the throttle on **Hold***: the engine would stay at
+     whatever throttle it had when the link was lost.
+   - *Don't use **Fail-Safe** mode with **Value 0%***: 0% is mid-throttle
+     (1500 µs).
+
+<img src="https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/main/docs/apps/img/throttle-setup-wizard-rx-config.png" width="240" alt="REX12A Configuration menu with Fail-Safe selected">
+<img src="https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/main/docs/apps/img/throttle-setup-wizard-failsafe-out-off.png" width="240" alt="REX12A Fail-Safe screen: Fail-Safe Enabled, delay 1.5s, OutPin 1 mode Out OFF">
+
+*The receiver's Configuration menu, and its Fail-Safe screen with the
+throttle on OutPin 1 set to Out OFF.*
 
 Then **test it**: ECU powered, fuel off, switch the transmitter off. The
 ECU must report signal loss.
