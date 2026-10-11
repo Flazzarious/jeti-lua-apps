@@ -52,7 +52,7 @@ Approach:
 
 **Testing**: `python tools/check.py`; LuaLS diagnostics; calibration against the servo monitor; emulator scenarios and seeded faults; transmitter checks; ECU bench test ([quickstart.md](quickstart.md))
 
-**Target Platform**: JETI DS-24 II / DC-24 II, firmware 6.03+ (emulator 6.04). Other transmitters get a "needs a DC/DS-24" notice (R13)
+**Target Platform**: JETI DS-24 II / DC-24 II, firmware 6.03+ (emulator 6.04). Older DC/DS transmitters should work too; features their firmware lacks are hidden (R13)
 
 **Project Type**: Embedded transmitter app (single Lua script)
 

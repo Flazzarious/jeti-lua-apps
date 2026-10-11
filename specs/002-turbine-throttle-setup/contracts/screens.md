@@ -17,8 +17,8 @@ F-key labels are ≤ 7 characters.
   callouts (optional)". Guided setup and Verify are disabled until setup is
   complete. Summary is disabled while `res = 0`. Voice callouts is always
   available.
-- On a transmitter that isn't a DC/DS-24: only "Throttle Setup Wizard
-  needs a DC/DS-24" (R13).
+- No device check: on older transmitters, features the firmware lacks are
+  hidden (R13).
 
 ## 2. Setup inputs (FR-001 to FR-005a)
 

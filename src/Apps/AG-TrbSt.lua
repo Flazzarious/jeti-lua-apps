@@ -28,10 +28,10 @@ local REC = {
 local ECU_NAMES = { "--", "Xicoy", "Other" }  -- selectbox values (index = ecu + 1)
 
 -- Transmitter menus opened with system.openExternal (R3, API v1.5 p. 74-75).
-local MENU = { servo = ":servoSetup", other = ":otherProps", dev = ":devExplorer" }
+local MENU = { servo = ":servoSetup", other = ":otherProps", dev = ":devExplorer", sound = ":soundEvent" }
 
 -- Screens (subforms, contracts/screens.md) and saved result states (data-model.md).
-local SCR = { HOME = 1, INPUTS = 2, GUIDE = 3, VERIFY = 4, FAILSAFE = 5, SUMMARY = 6 }
+local SCR = { HOME = 1, INPUTS = 2, GUIDE = 3, VERIFY = 4, FAILSAFE = 5, SUMMARY = 6, VOICE = 7 }
 local RES = { NONE = 0, PASSED = 1, COMPLETE = 2 }
 
 -- Verify thresholds (contracts/verify.md), tuned on the bench.
@@ -61,7 +61,7 @@ local DEFAULTS = {
 }  -- sw, stk and meas default to nil
 local RANGES = {
   offSg = { -1, 1 }, idlSg = { -1, 1 }, out = { 0, 24 }, ecu = { 0, 2 }, tol = { 5, 25 },
-  scr = { 1, 6 }, gStep = { 1, 5 }, res = { 0, 2 },
+  scr = { 1, 7 }, gStep = { 1, 5 }, res = { 0, 2 },
 }
 
 local cfg = {}
@@ -329,16 +329,214 @@ local function learn()
   live.swText, live.stkText = nil, nil
 end
 
+------------------------------------------------------------------------------
+-- Voice callouts (optional; spec User Story 4, research R14, R15). The app
+-- never plays these: it copies them to /Audio for JETI's Sounds on event.
+------------------------------------------------------------------------------
+
+local VOICE = {
+  src = "/Apps/AG-TrbSt", dest = "/Audio",
+  files = { "TurbOff.wav", "TurbOn.wav" },
+  CHUNK = 2048, CHUNKS_PER_LOOP = 4,      -- keeps each loop() call light (R15)
+}
+local vstate = { "no", "no" }             -- per file: "yes", "no", "copying...", "copy failed"
+local vsrcOk = false                      -- both of the app's own files are present
+---@class CopyJob
+---@field list integer[]  indexes into VOICE.files still to copy
+---@field k integer       position in list
+---@field fin JetiFile|nil
+---@field fout JetiFile|nil
+---@field created boolean the destination was created by this copy
+local job = nil ---@type CopyJob|nil  -- copy in progress (R15)
+
+-- JETI Studio's io.open needs the path without its leading "/"; the
+-- transmitter takes the absolute path (docs/jeti-api-notes.md).
+local function openFile(path, mode)
+  return io.open(path, mode) or io.open(string.sub(path, 2), mode)
+end
+
+local function removeFile(path)
+  return io.remove(path) or io.remove(string.sub(path, 2))
+end
+
+local function fileExists(path)
+  local f = openFile(path, "r")
+  if f then
+    io.close(f)
+    return true
+  end
+  return false
+end
+
+-- Size from the folder listing; nil if the folder can't be listed.
+local function fileSize(folder, name)
+  local want = string.lower(name)
+  for _, path in ipairs({ folder, string.sub(folder, 2) }) do
+    local ok, size = pcall(function()
+      for n, kind, sz in dir(path) do
+        if kind == "file" and string.lower(n) == want then
+          return sz
+        end
+      end
+    end)
+    if ok and size then
+      return size
+    end
+  end
+  return nil
+end
+
+local function canCopy()
+  if job or not vsrcOk then
+    return false
+  end
+  for i = 1, #VOICE.files do
+    if vstate[i] ~= "yes" then
+      return true
+    end
+  end
+  return false
+end
+
+-- Status labels and the Copy button, only while this screen is showing.
+local function showVoice()
+  if not formOpen or cur ~= SCR.VOICE or not idx.vs then
+    return
+  end
+  for i = 1, #VOICE.files do
+    form.setProperties(idx.vs[i], { label = vstate[i] })
+  end
+  form.setButton(2, "Copy", canCopy() and ENABLED or DISABLED)
+end
+
+local function scanVoice()
+  vsrcOk = true
+  for i, name in ipairs(VOICE.files) do
+    if not fileExists(VOICE.src .. "/" .. name) then
+      vsrcOk = false
+    end
+    if not (job and job.list[job.k] == i) and vstate[i] ~= "copy failed" then
+      vstate[i] = fileExists(VOICE.dest .. "/" .. name) and "yes" or "no"
+    end
+  end
+end
+
+-- Move on to the next file; the job ends after the last one.
+---@param j CopyJob
+local function nextFile(j)
+  j.fin, j.fout, j.created = nil, nil, false
+  j.k = j.k + 1
+  if j.k > #j.list then
+    job = nil
+  end
+  showVoice()
+end
+
+-- Close the file being copied and check it; on failure delete the partial copy.
+---@param j CopyJob
+---@param ok boolean
+local function finishFile(j, ok)
+  local i = j.list[j.k]
+  local name = VOICE.files[i]
+  if j.fin then
+    io.close(j.fin)
+  end
+  if j.fout then
+    io.close(j.fout)
+  end
+  if ok and fileSize(VOICE.dest, name) ~= fileSize(VOICE.src, name) then
+    ok = false
+  end
+  if not ok and j.created then
+    removeFile(VOICE.dest .. "/" .. name)
+  end
+  vstate[i] = ok and "yes" or "copy failed"
+  nextFile(j)
+end
+
+-- One loop() step of the copy: open the next file, or move a few chunks.
+---@param j CopyJob
+local function stepCopy(j)
+  local i = j.list[j.k]
+  local name = VOICE.files[i]
+  if not j.fin then
+    local dest = VOICE.dest .. "/" .. name
+    if fileExists(dest) then            -- never overwrite (FR-027): keep it
+      vstate[i] = "yes"
+      nextFile(j)
+      return
+    end
+    j.fin = openFile(VOICE.src .. "/" .. name, "r")
+    j.fout = j.fin and openFile(dest, "w") or nil
+    j.created = j.fout ~= nil
+    if not (j.fin and j.fout) then
+      finishFile(j, false)
+      return
+    end
+    vstate[i] = "copying..."
+    showVoice()
+  end
+  for _ = 1, VOICE.CHUNKS_PER_LOOP do
+    local data = io.read(j.fin, VOICE.CHUNK)
+    if data == nil or data == "" then
+      finishFile(j, true)
+      return
+    end
+    if not io.write(j.fout, data) then
+      finishFile(j, false)
+      return
+    end
+  end
+end
+
+local function startCopy()
+  local list = {}
+  for i = 1, #VOICE.files do
+    if vstate[i] ~= "yes" then
+      vstate[i] = "no"
+      list[#list + 1] = i
+    end
+  end
+  if #list > 0 then
+    job = { list = list, k = 1, created = false }
+  end
+  showVoice()
+end
+
+local function buildVoice()
+  form.setTitle("Voice callouts")
+  scanVoice()
+  hint("Say 'Turbine off' at CUT and")
+  hint("'Turbine on' at RUN, using the")
+  hint("transmitter's Sounds on event.")
+  idx.vs = {}
+  for i, name in ipairs(VOICE.files) do
+    form.addRow(2)
+    form.addLabel({ label = name .. " in /Audio", width = LABEL_W })
+    idx.vs[i] = form.addLabel({ label = vstate[i], alignRight = true })
+  end
+  hint("Voice files not installed.", not vsrcOk)
+  hint("Copy puts them in /Audio.")
+  hint("Sounds on event: add the")
+  hint("safety switch at CUT with")
+  hint("TurbOff.wav, and at RUN with")
+  hint("TurbOn.wav. Keep any callouts")
+  hint("you already have, or use your")
+  hint("own files.")
+  hint("Voice: Piper, Amy (CC BY-SA 4.0).")
+  form.setButton(1, "Back", ENABLED)
+  form.setButton(2, "Copy", canCopy() and ENABLED or DISABLED)
+  if canOpenMenus() then
+    form.setButton(3, "Open", ENABLED)
+  end
+end
+
 local function buildHome()
   form.setTitle(APP_NAME)
   form.addRow(1)
-  form.addLink(function()
-    print("TrbSt link: Setup inputs")
-    local ok, err = pcall(goTo, SCR.INPUTS)
-    if not ok then
-      print("TrbSt goTo error: " .. tostring(err))
-    end
-  end, { label = "Setup inputs" })
+  form.addLink(function() goTo(SCR.INPUTS) end, { label = "Setup inputs" })
+  form.addRow(1)
+  form.addLink(function() goTo(SCR.VOICE) end, { label = "Voice callouts (optional)" })
 end
 
 local function buildStub()
@@ -354,6 +552,7 @@ local BUILD = {
   [SCR.VERIFY] = buildStub,
   [SCR.FAILSAFE] = buildStub,
   [SCR.SUMMARY] = buildStub,
+  [SCR.VOICE] = buildVoice,
 }
 
 -- Show a Lua error on the form instead of losing the form (calibration aid).
@@ -367,8 +566,7 @@ local function showError(where, err)
   form.setButton(1, "Back", ENABLED)
 end
 
-local function initForm(subformId)
-  print("TrbSt build " .. cur .. " (subform " .. tostring(subformId) .. ")")
+local function initForm()
   formOpen = true
   idx = {}
   local ok, err = pcall(BUILD[cur])
@@ -389,12 +587,20 @@ local function onKey(keyCode)
     elseif keyCode == KEY_4 and canOpenMenus() then
       system.openExternal(MENU.other)
     end
+  elseif cur == SCR.VOICE then
+    if keyCode == KEY_2 and canCopy() then
+      if form.question("Copy voice files to /Audio?", "TurbOff.wav and TurbOn.wav.",
+          "Files already there are kept.") == 1 then
+        startCopy()
+      end
+    elseif keyCode == KEY_3 and canOpenMenus() then
+      system.openExternal(MENU.sound)
+    end
   end
 end
 
 -- The form is gone: drop its indices so nothing calls form.* on them (R9).
 local function closeForm()
-  print("TrbSt form closed on screen " .. cur)
   formOpen = false
   idx = {}
 end
@@ -437,22 +643,22 @@ end
 ------------------------------------------------------------------------------
 
 local function init()
-  print("TrbSt keys: F1=" .. tostring(KEY_1) .. " F5=" .. tostring(KEY_5) .. " ENTER=" .. tostring(KEY_ENTER)
-    .. " ESC=" .. tostring(KEY_ESC) .. " RELEASED=" .. tostring(KEY_RELEASED))
   loadSettings()
   refreshOutCode()
   cur = cfg.scr
   system.registerForm(1, MENU_APPS, APP_NAME, initForm, onKey, nil, closeForm)
 end
 
-local beatAt = 0             -- debug heartbeat (calibration build only)
-
 local function loop()
-  local now = system.getTimeCounter()
-  if now - beatAt >= 2000 then
-    beatAt = now
-    print("TrbSt loop: formOpen=" .. tostring(formOpen) .. " cur=" .. cur .. " idx.us=" .. tostring(idx.us)
-      .. " sw=" .. tostring(readSwitch()) .. " stk=" .. tostring(readStick()) .. " out=" .. tostring(readOut()))
+  local j = job
+  if j then                  -- the copy continues even with the form closed (R15)
+    local ok, err = pcall(stepCopy, j)
+    if not ok then
+      print("TrbSt copy: " .. tostring(err))
+      if job then
+        finishFile(job, false)
+      end
+    end
   end
   if not formOpen then
     return
@@ -471,6 +677,10 @@ end
 
 local function destroy()
   formOpen = false
+  if job then                -- don't leave a half-written file in /Audio
+    pcall(finishFile, job, false)
+    job = nil
+  end
 end
 
 ---@type JetiApp

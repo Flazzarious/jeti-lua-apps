@@ -449,8 +449,11 @@ on" when flipping it, with the app removed from the model.
   has assets, its own asset folder. It MUST NOT depend on any other app in
   this repository. Any shared module it uses MUST be listed in the plan and
   included in the install instructions and release package.
-- **FR-025**: The app MUST work on the DS-24 II / DC-24 II. On other
-  transmitters it MUST either work or show a clear "not supported" notice.
+- **FR-025**: The app MUST work on the DS-24 II / DC-24 II, and SHOULD
+  work on older JETI DC/DS transmitters too (Aaron, 2026-10-10): it uses
+  only form screens, no drawing. Where the firmware lacks a feature, the
+  app hides it instead of failing: no Open buttons below firmware 5.01,
+  no voice copy without file delete (5.00).
 
 **Voice callouts (optional, User Story 4)**
 

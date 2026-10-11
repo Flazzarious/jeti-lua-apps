@@ -371,13 +371,23 @@ setting-write API, which constitution I would forbid anyway.
 
 ## R13. Transmitter support (FR-025)
 
-**Decision.** If `system.getDeviceType()` doesn't contain "24", the app's
-form shows only "Throttle Setup Wizard needs a DC/DS-24" and does
-nothing else. If `system.openExternal` is nil (firmware before 5.01), the
-Open buttons are hidden and the step text still names the menu.
+**Decision (revised 2026-10-10, Aaron: should work on older JETI
+transmitters).** No device check. The app runs on any DC/DS and tests for
+features instead:
 
-**Rationale.** The layout and line lengths are designed and tested on the
-24 series only. A clear notice satisfies FR-025 for everything else.
+| Feature | Needs | If missing |
+| --- | --- | --- |
+| Open buttons (`system.openExternal`) | firmware 5.01 | hidden; step text still names the menu |
+| Stick proportional check (`system.getSwitchInfo`) | 4.22 | treated as OK (already the case) |
+| Voice copy (`io.remove` for cleanup, `dir` for the size check) | 5.00 | Copy hidden; the screen tells the pilot to copy the files by hand |
+
+**Rationale.** Every screen is built from form components, so the
+firmware lays it out on any display, including the 212 × 64 monochrome
+DC/DS-14/16. Lines are kept to 32 characters; on the smaller screens they
+may wrap or cut off, which only a test there can show. The DC/DS-14/16's
+50 kB memory cap is a risk for an app of this size: check memory with
+`collectgarbage("count")` before claiming support there. Only the DS-24 II
+is tested.
 
 ## R14. The voice files (FR-026, FR-029)
 
