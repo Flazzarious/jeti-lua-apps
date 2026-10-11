@@ -306,6 +306,10 @@ local function buildInputs()
 
   form.setButton(1, "Back", ENABLED)
   form.setButton(3, "Learn", ENABLED)
+  if canOpenMenus() then            -- shortcuts to the two setup menus (Aaron, 2026-10-10)
+    form.setButton(2, "Servo", ENABLED)
+    form.setButton(4, "Other", ENABLED)
+  end
 
   inputsConfirmed = false
   live.at, live.swText, live.stkText, live.us, live.swPct, live.stkPct = 0, nil, nil, nil, nil, nil
@@ -1155,6 +1159,10 @@ local function onKey(keyCode)
   elseif cur == SCR.INPUTS then
     if keyCode == KEY_3 then
       learn()
+    elseif keyCode == KEY_2 and canOpenMenus() then
+      system.openExternal(MENU.servo)
+    elseif keyCode == KEY_4 and canOpenMenus() then
+      system.openExternal(MENU.other)
     end
   elseif cur == SCR.VOICE then
     if keyCode == KEY_2 and canCopy() then

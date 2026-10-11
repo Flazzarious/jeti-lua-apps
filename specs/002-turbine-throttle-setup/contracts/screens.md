@@ -34,6 +34,10 @@ F-key labels are ≤ 7 characters.
 | Targets | label | "Targets: 1100 / 1200 / 1900 us" (or 1000 for Xicoy; "--" until chosen) |
 | Tolerance | intbox 5–25, step 1 | "+/- 10 us" |
 
+- F-keys: F1 "Back", F2 "Servo" (opens `:servoSetup`), F3 "Learn", F4
+  "Other" (opens `:otherProps`). F2 and F4 are hidden without
+  `system.openExternal`. They stay on this screen permanently (Aaron,
+  2026-10-10), as shortcuts alongside the guide's Open buttons.
 - Choosing a new switch or stick clears `offSg`/`idlSg` (learn again).
 - **FR-005a:** while `res > 0`, the first change on this screen asks
   `form.question("Clear saved result?", "Changing setup means it must be",
