@@ -10,9 +10,12 @@ pixel 8 x 8, with "AG" (Aaron George) drawn as strokes:
   overspeed zone and a yellow max mark, "AG" in the center.
 - Flameout Alarm (--app flameout): the window's rising segmented RPM sweep,
   lit cyan up to past a yellow idle marker, "AG" at the upper left.
+- Throttle Setup Wizard (--app throttle): the silver safety switch lever and
+  a throttle bar with cut, idle and full marks, "AG" at the upper left.
 
     python tools/publish/make_icon.py                  # docs/apps/img/speed-gauge-icon.png
     python tools/publish/make_icon.py --app flameout   # docs/apps/img/flameout-alarm-icon.png
+    python tools/publish/make_icon.py --app throttle   # docs/apps/img/throttle-setup-wizard-icon.png
     python tools/publish/make_icon.py --preview DIR    # also Speed Gauge's variants
 
 Standard library only.
@@ -190,6 +193,47 @@ def shade_flameout(x, y):
     return col
 
 
+SILVER = (200, 205, 212)
+
+# Throttle Setup Wizard: the silver safety switch (a lever on a ring) at the
+# left, a throttle bar at the right with cut / idle / full marks.
+TRB = {"bar": (40.0, 52.0, 13.0, 55.0), "fill": 0.62,   # x0, x1, top, bottom; lit fraction
+       "cut": 0.06, "idle": 0.22, "full": 0.96,          # mark positions, 0 = bottom
+       "base": (17.0, 48.0, 6.5), "knob": (11.5, 33.0, 3.4), "lever": 1.6,
+       "ag": (-9.0, -18.0)}
+
+
+def shade_throttle(x, y):
+    """Color of one sample point in Throttle Setup Wizard's icon."""
+    c = SIZE / 2
+    dx, dy = x - c, y - c
+    r_corner = 12
+    qx, qy = max(abs(dx) - (c - r_corner), 0), max(abs(dy) - (c - r_corner), 0)
+    if math.hypot(qx, qy) > r_corner:
+        return None
+    col = BG
+    x0, x1, top, bot = TRB["bar"]
+    if x0 <= x <= x1 and top <= y <= bot:
+        edge = min(x - x0, x1 - x, y - top, bot - y) < 0.9
+        lit = y >= bot - TRB["fill"] * (bot - top)
+        col = EDGE if edge else (CYAN if lit else UNLIT)
+    for key, mark in (("cut", ZONE), ("idle", YELLOW), ("full", WHITE)):
+        ym = bot - TRB[key] * (bot - top)
+        if x0 - 3 <= x <= x1 + 3 and abs(y - ym) <= 1.1:
+            col = mark
+    bx, by, br = TRB["base"]
+    kx, ky, kr = TRB["knob"]
+    d = math.hypot(x - bx, y - by)
+    if d <= br:
+        col = RIM if d > br - 1.8 else FACE
+    if on_seg(x, y, bx, by, kx, ky, TRB["lever"]) or math.hypot(x - kx, y - ky) <= kr:
+        col = SILVER
+    ox, oy = TRB["ag"]
+    if monogram(x - ox, y - oy, c):
+        col = WHITE
+    return col
+
+
 def render(variant, size=SIZE):
     rows = []
     step = 1 / SS
@@ -204,6 +248,8 @@ def render(variant, size=SIZE):
                     syp = (py + (sy + 0.5) * step) * scale
                     if variant == "flameout":
                         col = shade_flameout(sxp, syp)
+                    elif variant == "throttle":
+                        col = shade_throttle(sxp, syp)
                     else:
                         col = shade(sxp, syp, variant)
                     if col is not None:
@@ -236,9 +282,11 @@ def write_png(path, size, rows):
 
 
 def main():
-    if "--app" in sys.argv and sys.argv[sys.argv.index("--app") + 1] == "flameout":
-        out = REPO / "docs" / "apps" / "img" / "flameout-alarm-icon.png"
-        write_png(out, SIZE, render("flameout"))
+    app = sys.argv[sys.argv.index("--app") + 1] if "--app" in sys.argv else None
+    if app in ("flameout", "throttle"):
+        name = {"flameout": "flameout-alarm-icon.png", "throttle": "throttle-setup-wizard-icon.png"}[app]
+        out = REPO / "docs" / "apps" / "img" / name
+        write_png(out, SIZE, render(app))
         print(f"wrote {out.relative_to(REPO)}")
         return
     write_png(OUT, SIZE, render("arc"))

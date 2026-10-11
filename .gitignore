@@ -19,3 +19,7 @@ venv/
 
 # Local JETI Studio test source (tools/publish/make_apps_json.py --local)
 Apps.local.json
+
+# Model files copied from the transmitter (contain transmitter and receiver IDs)
+docs/examples/models/
+docs/examples/*.jsn

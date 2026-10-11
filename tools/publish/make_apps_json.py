@@ -79,6 +79,19 @@ APPS = [
             "src/Apps/AG-FlmOt",
         ],
     },
+    {
+        "name": "Throttle Setup Wizard (DC/DS-24II)",
+        "script": "AG-TrbSt",
+        "tag": "AG-TrbSt-v0.1.0",
+        "author": "Aaron George",
+        "hw": HW_DCDS24_II,   # older DC/DS should work but are untested (spec FR-025)
+        "description": "docs/apps/throttle-setup-wizard.html",
+        "previewIcon": "docs/apps/img/throttle-setup-wizard-icon.png",
+        "paths": [
+            "src/Apps/AG-TrbSt.lua",
+            "src/Apps/AG-TrbSt",
+        ],
+    },
 ]
 
 
