@@ -184,8 +184,10 @@ Max negative / Max positive on screen. Failsafe labels are still to be
 confirmed.
 
 **Measured (transmitter, 2026-10-10).** `openExternal(":servoSetup")`
-opens the Servo Setup screen; pressing Esc there returns straight to the
-app's Setup inputs screen. R4's resume design is still kept for reopening
+opens the Servo Setup screen and `(":otherProps")` opens Other Model
+Options; pressing Esc in either returns straight to the app's Setup inputs
+screen. ±125% travel also read correctly, so open point R1.2 (clipping) is
+closed and the 900–2100 µs range was never a problem. R4's resume design is still kept for reopening
 the app later.
 
 **Open point (task 1).** The call is asynchronous. What happens to the
