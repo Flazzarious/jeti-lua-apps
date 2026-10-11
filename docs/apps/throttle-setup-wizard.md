@@ -72,7 +72,8 @@ check: fuel off, or the ECU unplugged from the engine.
 2. **Setup inputs:** choose your safety switch and your throttle stick
    (assign it as **proportional, P**), put the switch at CUT and the stick
    at idle (down) and press **Learn**. Choose the throttle output and your
-   ECU: **Xicoy** or **Other**.
+   ECU: **Xicoy**, or **Other** for everything else. Other has been tested
+   with KingTech and Swiwin ECUs and should work with most others.
 3. **Guided setup:** five steps, each with the exact values and an **Open**
    button for the right menu. Skip this if the model is already set up.
 4. **Verify:** follow the prompts for each switch and stick position.
@@ -85,16 +86,17 @@ check: fuel off, or the ECU unplugged from the engine.
 One setup for every turbine. Only the **Throttle-Cut output value**
 depends on the ECU:
 
-| Setting | Xicoy | All other ECUs (KingTech, Swiwin, JetCat, …) |
+| Setting | Xicoy | Other ECUs |
 | --- | --- | --- |
 | Max negative / Max positive | −80% / 80% | −80% / 80% |
 | Throttle-Cut output value | **−125%** | **−100%** |
 | Throttle-Idle offset | 20% | 20% |
 | Signal: cut / idle / full | 1000 / 1200 / 1900 µs | 1100 / 1200 / 1900 µs |
 
-Xicoy asks for idle at 15–30% of the cut-to-full range: −125% puts it at
-22%. Brands other than Xicoy, KingTech and Swiwin haven't been tested, but
-−100% is expected to work.
+**Other ECUs:** tested with **KingTech** and **Swiwin**, and should work
+with most other ECUs that learn their throttle range from the receiver
+(JetCat, JetCentral and others). **Xicoy** asks for idle at 15–30% of the
+cut-to-full range, so it gets −125%, which puts idle at 22%.
 
 You need a **two-position switch** for the safety switch. A **JETI
 two-position locking switch** for the DS-24 II is highly recommended: you

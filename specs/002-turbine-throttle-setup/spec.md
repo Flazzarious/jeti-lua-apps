@@ -324,7 +324,8 @@ confirm it and check that the summary shows "Setup complete".
 - **FR-002**: The app MUST let the pilot choose the throttle stick and the
   throttle output channel to measure.
 - **FR-003**: The app MUST let the pilot choose the ECU type: Xicoy, or
-  other (KingTech, Swiwin, JetCat and the rest). It has no default; guided
+  other. The app MUST say that "other" has been tested with KingTech and
+  Swiwin and should work with most other ECUs. It has no default; guided
   setup and verify stay disabled until it is chosen. The targets follow
   from it: Xicoy 1000 / 1200 / 1900 µs, other 1100 / 1200 / 1900 µs. The
   pilot cannot type targets.

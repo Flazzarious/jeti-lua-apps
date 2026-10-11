@@ -29,7 +29,7 @@ F-key labels are ≤ 7 characters.
 | Learn | label + F3 "Learn" | "Switch to CUT, stick to idle," / "then press Learn menu button." Stores `offSg`, `idlSg` (R5) |
 | Throttle output | selectbox "--", "O1".."O24" | hint: "Output (O1-O24) the ECU's" / "throttle lead is plugged into." |
 | Signal now | label | live: "1102 us" / "choose output" / "no signal"; hint "Pulse width the ECU gets now." |
-| ECU | selectbox "--", "Xicoy", "Other" | starts at "--" (not chosen); hint "Xicoy: cut -125%. Others: -100%." |
+| ECU | selectbox "--", "Xicoy", "Other" | starts at "--" (not chosen); hints "Xicoy: Throttle-Cut -125%." / "Other: Throttle-Cut -100%." / "Tested with KingTech and Swiwin;" / "should work with most others." |
 | Targets | label | "Targets: 1100 / 1200 / 1900 us" (or 1000 for Xicoy; "--" until chosen) |
 | Tolerance | intbox 5–25, step 1 | "+/- 10 us" |
 
