@@ -81,8 +81,11 @@ be bumped by accident in flight.
 the throttle safety switch is **SF**, the short silver two-position toggle on
 the top-right panel, next to SE (the long blue lever). The red switch on the
 top edge is not the throttle switch. Photo:
-[`assets/safety-switch-sf.jpg`](assets/safety-switch-sf.jpg). Which SF
-position is OFF (Throttle Cut) is still to be confirmed. This is an example
+[`assets/safety-switch-sf.jpg`](assets/safety-switch-sf.jpg). The photo
+shows SF in the **RUN** position: Throttle Cut off, engine allowed to run
+(Aaron, 2026-10-10). The other position is OFF (Throttle Cut on). Note the
+wording: pilots often say "cut off" for RUN, while this spec's "OFF" means
+engine off. This is an example
 for testing and screenshots, not a default: the app lets every pilot choose
 their own switch (FR-001).
 

@@ -29,7 +29,8 @@ fast in an emergency, and don't use it for anything else.
 
 ![The short silver locking switch SF, used as the throttle safety switch, next to SE on a DS-24 II](https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/main/docs/apps/img/throttle-setup-wizard-switch.jpg)
 
-*Example: the short silver locking switch **SF** as the safety switch.*
+*Example: the short silver locking switch **SF** as the safety switch,
+shown in RUN (Throttle Cut off, engine allowed to run).*
 
 ### 1. Throttle travel
 
