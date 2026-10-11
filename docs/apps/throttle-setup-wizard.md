@@ -1,18 +1,86 @@
 # Throttle Setup Wizard
 
-A step-by-step guide to setting up a turbine's throttle on a JETI
-**DS-24 II / DC-24 II**, and an app that walks you through it and then
-**checks the result** by measuring the throttle signal.
-
-One two-position safety switch selects **CUT** (Throttle Cut, engine off) or
-**RUN** (Throttle Idle, engine allowed to run). The throttle stick then runs from idle to
-full. The ECU learns three positions from the transmitter: cut, idle and
-full.
+Set up a turbine's throttle on one **safety switch**, and **prove it works**
+before the engine ever starts. For the JETI **DS-24 II / DC-24 II**.
 
 ![Other Model Options with Throttle Cut and Throttle Idle on the same switch](https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/main/docs/apps/img/throttle-setup-wizard-cut-idle.png)
 
-**Bench use only.** Make sure the engine can't start while you do this:
-fuel off, or the ECU unplugged from the engine.
+## One switch instead of the trim
+
+Many pilots still start and stop their turbine the old way: **throttle trim
+fully down to stop, trim fully up to arm and idle**, clicking the digital
+trim up and down every flight. It works, but it's slow, easy to get wrong,
+and slow to shut down in an emergency. Xicoy's manual warns that digital
+trims cause an **unstable idle and a delay in shutting off the engine**,
+and tells you to use the transmitter's throttle cut switch instead.
+
+The JETI way is simpler and safer: **one two-position safety switch**.
+
+- **CUT**: Throttle Cut, engine off. The stick does nothing.
+- **RUN**: Throttle Idle, the engine may run. The stick goes from idle to
+  full.
+
+One flick stops the engine, every time, wherever the stick and trim are.
+All you have to do is **set up that switch correctly once**. That's the
+part people find tricky, and that's what this app is for.
+
+## What the app does for you
+
+You make each change on the transmitter; the app tells you exactly what to
+enter, opens the right menu, and then **checks the result by measuring the
+throttle signal**. Even if you set everything up by hand (or the model is
+already set up), run its check:
+
+1. **Proof, not assumption.** It measures the real throttle signal with the
+   switch at CUT and RUN and the stick at idle and full, and shows pass or
+   fail against your targets. A setup that looks right in the menus can
+   still be wrong, such as a switch assigned the wrong way round.
+2. **It tests the dangerous case.** With the switch at CUT and the stick at
+   full, the throttle must stay at cut. That is the failure that matters
+   most, and it's easy never to check.
+3. **It tells you what to fix.** Not just "fail", but which setting:
+   "Switch RUN gave cut: reverse the switch assignment", "Full off by
+   +40 us: check Travel +", "Throttle reversed: check servo reverse",
+   "Output doesn't move: choose the throttle output".
+4. **Accurate readings.** It waits until the stick is fully at the end and
+   held still, then averages the signal, so a stick at 95% doesn't give a
+   false result.
+5. **No targets your ECU can't use.** It refuses an idle too close to cut
+   (the ECU may confuse run with stop after learning the radio) and warns
+   when idle is below the 15% of the range Xicoy asks for.
+6. **The numbers for any targets.** If your ECU was taught different
+   values, it works out the travel and idle offset that reproduce them,
+   including uneven travel. No trial and error.
+7. **Failsafe isn't forgotten.** It won't call the setup complete until you
+   confirm a hand test of failsafe, the one safety setting no transmitter
+   can measure.
+8. **A record.** The summary keeps the switch, targets, measured values and
+   date for the model, and clears itself if you change the setup.
+9. **The same check every time.** Every new model gets the same check, the
+   same way, in a couple of minutes.
+
+The app **can't change any setting itself**: the JETI Lua interface can
+only read and open menus, and changing a turbine's throttle from an app
+would be unsafe. Once the setup passes, remove the app from the model.
+Nothing at flight time depends on it.
+
+**Bench use only.** Make sure the engine can't start while you set up or
+check: fuel off, or the ECU unplugged from the engine.
+
+## Using the app
+
+1. Add **AG-TrbSt** in *Applications → User Applications*, then open
+   **Throttle Setup Wizard** in *Applications*.
+2. **Setup inputs:** choose your safety switch and your throttle stick
+   (assign it as **proportional, P**), put the switch at CUT and the stick
+   at idle (down) and press **Learn**. Choose the throttle output and check
+   the targets (default 1000 / 1200 / 1900 µs).
+3. **Guided setup:** five steps, each with the exact values and an **Open**
+   button for the right menu. Skip this if the model is already set up.
+4. **Verify:** follow the prompts for each switch and stick position.
+5. **Failsafe:** test it by hand and confirm. The summary then shows
+   "Setup complete" and the next step: your ECU's radio learning, or skip
+   it if the ECU already knows these values.
 
 ## The setup by hand
 
@@ -50,7 +118,7 @@ shown in RUN (Throttle Cut off, engine allowed to run).*
    activates Throttle Cut.
 2. Set **Throttle-Cut output value** to **−100%**.
 
-### 3. Throttle Idle (engine RUN)
+### 3. Throttle Idle (RUN position)
 
 Same screen, *Throttle Idle*:
 
@@ -62,6 +130,9 @@ Same screen, *Throttle Idle*:
 Throttle-Idle switch and **✗** next to Throttle-Cut switch. Flip to CUT and
 they swap. If both show the same mark, one of them was assigned in the
 wrong position: assign it again.
+
+Leave the throttle trim centered (or turned off for throttle): the switch
+now does the trim's old job.
 
 ### 4. Failsafe
 
@@ -84,33 +155,21 @@ On the servo monitor the throttle should read:
 | RUN | down | −60% | 1200 µs |
 | RUN | up | +80% | 1900 µs |
 
+Or let the app do this for you: that's its **Verify** step.
+
 ### 6. Teach the ECU
 
 Run your ECU's radio learning ("Teach RC", "Radio setup") and follow its
-prompts for cut, idle and full. If the ECU was already taught these exact
-values, you can skip this.
-
-## What the app does
-
-- **Asks for** your safety switch, which position is CUT, the throttle stick,
-  the throttle output and your targets (default 1000 / 1200 / 1900 µs). It
-  refuses targets an ECU can't use, such as idle too close to cut.
-- **Shows each step** with the exact values for your targets, and opens the
-  right transmitter menu for you.
-- **Verifies** by measuring the throttle signal in every switch and stick
-  position, and says what's wrong if a step fails (e.g. "Switch RUN gave
-  cut. Reverse the switch assignment.").
-- **Asks you to test failsafe by hand**, then shows a summary.
-
-The app **can't change any setting itself**: the JETI Lua interface can
-only read and open menus, and changing a turbine's throttle from an app
-would be unsafe. You make each change; the app tells you exactly what and
-then proves it worked. Once the setup passes, remove the app from the
-model. Nothing at flight time depends on it.
+prompts for cut, idle and full: switch at CUT for cut, RUN with the stick
+down for idle, RUN with the stick up for full. If the ECU was already taught
+these exact values, you can skip this.
 
 ## Credits and licenses
 
 Throttle Setup Wizard: MIT license, Copyright (c) 2026 Aaron George.
+
+Xicoy's advice on digital trims is from the Xicoy TurboJet Engines User
+Manual (v1.5, 2024); idle ranges from the Xicoy and KingTech manuals.
 
 Source, full credits and license texts:
 [github.com/Flazzarious/jeti-lua-apps](https://github.com/Flazzarious/jeti-lua-apps)

@@ -28,6 +28,14 @@ doesn't fully cut, an idle that sits too low, or a failsafe that holds the
 engine at idle on signal loss all look fine on the bench until something
 goes wrong. Pilots set this up rarely, so they rarely remember the details.
 
+Many pilots avoid the setup altogether and use the older **trim method**:
+throttle trim fully down to stop the engine, fully up to arm and idle,
+clicking the digital trim every flight. Xicoy's manual warns that digital
+trims cause an unstable idle and delay shutting off the engine in an
+emergency, and recommends the transmitter's throttle cut switch instead.
+A correctly set up safety switch (CUT / RUN) is simpler and safer; the
+hard part is setting it up correctly once.
+
 **Goal.** The app gives step-by-step instructions with the exact values to
 enter, takes the pilot straight to each menu, and then measures the throttle
 output in all four switch-and-stick states and reports pass or fail. Once
