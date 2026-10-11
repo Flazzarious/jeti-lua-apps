@@ -191,6 +191,10 @@ the emulator's numbers above:
   folders (Aaron's DS-24 II card, 2026-10-10). Put files meant for the
   transmitter's voice pickers (Sounds on event) in `/Audio/<lang>`, using
   `system.getLocale()` for `<lang>`.
+- **Copying files with Jeti's `io` works**: `io.read(f, 2048)` /
+  `io.write(f, data)` in chunks copied two WAVs from `/Apps/AG-TrbSt` to
+  `/Audio/en` byte-exact (sizes match), and Sounds on event could pick them
+  (transmitter, 2026-10-10, Throttle Setup Wizard).
 - Audio: relative paths resolve under `/Audio` and `/Audio/<lang>`. Foreground
   playback (`AUDIO_IMMEDIATE`, `AUDIO_QUEUE`) is WAV only; background accepts
   MP3.

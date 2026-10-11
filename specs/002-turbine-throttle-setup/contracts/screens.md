@@ -88,9 +88,11 @@ last step. Rows:
   write|size a/b".
 - If the app's own files are missing: "Voice files not installed." and no
   Copy button (FR-027).
-- Instructions: "Sounds on event: add the" / "safety switch at CUT with" /
-  "TurbOff.wav, and at RUN with" / "TurbOn.wav. Keep any callouts" /
-  "you already have, or use your" / "own files."
+- Instructions: "Then press Open. In Sounds on" / "event add TWO events, one per" /
+  "switch position:" / "1. Safety switch at CUT," / "   file TurbOff.wav" /
+  "2. Safety switch at RUN," / "   file TurbOn.wav" / "Keep any callouts you already" /
+  "have, or use your own files." (Sounds on event needs one event per
+  position; the app can't add them, research R15.)
 - Credit: "Voice: Piper, Amy (CC BY-SA 4.0)." (FONT_MINI, FR-029)
 
 F-keys: F1 "Back", F2 "Copy" (shown only when a file is missing from

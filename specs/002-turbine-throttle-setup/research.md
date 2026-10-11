@@ -436,6 +436,13 @@ the destination is now `/Audio/<language>` from `system.getLocale()`
 (`/Audio/en` here), and a failed copy names its step on screen ("failed:
 read / create / write / size a/b") so the cause can be seen.
 
+**Second attempt, to `/Audio/en` (Aaron, 2026-10-10): works.** Both files
+showed "yes" (sizes verified against the originals), and Sounds on event
+could pick them. So Jeti's `io.read`/`io.write` copy WAV bytes intact.
+Sounds on event needs **one event per switch position** (two in all); the
+app can't add them (no Lua API for model settings, and constitution I), so
+its instructions say to add two and which file goes on each.
+
 **Open points (transmitter):** that Jeti's `io.read`/`io.write` copy WAV
 bytes exactly (Lua strings are binary-safe, but Jeti's reduced `io` has
 only been used for reading here); that Sounds on event lists files in
