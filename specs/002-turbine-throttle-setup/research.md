@@ -131,6 +131,16 @@ manual puts Throttle Cut and Throttle Idle under "Advanced Properties →
 Other Model Options". The stub in `types/jeti.lua` only mentions files, so
 task 1 updates its comment with the menu constants (source: API p. 74–75).
 
+**Labels on the transmitter (Aaron, 2026-10-10, `Screen007.png`, kept as
+`docs/apps/img/throttle-setup-wizard-cut-idle.png`).** The screen is titled
+"Other Model Options". Section "Throttle Cut (Channel: 1)" has
+"Throttle-Cut switch" and "Throttle-Cut output value"; section "Throttle
+Idle (Channel: 1)" has "Throttle-Idle switch" and "Throttle-Idle offset".
+Each switch row shows ✓ when that function is active and ✗ when not, so
+with both on one switch they always show opposite marks. The guide text
+uses these labels (FR-007). Servo setup and failsafe labels are still to
+be confirmed.
+
 **Open point (task 1).** The call is asynchronous. What happens to the
 app's form when the pilot backs out of the menu isn't documented. The
 design doesn't depend on it (R4).
@@ -166,6 +176,12 @@ which way a stick reads with a given stick mode and calibration, varies
 and isn't documented. Learning both from the pilot's own hands removes the
 question and costs one press. It also matches how the pilot thinks
 ("this is OFF").
+
+**Found on the transmitter (2026-10-10).** The stick has to be assigned
+as **proportional** in the inputbox's dialog. `addInputbox(item, true)`
+only *allows* it; assigned as a switch, the stick never reads "middle".
+Learn refuses a stick whose `getSwitchInfo(stk).proportional` is false,
+and the screen hints "Assign it as proportional (P)."
 
 **Alternatives.** A "+/−" selectbox for OFF: error-prone, since the pilot
 doesn't know which sign is which. Assuming stick low = −1: wrong for
@@ -300,7 +316,7 @@ setting-write API, which constitution I would forbid anyway.
 ## R13. Transmitter support (FR-025)
 
 **Decision.** If `system.getDeviceType()` doesn't contain "24", the app's
-form shows only "Turbine Throttle Setup needs a DC/DS-24" and does
+form shows only "Throttle Setup Wizard needs a DC/DS-24" and does
 nothing else. If `system.openExternal` is nil (firmware before 5.01), the
 Open buttons are hidden and the step text still names the menu.
 

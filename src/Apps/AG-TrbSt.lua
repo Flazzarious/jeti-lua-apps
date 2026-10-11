@@ -1,4 +1,4 @@
--- AG-TrbSt.lua — Turbine Throttle Setup: guides the JETI turbine throttle setup and verifies the throttle output.
+-- AG-TrbSt.lua — Throttle Setup Wizard: guides the JETI turbine throttle setup and verifies the throttle output.
 -- Copyright (c) 2026 Aaron George
 -- SPDX-License-Identifier: MIT
 --
@@ -11,7 +11,7 @@
 -- Design: specs/002-turbine-throttle-setup/ (plan.md, research.md,
 -- data-model.md, contracts/). Research decisions are cited as R1..R13.
 
-local APP_NAME = "Turbine Throttle Setup"
+local APP_NAME = "Throttle Setup Wizard"
 local APP_VERSION = "0.1.0"
 
 -- Output reading -> pulse width, and percent -> pulse width (R1, R2).
@@ -161,6 +161,7 @@ local live = {
   at = 0,                   -- last label refresh (getTimeCounter)
   outCode = nil,            -- "O<n>" for the chosen output, rebuilt when out changes
   swText = nil, stkText = nil, us = nil,   -- last shown values, to update on change only
+  swPct = nil, stkPct = nil,
 }
 
 local function refreshOutCode()
@@ -231,10 +232,13 @@ local function hint(text, visible)
   return form.addLabel({ label = text, font = FONT_MINI, visible = visible ~= false })
 end
 
+-- Always rebuild subform 1 and pick the screen from `cur`. Switching with
+-- reinit(2) appeared to close the form in the emulator (6.04, 2026-10-10);
+-- reinit(1) is what Speed Gauge uses.
 local function goTo(screen)
   cur = screen
   save("scr", screen)
-  form.reinit(screen)
+  form.reinit(1)
 end
 
 local function canOpenMenus()
@@ -307,11 +311,14 @@ local function buildInputs()
     save("stk", v)
     save("idlSg", 0)
   end)
+  hint("Assign it as proportional (P).")
   form.addRow(2)
   form.addLabel({ label = "  Position", width = LABEL_W })
   idx.stk = form.addLabel({ label = "--", alignRight = true })
 
-  hint("Switch to OFF, stick to idle, press Learn.")
+  hint("Switch to OFF and stick to")
+  hint("idle (down), then press the")
+  hint("Learn menu button.")
   idx.learn = hint("", false)
 
   form.addRow(2)
@@ -323,9 +330,12 @@ local function buildInputs()
     save("out", i - 1)
     refreshOutCode()
   end)
+  hint("Output (O1-O24) the ECU's")
+  hint("throttle lead is plugged into.")
   form.addRow(2)
-  form.addLabel({ label = "  Output now", width = LABEL_W })
+  form.addLabel({ label = "  Signal now", width = LABEL_W })
   idx.us = form.addLabel({ label = "--", alignRight = true })
+  hint("Pulse width the ECU gets now.")
 
   pend.tCut, pend.tIdle, pend.tFull = cfg.tCut, cfg.tIdle, cfg.tFull
   addTarget("Cut target (us)", "tCut")
@@ -355,7 +365,14 @@ local function buildInputs()
     form.setButton(4, "Other", ENABLED)
   end
 
-  live.at, live.swText, live.stkText, live.us = 0, nil, nil, nil
+  live.at, live.swText, live.stkText, live.us, live.swPct, live.stkPct = 0, nil, nil, nil, nil, nil
+end
+
+-- The stick must be assigned as proportional, or it reads like a switch and
+-- "middle" is never seen (transmitter, 2026-10-10). nil info is treated as OK.
+local function stickIsProportional()
+  local info = cfg.stk and system.getSwitchInfo(cfg.stk)
+  return info == nil or info.proportional ~= false
 end
 
 -- F3 on Setup inputs: store the OFF sign and the stick's idle sign (R5).
@@ -364,6 +381,8 @@ local function learn()
   local sv, kv = readSwitch(), readStick()
   if sv == nil or kv == nil then
     text = "Choose the switch and stick first."
+  elseif not stickIsProportional() then
+    text = "Stick must be proportional (P)."
   elseif math.abs(sv) < V.SW_BAND then
     text = "Use a two-position switch."
   elseif math.abs(kv) < V.END_BAND then
@@ -382,7 +401,13 @@ end
 local function buildHome()
   form.setTitle(APP_NAME)
   form.addRow(1)
-  form.addLink(function() goTo(SCR.INPUTS) end, { label = "Setup inputs" })
+  form.addLink(function()
+    print("TrbSt link: Setup inputs")
+    local ok, err = pcall(goTo, SCR.INPUTS)
+    if not ok then
+      print("TrbSt goTo error: " .. tostring(err))
+    end
+  end, { label = "Setup inputs" })
 end
 
 local function buildStub()
@@ -400,10 +425,26 @@ local BUILD = {
   [SCR.SUMMARY] = buildStub,
 }
 
-local function initForm()
+-- Show a Lua error on the form instead of losing the form (calibration aid).
+local function showError(where, err)
+  local text = where .. ": " .. tostring(err)
+  print(text)
+  for i = 1, #text, 32 do
+    form.addRow(1)
+    form.addLabel({ label = string.sub(text, i, i + 31), font = FONT_MINI })
+  end
+  form.setButton(1, "Back", ENABLED)
+end
+
+local function initForm(subformId)
+  print("TrbSt build " .. cur .. " (subform " .. tostring(subformId) .. ")")
   formOpen = true
   idx = {}
-  BUILD[cur]()
+  local ok, err = pcall(BUILD[cur])
+  if not ok then
+    idx = {}
+    showError("build " .. cur, err)
+  end
 end
 
 local function onKey(keyCode)
@@ -422,6 +463,7 @@ end
 
 -- The form is gone: drop its indices so nothing calls form.* on them (R9).
 local function closeForm()
+  print("TrbSt form closed on screen " .. cur)
   formOpen = false
   idx = {}
 end
@@ -432,21 +474,30 @@ local function updateInputs(now)
     return
   end
   live.at = now
-  local t = switchText(readSwitch())
-  if t ~= live.swText then
-    live.swText = t
-    form.setProperties(idx.sw, { label = t })
+  -- Word plus raw percent, e.g. "middle (+3%)"; rebuilt only when either changes.
+  local v = readSwitch()
+  local t, p = switchText(v), v and math.floor(v * 100 + 0.5) or 0
+  if t ~= live.swText or p ~= live.swPct then
+    live.swText, live.swPct = t, p
+    form.setProperties(idx.sw, { label = v and string.format("%s (%+d%%)", t, p) or t })
   end
-  t = stickText(readStick())
-  if t ~= live.stkText then
-    live.stkText = t
-    form.setProperties(idx.stk, { label = t })
+  v = readStick()
+  t, p = stickText(v), v and math.floor(v * 100 + 0.5) or 0
+  if t ~= live.stkText or p ~= live.stkPct then
+    live.stkText, live.stkPct = t, p
+    form.setProperties(idx.stk, { label = v and string.format("%s (%+d%%)", t, p) or t })
   end
-  local v = readOut()
+  v = readOut()
   local us = v and toUs(v) or -1
   if us ~= live.us then
     live.us = us
-    form.setProperties(idx.us, { label = us >= 0 and (us .. " us") or "--" })
+    local text = "choose output"
+    if us >= 0 then
+      text = us .. " us"
+    elseif live.outCode then
+      text = "no signal"
+    end
+    form.setProperties(idx.us, { label = text })
   end
 end
 
@@ -455,18 +506,35 @@ end
 ------------------------------------------------------------------------------
 
 local function init()
+  print("TrbSt keys: F1=" .. tostring(KEY_1) .. " F5=" .. tostring(KEY_5) .. " ENTER=" .. tostring(KEY_ENTER)
+    .. " ESC=" .. tostring(KEY_ESC) .. " RELEASED=" .. tostring(KEY_RELEASED))
   loadSettings()
   refreshOutCode()
   cur = cfg.scr
   system.registerForm(1, MENU_APPS, APP_NAME, initForm, onKey, nil, closeForm)
 end
 
+local beatAt = 0             -- debug heartbeat (calibration build only)
+
 local function loop()
+  local now = system.getTimeCounter()
+  if now - beatAt >= 2000 then
+    beatAt = now
+    print("TrbSt loop: formOpen=" .. tostring(formOpen) .. " cur=" .. cur .. " idx.us=" .. tostring(idx.us)
+      .. " sw=" .. tostring(readSwitch()) .. " stk=" .. tostring(readStick()) .. " out=" .. tostring(readOut()))
+  end
   if not formOpen then
     return
   end
   if cur == SCR.INPUTS and idx.us then
-    updateInputs(system.getTimeCounter())
+    local ok, err = pcall(updateInputs, system.getTimeCounter())
+    if not ok then
+      print("TrbSt loop: " .. tostring(err))
+      if idx.learn then
+        form.setProperties(idx.learn, { label = string.sub("ERR " .. tostring(err), 1, 60), visible = true })
+      end
+      idx.us = nil            -- stop retrying every loop
+    end
   end
 end
 

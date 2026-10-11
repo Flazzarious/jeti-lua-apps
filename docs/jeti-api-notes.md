@@ -233,6 +233,13 @@ The app file returns a table: `init`, `loop`, `destroy` (5.00+), `author`,
 - `system.getInputs("P1","SA",...)` returns raw controls in −1..1 (up to 8).
 - For user-assigned switches, store a SwitchItem from `form.addInputbox` and read
   it with `system.getInputsVal(item)`.
+- `form.addInputbox(item, true, ...)` only *allows* a proportional control:
+  the pilot still has to choose proportional (P) in the assignment dialog.
+  Assigned as a switch, a stick reads only its switched states. Check
+  `system.getSwitchInfo(item).proportional` (transmitter, 2026-10-10,
+  Throttle Setup Wizard).
+- `system.getInputs("O<n>")` reads servo outputs: a ±100% travel throttle
+  read 1000–2000 µs as `1500 + 500 * v` (transmitter, 2026-10-10).
 
 ## Forms
 
@@ -241,6 +248,14 @@ The app file returns a table: `init`, `loop`, `destroy` (5.00+), `author`,
 - Component functions return an index used with `form.setValue`,
   `form.getValue`, `form.setProperties`.
 - `form.setButton(n, text, state)` labels F1–F5 (max 7 chars, or `":icon"`).
+- **Key codes are bit flags** (emulator 6.04, 2026-10-10, Turbine Throttle
+  Setup): `KEY_1` 1, `KEY_2` 2, `KEY_3` 4, `KEY_4` 8, `KEY_5` 16, `KEY_ESC`
+  32, `KEY_ENTER` 64, `KEY_RELEASED` −2147483648 (0x80000000). The key
+  handler also gets a `KEY_RELEASED` after each press.
+- **F5, ESC and power close the form** unless the key handler calls
+  `form.preventDefault()`. Links (`form.addLink`) are chosen with the
+  rotary press (`KEY_ENTER`); pressing F5 on a link closes the app's form
+  instead.
 - `form.question(...)` blocks the calling code until answered, so never call it
   from `loop()` in flight.
 

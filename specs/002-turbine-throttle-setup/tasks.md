@@ -46,6 +46,12 @@ built and checked on its own.
 - All on-screen text is ASCII ("us" for µs, "+/-" for ±, "-" for dashes)
   until quickstart section 3 confirms `µ` and `±` render. Lines ≤ 32
   characters, F-key labels ≤ 7.
+- F5, ESC and the power key close a form by default (API v1.5, "form.preventDefault").
+  Any screen that gives F5 an action (Next, Start, Yes) MUST call
+  `form.preventDefault()` for `KEY_5` in the key handler. Links are chosen
+  with the rotary press (`KEY_ENTER`), not F5 (emulator, 2026-10-10).
+- Switch screens with `form.reinit(1)` only; the screen comes from `cur`.
+  `form.reinit(2)` was not shown to work here (emulator, 2026-10-10).
 - `src/Apps/AG-TrbSt.lua` is one file, so tasks that touch it run one after
   another. Docs and stub tasks are separate files.
 - Run `python tools/check.py` after each phase. It must report 0 errors.
@@ -139,10 +145,10 @@ built and checked on its own.
 
 **Purpose**: Device support, docs, and transmitter and bench validation
 
-- [ ] T031 Add the device check in `src/Apps/AG-TrbSt.lua` (FR-025, research R13): in `init()`, `isDs24 = string.find(system.getDeviceType() or "", "24", 1, true) ~= nil`. If false, every screen builder shows only "Turbine Throttle Setup" / "needs a DC/DS-24" and `loop()` does nothing
+- [ ] T031 Add the device check in `src/Apps/AG-TrbSt.lua` (FR-025, research R13): in `init()`, `isDs24 = string.find(system.getDeviceType() or "", "24", 1, true) ~= nil`. If false, every screen builder shows only "Throttle Setup Wizard" / "needs a DC/DS-24" and `loop()` does nothing
 - [ ] T032 Review `src/Apps/AG-TrbSt.lua` against the "Rules for every code task" above: count main-chunk locals (must be < 200), search for `string.format`, `..` and `{` inside `loop()` and confirm each is a change-only rebuild, search for `registerControl|setControl|setProperty|os%.|debug%.|coroutine|bit32` (must be none; SC-008), and run LuaLS diagnostics (no errors)
-- [ ] T033 [P] Add Turbine Throttle Setup to `README.md`: a row in the apps table (`AG-TrbSt.lua`, "Turbine Throttle Setup", original) and a short section: what it does, that it only reads and instructs and never changes a setting, the default targets 1000 / 1200 / 1900 us and why (idle position 22%, ECU guidance from the Xicoy and KingTech manuals), that it's removed from the model after setup, and the install (one file, no assets, FR-024)
-- [ ] T034 [P] Add the row `| Turbine Throttle Setup | src/Apps/AG-TrbSt.lua | specs/002-turbine-throttle-setup/ | original |` to the apps table in `CLAUDE.md`
+- [ ] T033 [P] Add Throttle Setup Wizard to `README.md`: a row in the apps table (`AG-TrbSt.lua`, "Throttle Setup Wizard", original) and a short section: what it does, that it only reads and instructs and never changes a setting, the default targets 1000 / 1200 / 1900 us and why (idle position 22%, ECU guidance from the Xicoy and KingTech manuals), that it's removed from the model after setup, and the install (one file, no assets, FR-024)
+- [ ] T034 [P] Add the row `| Throttle Setup Wizard | src/Apps/AG-TrbSt.lua | specs/002-turbine-throttle-setup/ | original |` to the apps table in `CLAUDE.md`
 - [ ] T035 MANUAL: quickstart section 3 on the DS-24 II: calibration rows a, c, e; every screen readable with no line cut off; whether `µ` and `±` render; verify (2.7) and two seeded faults; CPU figure during verify; SC-008 (outputs and model file unchanged after a no-change run); copied-model check. Report results
 - [ ] T036 If T035 shows `µ` and `±` render, switch "us" → "µs" and "+/-" → "±" in all screen text in `src/Apps/AG-TrbSt.lua` and note it in `docs/jeti-api-notes.md`; also fix any line T035 reports as cut off
 - [ ] T037 MANUAL: quickstart section 4, bench test with a real ECU and the engine unable to start: full wizard timed (SC-001, under 10 minutes), app removed and all four states re-checked on the servo monitor (SC-007, FR-022), failsafe hand test, Teach RC (or skip) and the ECU reads cut, idle and full correctly. Report results

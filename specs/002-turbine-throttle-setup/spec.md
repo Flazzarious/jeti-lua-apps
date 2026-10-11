@@ -42,7 +42,7 @@ app instructs and verifies. The app never drives any output and never
 changes any setting (constitution principle I). Nothing at flight time
 depends on it.
 
-Proposed script name: `AG-TrbSt.lua`, menu name "Turbine Throttle Setup".
+Proposed script name: `AG-TrbSt.lua`, menu name "Throttle Setup Wizard".
 The filename becomes permanent at first release (constitution V).
 
 ### Reference setup (from Aaron)
@@ -73,7 +73,9 @@ The guide reaches the same targets with travel −100/+80, cut −100% and
 idle offset 40%.
 
 A locking two-position safety switch, mounted where it is easy to reach in an
-emergency, is recommended.
+emergency, is recommended. Aaron recommends JETI's two-position locking
+switch for the DS-24 II: the lever must be pulled out to flip, so it can't
+be bumped by accident in flight.
 
 **Aaron's transmitter (example configuration, 2026-10-10).** On his DS-24 II
 the throttle safety switch is **SF**, the short silver two-position toggle on
@@ -473,3 +475,24 @@ confirm it and check that the summary shows "Setup complete".
 5. Measure the app form canvas and choose a screen layout.
 6. Check whether copying a model on the transmitter also copies a Lua
    app's saved settings.
+
+### Follow-up ideas (not in this release)
+
+- **Show the model's current settings next to the needed ones** (Aaron,
+  2026-10-10). The app would **read** the current model's `.jsn` file on
+  the SD card and show, on each instruction step, "Travel −: 80%, set
+  100%" or "Idle offset: 20% ✓". It could also flag a wrong switch,
+  position or reversed servo before verify runs. Read-only, so
+  constitution I still holds: the app never writes the file. The pilot
+  still makes every change. Writing the file was considered and rejected:
+  the transmitter keeps the model in memory and saves over the file, the
+  format is undocumented and changes between firmware versions, and a
+  bug could corrupt a turbine's throttle setup.
+  Field names seen in Aaron's models (firmware 6.04/6.06): `Servos[n]`
+  `Max-Negative` / `Max-Positive` (travel), `Common`
+  `Throtle-Cut-Value` (×40, −4000 = −100%), `Throtle-Idle-Value`,
+  `Throtle-Cut-Switch` / `Throtle-Idle-Switch`.
+  Open questions: which file belongs to the current model; whether edits
+  are on the card before the pilot leaves the menu or switches models;
+  the memory and CPU needed to decode about 60 KB of JSON; and how to
+  match a servo output to the throttle function (`Servo-Code`).

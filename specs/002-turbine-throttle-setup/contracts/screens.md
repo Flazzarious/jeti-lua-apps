@@ -1,6 +1,6 @@
 # Contract: Screens
 
-One form, registered under `MENU_APPS` as "Turbine Throttle Setup". Each
+One form, registered under `MENU_APPS` as "Throttle Setup Wizard". Each
 screen is a subform (`form.reinit(n)`) built from form components only
 (research R9). Text lines are ≤ 32 characters. Live labels update from
 `loop()` only while the form is open, at most every 200 ms, and only when
@@ -15,7 +15,7 @@ F-key labels are ≤ 7 characters.
 - Links: "Setup inputs", "Guided setup", "Verify", "Summary". Guided setup
   and Verify are disabled until setup is complete. Summary is disabled
   while `res = 0`.
-- On a transmitter that isn't a DC/DS-24: only "Turbine Throttle Setup
+- On a transmitter that isn't a DC/DS-24: only "Throttle Setup Wizard
   needs a DC/DS-24" (R13).
 
 ## 2. Setup inputs (FR-001 to FR-005a)
@@ -23,10 +23,11 @@ F-key labels are ≤ 7 characters.
 | Row | Component | Notes |
 | --- | --- | --- |
 | Warning | two labels | "ENGINE MUST NOT BE ABLE TO START" / "(fuel off or ECU unplugged)" (FR-023) |
-| Safety switch | inputbox, not proportional | live: "OFF" / "RUN" / "middle" / "not learned" |
-| Throttle stick | inputbox, proportional | live: "idle" / "full" / "middle" |
-| Learn | label + F3 "Learn" | "Switch to OFF, stick to idle, press Learn." Stores `offSg`, `idlSg` (R5) |
-| Throttle output | selectbox "O1".."O24" | live: "1102 us" |
+| Safety switch | inputbox, not proportional | live: "OFF" / "RUN" / "middle" / "not learned", plus raw percent, e.g. "OFF (-100%)" |
+| Throttle stick | inputbox, proportional | live: "idle" / "full" / "middle" / "not learned", plus raw percent, e.g. "middle (+3%)" |
+| Learn | label + F3 "Learn" | "Switch to OFF, stick to idle," / "then press Learn menu button." Stores `offSg`, `idlSg` (R5) |
+| Throttle output | selectbox "--", "O1".."O24" | hint: "Output (O1-O24) the ECU's" / "throttle lead is plugged into." |
+| Signal now | label | live: "1102 us" / "choose output" / "no signal"; hint "Pulse width the ECU gets now." |
 | Cut / Idle / Full | intboxes, 900–2100, step 5 | defaults on long press |
 | Idle position | label | "Idle position: 22.2%" |
 | Message | label | refusal or warning ([settings-math.md](settings-math.md)) |
@@ -37,8 +38,10 @@ F-key labels are ≤ 7 characters.
   `form.question("Clear saved result?", "Changing setup means it must be",
   "verified again.")`. No puts the value back. Yes sets `res = 0`, clears
   `meas` and `when`, and allows further changes without asking again.
-- Learn refusals: "Use a two-position switch" (switch near 0) and "Move
-  the stick fully to idle" (|v| < 0.95).
+- Learn refusals: "Stick must be proportional (P)." (`getSwitchInfo(stk)
+  .proportional == false`), "Use a two-position switch" (switch near 0)
+  and "Move the stick fully to idle" (|v| < 0.95).
+- Under the stick row: hint "Assign it as proportional (P)."
 
 ## 3. Guided setup (FR-006 to FR-012)
 
@@ -51,10 +54,10 @@ firmware 6.x in task 1 (spec research item 3) and changed here if needed.
 | Step | Menu (Open) | Content |
 | --- | --- | --- |
 | 1 Endpoints | `:servoSetup` | "Model > Servo setup > [throttle]" / "Travel -: 100%" / "Travel +: 80%" (one "Travel: +/-X%" line when equal; `±` only if the charset check passes) |
-| 2 Throttle Cut | `:otherProps` | "Adv. properties > Other model" / "options > Throttle Cut" / "Switch: your safety switch, OFF" / "Output value: -100%" |
-| 3 Throttle Idle | `:otherProps` | "...> Throttle Idle" / "Switch: same switch, RUN" / "Idle offset: 40%" |
+| 2 Throttle Cut | `:otherProps` | "Other Model Options >" / "Throttle Cut" / "Throttle-Cut switch: choose it" / "and move the switch to OFF." / "Throttle-Cut output value: -100%" |
+| 3 Throttle Idle | `:otherProps` | "Other Model Options >" / "Throttle Idle" / "Throttle-Idle switch: same" / "switch, moved to RUN." / "Throttle-Idle offset: 40%" / "Check: in RUN, Idle shows a" / "tick and Cut a cross." |
 | 4 Failsafe | `:devExplorer` | "Device Explorer > receiver >" / "throttle output failsafe:" / "OFF (no pulse), or about 1000 us" / "The app can't read this. You'll" / "test it by hand at the end." (FR-010) |
-| 5 Safety switch | none | "Use a locking 2-position switch" / "within easy reach." / "Don't use it for anything else." (FR-011) |
+| 5 Safety switch | none | "Use a JETI 2-position locking" / "switch: pull the lever to flip," / "so it can't be bumped." / "Fit it within easy reach." / "Don't use it for anything else." (FR-011) |
 
 - The step is saved to `gStep` on every change (FR-009).
 - From Home, "Verify" skips the guide entirely (FR-012).
