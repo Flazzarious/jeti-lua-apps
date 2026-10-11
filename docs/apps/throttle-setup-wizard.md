@@ -27,6 +27,10 @@ have to pull the lever out before it will flip, so it can't be bumped to
 RUN on the bench or knocked to OFF in flight. Fit it where you can reach it
 fast in an emergency, and don't use it for anything else.
 
+![The short silver locking switch SF, used as the throttle safety switch, next to SE on a DS-24 II](https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/main/docs/apps/img/throttle-setup-wizard-switch.jpg)
+
+*Example: the short silver locking switch **SF** as the safety switch.*
+
 ### 1. Throttle travel
 
 *Model → Servo Setup*, the throttle output (e.g. channel 1):
