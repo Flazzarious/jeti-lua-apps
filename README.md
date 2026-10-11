@@ -9,6 +9,7 @@ spec-driven workflow (GitHub Spec Kit + Claude Code) in VS Code.
 | --- | --- | --- | --- | --- |
 | Speed Gauge | [`AG-SpdGa.lua`](src/Apps/AG-SpdGa.lua) | Released (0.3.0) | [001](specs/001-speed-gauge/spec.md) | DFM Speed Announcer by Dave McQueeney (MIT) |
 | Flameout Alarm | [`AG-FlmOt.lua`](src/Apps/AG-FlmOt.lua) | Released (0.1.0) | [003](specs/003-flameout-alarm/spec.md) | Original |
+| Throttle Setup Wizard | [`AG-TrbSt.lua`](src/Apps/AG-TrbSt.lua) | In development | [002](specs/002-turbine-throttle-setup/spec.md) | Original |
 
 ### Screenshots
 
@@ -25,6 +26,14 @@ Taken on a DS-24 II transmitter.
 <img src="docs/apps/img/flameout-alarm-armed.png" width="200" alt="Flameout Alarm armed, RPM bar at 60,000">
 <img src="docs/apps/img/flameout-alarm-flameout.png" width="200" alt="Flameout Alarm showing the red FLAMEOUT alarm at 0 RPM">
 <img src="docs/apps/img/flameout-alarm-disarmed.png" width="200" alt="Flameout Alarm disarmed at 35,000 RPM">
+
+**Throttle Setup Wizard** (in development): setup inputs, voice callouts,
+the transmitter's Sounds on Event. Full guide:
+[Throttle Setup Wizard](docs/apps/throttle-setup-wizard.md).
+
+<img src="docs/apps/img/throttle-setup-wizard-setup-inputs.png" width="200" alt="Throttle Setup Wizard Setup inputs: safety switch Sf at CUT, throttle stick P4 at idle, output O1">
+<img src="docs/apps/img/throttle-setup-wizard-voice-callouts.png" width="200" alt="Throttle Setup Wizard Voice callouts: TurbOff.wav and TurbOn.wav copied to /Audio/en">
+<img src="docs/apps/img/throttle-setup-wizard-sound-events.png" width="200" alt="Sounds on Event with TURBON.WAV and TURBOFF.WAV on switch Sf">
 
 ### Speed Gauge
 

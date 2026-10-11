@@ -3,7 +3,7 @@
 Set up a turbine's throttle on one **safety switch**, and **prove it works**
 before the engine ever starts. For the JETI **DS-24 II / DC-24 II**.
 
-![Other Model Options with Throttle Cut and Throttle Idle on the same switch](https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/main/docs/apps/img/throttle-setup-wizard-cut-idle.png)
+![Other Model Options with Throttle Cut and Throttle Idle on the same switch](img/throttle-setup-wizard-cut-idle.png)
 
 ## One switch instead of the trim
 
@@ -82,8 +82,8 @@ check: fuel off, or the ECU unplugged from the engine.
    ECU** (Teach RC).
 6. **Voice callouts (optional):** see step 7 below.
 
-<img src="https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/main/docs/apps/img/throttle-setup-wizard-home.png" width="240" alt="Throttle Setup Wizard home screen with Setup inputs and Voice callouts">
-<img src="https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/main/docs/apps/img/throttle-setup-wizard-setup-inputs.png" width="240" alt="Setup inputs: engine warning, safety switch Sf at CUT (+100%), throttle stick P4 at idle (-100%), throttle output O1">
+<img src="img/throttle-setup-wizard-home.png" width="240" alt="Throttle Setup Wizard home screen with Setup inputs and Voice callouts">
+<img src="img/throttle-setup-wizard-setup-inputs.png" width="240" alt="Setup inputs: engine warning, safety switch Sf at CUT (+100%), throttle stick P4 at idle (-100%), throttle output O1">
 
 *The app's home screen, and Setup inputs showing the safety switch at CUT
 and the stick at idle, live.*
@@ -111,7 +111,7 @@ have to pull the lever out before it will flip, so it can't be bumped to
 RUN on the bench or knocked to CUT in flight. Fit it where you can reach it
 fast in an emergency, and don't use it for anything else.
 
-![The short silver locking switch SF, used as the throttle safety switch, next to SE on a DS-24 II](https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/main/docs/apps/img/throttle-setup-wizard-switch.jpg)
+![The short silver locking switch SF, used as the throttle safety switch, next to SE on a DS-24 II](img/throttle-setup-wizard-switch.jpg)
 
 *Example: the short silver locking switch **SF** as the safety switch,
 shown in RUN (Throttle Cut off, engine allowed to run).*
@@ -139,8 +139,8 @@ Leave **Max negative limit** and **Max positive limit** at their defaults
 2. Set **Throttle-Cut output value** to **−100%**, or **−125%** for a
    Xicoy ECU.
 
-<img src="https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/main/docs/apps/img/throttle-setup-wizard-cut-100.png" width="240" alt="Throttle Cut on switch Sf with output value -100%, for most ECUs">
-<img src="https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/main/docs/apps/img/throttle-setup-wizard-cut-125-xicoy.png" width="240" alt="Throttle Cut on switch Sf with output value -125%, for Xicoy ECUs">
+<img src="img/throttle-setup-wizard-cut-100.png" width="240" alt="Throttle Cut on switch Sf with output value -100%, for most ECUs">
+<img src="img/throttle-setup-wizard-cut-125-xicoy.png" width="240" alt="Throttle Cut on switch Sf with output value -125%, for Xicoy ECUs">
 
 *Left: −100% for most ECUs. Right: −125% for Xicoy. The ✓ next to
 Throttle-Cut switch means the switch is at CUT right now.*
@@ -182,8 +182,8 @@ Fail-Safe*:
    - *Don't use **Fail-Safe** mode with **Value 0%***: 0% is mid-throttle
      (1500 µs).
 
-<img src="https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/main/docs/apps/img/throttle-setup-wizard-rx-config.png" width="240" alt="REX12A Configuration menu with Fail-Safe selected">
-<img src="https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/main/docs/apps/img/throttle-setup-wizard-failsafe-out-off.png" width="240" alt="REX12A Fail-Safe screen: Fail-Safe Enabled, delay 1.5s, OutPin 1 mode Out OFF">
+<img src="img/throttle-setup-wizard-rx-config.png" width="240" alt="REX12A Configuration menu with Fail-Safe selected">
+<img src="img/throttle-setup-wizard-failsafe-out-off.png" width="240" alt="REX12A Fail-Safe screen: Fail-Safe Enabled, delay 1.5s, OutPin 1 mode Out OFF">
 
 *The receiver's Configuration menu, and its Fail-Safe screen with the
 throttle on OutPin 1 set to Out OFF.*
@@ -234,8 +234,8 @@ itself, so they keep working after you remove the app.
 3. If you already have callouts for this switch, you'll see them there:
    keep them, swap in these files, or use your own.
 
-<img src="https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/main/docs/apps/img/throttle-setup-wizard-voice-callouts.png" width="240" alt="The app's Voice callouts screen: voice folder /Audio/en, TurbOff.wav yes, TurbOn.wav yes">
-<img src="https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/main/docs/apps/img/throttle-setup-wizard-sound-events.png" width="240" alt="Sounds on Event with two lines on switch Sf: TURBON.WAV and TURBOFF.WAV">
+<img src="img/throttle-setup-wizard-voice-callouts.png" width="240" alt="The app's Voice callouts screen: voice folder /Audio/en, TurbOff.wav yes, TurbOn.wav yes">
+<img src="img/throttle-setup-wizard-sound-events.png" width="240" alt="Sounds on Event with two lines on switch Sf: TURBON.WAV and TURBOFF.WAV">
 
 *Left: the app after copying (both files "yes", so Copy is greyed out).
 Right: Sounds on Event with both lines. The switch is at CUT, so the
