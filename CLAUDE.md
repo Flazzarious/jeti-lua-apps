@@ -53,6 +53,9 @@ or shorten an existing credit or license notice.
   structure.
 - `src/Apps/lib/`: shared modules. Check here before writing a helper another
   app may already have.
+- Voice callouts or other speech files: follow the `jeti-voice` skill
+  (`.claude/skills/jeti-voice/`) so every app uses the same Piper "Amy"
+  voice, file format and credits.
 
 ## Layout and naming (constitution V and VII)
 
