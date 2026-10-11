@@ -40,8 +40,9 @@ hard part is setting it up correctly once.
 enter, takes the pilot straight to each menu, and then measures the throttle
 output in all four switch-and-stick states and reports pass or fail. Once
 the setup has passed, the app has done its job: the pilot removes it from the
-model and goes on to the ECU's own "learn transmitter" (Teach RC) step, or
-skips that step if the targets already match what the ECU was taught.
+model and goes on to the ECU's own "learn transmitter" (Teach RC) step.
+**The pilot must always re-learn the ECU after setting these values**; the
+app never suggests skipping it (non-negotiable, Aaron 2026-10-10).
 
 **What the app can't do.** The transmitter's app interface can read stick,
 switch and servo-output positions and can open the transmitter's menus, but
@@ -55,30 +56,32 @@ The filename becomes permanent at first release (constitution V).
 
 ### Reference setup (from Aaron)
 
-This is the proven manual procedure the app guides, with its default values:
+This is the proven manual procedure the app guides. **These are the only
+values the app recommends** (Aaron, 2026-10-10):
 
-1. Set the throttle channel endpoints to ±80%.
+1. Set the throttle output's **Max negative to −80%** and **Max positive to
+   80%**. Always.
 2. Assign Throttle Cut to a two-position switch, in the position chosen as
    CUT (engine off).
-3. Set the Throttle Cut value to −100%.
-4. Assign Throttle Idle to the same switch, in the engine RUN position.
-5. Set the Throttle Idle offset to 20%.
+3. Set the **Throttle-Cut output value**: **−100%** for every ECU, except
+   **−125% for Xicoy**. This is the only value that differs.
+4. Assign Throttle Idle to the same switch, in the RUN position.
+5. Set the **Throttle-Idle offset to 20%**. Always.
 6. Set the throttle failsafe to OFF, or to −125%, and verify that it works.
+7. Re-learn the ECU (Teach RC). Always.
 
-With these settings the throttle channel outputs **1100 µs** in Throttle Cut,
-**1200 µs** at idle and **1900 µs** at full throttle. Failsafe must give
-about 1000 µs (anything outside the normal range) or no pulse at all, so the
-ECU recognizes signal loss and shuts the engine down. These are the
-Spektrum-era positions Aaron's ECUs were already taught, which let him skip
-Teach RC. Other values work too, as long as the pilot understands exactly
-what they are doing.
+| ECU | Throttle-Cut output value | Cut | Idle | Full |
+| --- | --- | --- | --- | --- |
+| Xicoy | −125% | 1000 µs | 1200 µs | 1900 µs |
+| All others (KingTech, Swiwin, JetCat, …) | −100% | 1100 µs | 1200 µs | 1900 µs |
 
-**The app's default targets are 1000 / 1200 / 1900 µs**, not the values
-above (clarification 2026-10-10). That is the setup on Aaron's Avanti Mini
-(Xicoy ECU): travel −80/+80, Throttle Cut −125%, idle offset 20%. It puts
-idle at 22% of the cut-to-full range, inside every documented ECU's band.
-The guide reaches the same targets with travel −100/+80, cut −100% and
-idle offset 40%.
+Measured on Aaron's models: Flash (Swiwin), Rebel, Atom and the test model
+at −100%; Avanti Mini (Xicoy) at −125%. Xicoy's manual asks for idle at
+15–30% of the cut-to-full range; −125% puts it at 22% (−100% would give
+12.5%). Other brands besides KingTech and Swiwin are untested, but −100% is
+expected to work. Failsafe must give about 1000 µs (anything outside the
+normal range) or no pulse at all, so the ECU recognizes signal loss and
+shuts the engine down.
 
 A locking two-position safety switch, mounted where it is easy to reach in an
 emergency, is recommended. Aaron recommends JETI's two-position locking
@@ -101,16 +104,16 @@ their own switch (FR-001).
 
 - **Pulse width**: the throttle channel's output, in microseconds (µs). The
   transmitter's servo monitor shows it in percent: µs = 1500 + 5 × %.
-- **Targets**: the three pulse widths the pilot wants: cut, idle and full.
-  Defaults 1000 / 1200 / 1900 µs.
+- **ECU type**: Xicoy, or any other. It decides the Throttle-Cut output
+  value (−125% or −100%) and so the cut target.
+- **Targets**: the three pulse widths verify expects: cut, idle and full.
+  Set by the ECU type, never typed in: Xicoy 1000 / 1200 / 1900 µs, all
+  others 1100 / 1200 / 1900 µs.
 - **CUT / RUN position**: the two positions of the chosen safety switch.
   CUT selects Throttle Cut (engine off); RUN selects Throttle Idle. (Not
   "off", which pilots also use for "cut off", i.e. RUN.)
 - **Verify state**: one combination of switch position and stick position
   that the app measures. There are four (see User Story 2).
-- **Idle position**: where idle sits between cut and full, as a share of
-  the cut-to-full span: (idle − cut) ÷ (full − cut). Defaults: 200 ÷ 900 =
-  22.2%.
 - **Tolerance**: how far a measured pulse width may be from its target and
   still pass. Default ±10 µs.
 - **Clean run**: one verify run in which all four states pass back to back,
@@ -140,9 +143,16 @@ their own switch (FR-001).
   (idle position 22.2%), from Aaron's Xicoy-powered Avanti Mini, replacing
   1100 / 1200 / 1900 (12.5%, which would warn). Aaron expects it to suit
   the other ECUs too.
+- Q: Which settings should the app recommend, and can pilots type their own
+  targets? → A: **Supersedes the three answers above on uneven endpoints,
+  idle position and default targets.** Max negative −80% / Max positive
+  80% and idle offset 20% always; Throttle-Cut output value −100% for every
+  ECU except Xicoy (−125%). The pilot only chooses Xicoy or other. No
+  custom targets: keep the app simple. The pilot must always re-learn the
+  ECU (Teach RC) after setting these values (non-negotiable).
 - Q: What happens to a saved result when the pilot later changes a setup
   input? → A: Any change to a setup input (switch, CUT position, stick,
-  output, targets, tolerance) clears the saved result to "Not verified",
+  output, ECU type, tolerance) clears the saved result to "Not verified",
   after a confirm prompt that says so. Context from Aaron: the app is used
   once per new model; re-running on the same model is rare, and a model
   copied from a finished one usually doesn't need it either.
@@ -152,29 +162,29 @@ their own switch (FR-001).
 ### User Story 1 - Guided setup (Priority: P1)
 
 A pilot setting up a new turbine model opens the app, chooses the safety
-switch, which of its positions is CUT, and the throttle stick and throttle
-output, and accepts or edits the targets. The app then shows one step per
-screen, each with the menu to go to, the exact value to enter for the chosen
-targets, and an "Open menu" action that takes the pilot straight to that
-menu. The steps are: endpoints, Throttle Cut, Throttle Idle, failsafe, and a
-safety-switch recommendation.
+switch, which of its positions is CUT, the throttle stick and throttle
+output, and whether the ECU is a Xicoy. The app then shows one step per
+screen, each with the menu to go to, the exact value to enter, and an "Open
+menu" action that takes the pilot straight to that menu. The steps are:
+Max negative / Max positive (−80 / 80), Throttle Cut (−100%, or −125% for
+Xicoy), Throttle Idle (20%), failsafe, and a safety-switch recommendation.
 
 **Why this priority**: Getting the values right is the hard part, and the
 pilot can't verify what they haven't set up. With only this story the app is
 already a better checklist than a forum post.
 
-**Independent Test**: On the emulator, with a fresh model, follow only the
-instruction screens using the default targets. Then open the servo monitor
-and check that the throttle reads about 1000 / 1200 / 1900 µs in the three
-states.
+**Independent Test**: On the emulator, with a fresh model and ECU type
+"other", follow only the instruction screens. Then open the servo monitor
+and check that the throttle reads about 1100 / 1200 / 1900 µs (−80 / −60 /
++80%) in the three states.
 
 **Acceptance Scenarios**:
 
-1. **Given** the default targets, **When** the pilot reaches the endpoints
-   step, **Then** the screen says Travel −100% / +80% and names the menu.
-2. **Given** the pilot edits the targets (e.g. cut 1000, idle 1150,
-   full 2000), **When** they reach each step, **Then** the values shown are
-   the ones that produce those targets (FR-006).
+1. **Given** any ECU type, **When** the pilot reaches the first step,
+   **Then** the screen says Max negative −80% and Max positive 80% and names
+   the menu.
+2. **Given** ECU type Xicoy, **When** the pilot reaches the Throttle Cut
+   step, **Then** it says −125%; for any other ECU it says −100% (FR-006).
 3. **Given** any instruction step, **When** the pilot chooses "Open menu",
    **Then** the transmitter opens the relevant menu.
 4. **Given** the pilot leaves the app for a menu and comes back, **Then** the
@@ -206,9 +216,9 @@ just that the idle-stick number looks right.
 copy values from a checklist; only a measurement shows the model actually
 does what was intended.
 
-**Independent Test**: On the emulator, set up a model by hand for the app's
-targets (default 1000 / 1200 / 1900 µs), run verify only, and check that
-all four states pass.
+**Independent Test**: On the emulator, set up a model by hand with the
+recommended values (−80 / 80, cut −100%, idle 20%), choose ECU type
+"other", run verify only, and check that all four states pass.
 Then introduce one fault at a time (see Edge Cases) and check that verify
 fails at the right state with a useful message.
 
@@ -239,10 +249,9 @@ Once all four states pass, the app asks the pilot to test failsafe by hand:
 with the ECU powered and the fuel off, switch the transmitter off and
 confirm that the ECU reports signal loss. Only when the pilot confirms this
 test does the app report "Setup complete". The summary screen lists the
-switch, targets, measured values and the date, and reminds the pilot that
-the app can now be removed from the model and that the next step is the
-ECU's Teach RC (or skipping it if the targets match what the ECU already
-knows).
+switch, ECU type, targets, measured values and the date, and tells the
+pilot to remove the app from the model and then **re-learn the ECU (Teach
+RC)**. It never suggests skipping that step.
 
 **Why this priority**: Failsafe is the one safety setting the app cannot
 measure. Making the pilot confirm a hand test keeps "complete" honest.
@@ -269,9 +278,11 @@ confirm it and check that the summary shows "Setup complete".
   check stops with "Switch RUN gave cut. Reverse the switch assignment."
 - **Cut doesn't override the stick** (output rises with the stick while
   CUT): the cut-overrides-stick state fails and points to Throttle Cut.
-- **Endpoints that don't match the values shown** (e.g. full reads
-  1940 µs): the full state fails and shows expected vs. measured. Uneven
-  low and high endpoints are not a fault when the targets call for them.
+- **Max positive / Max negative not −80 / 80** (e.g. full reads 2000 µs):
+  the full or cut state fails and shows expected vs. measured.
+- **Wrong ECU type chosen** (e.g. Xicoy chosen, cut set to −100%): the cut
+  state fails by 100 µs and names the Throttle-Cut output value for that
+  ECU type.
 - **Wrong output selected** (the output doesn't move between idle and full
   stick): the app detects no change and asks the pilot to re-select the
   output before continuing.
@@ -285,16 +296,8 @@ confirm it and check that the summary shows "Setup complete".
   by the trim amount.
 - **Flight modes with different throttle settings**: the app verifies the
   current flight mode only and says so.
-- **Invalid targets** (cut ≥ idle, idle ≥ full, any value outside
-  900–2100 µs, or an idle position below 10% or above 30%): the app refuses
-  them and explains why. Too small a cut-to-idle gap risks the ECU
-  confusing run with stop after Teach RC.
-- **Idle position between 10% and 15%** (e.g. 1100 / 1200 / 1900, 12.5%):
-  the app accepts the targets but warns that some ECUs (e.g. Xicoy) want an
-  idle position of at least 15%.
-- **Targets that need settings outside what the transmitter allows** (e.g.
-  endpoints above the maximum): the app says the targets can't be reached
-  and why.
+- **ECU type not chosen**: guided setup and verify stay disabled until it
+  is.
 - **Failsafe confirmation skipped or declined**: status stays "Incomplete".
 - **Model already set up**: the pilot can go straight to verify without the
   instruction steps.
@@ -320,12 +323,11 @@ confirm it and check that the summary shows "Setup complete".
   of its two positions is CUT (Throttle Cut).
 - **FR-002**: The app MUST let the pilot choose the throttle stick and the
   throttle output channel to measure.
-- **FR-003**: The app MUST let the pilot set the three targets (cut, idle,
-  full) in µs, defaulting to 1000 / 1200 / 1900, and MUST refuse invalid
-  combinations. Valid targets have cut < idle < full, each within
-  900–2100 µs, and an idle position from 10% to 30%. For an idle position
-  from 10% up to (not including) 15%, the app MUST warn that some ECUs want
-  at least 15%.
+- **FR-003**: The app MUST let the pilot choose the ECU type: Xicoy, or
+  other (KingTech, Swiwin, JetCat and the rest). It has no default; guided
+  setup and verify stay disabled until it is chosen. The targets follow
+  from it: Xicoy 1000 / 1200 / 1900 µs, other 1100 / 1200 / 1900 µs. The
+  pilot cannot type targets.
 - **FR-004**: The app MUST let the pilot set the verify tolerance from 5 to
   25 µs, default 10.
 - **FR-005**: All setup inputs MUST be saved per model and restored when the
@@ -336,12 +338,9 @@ confirm it and check that the summary shows "Setup complete".
 
 **Instructions**
 
-- **FR-006**: For the chosen targets, the app MUST show the endpoint values,
-  the Throttle Cut value and the Throttle Idle offset that produce them.
-  For the default targets these are travel −100% / +80%, cut −100% and
-  idle offset 40%. When the cut and
-  full targets are not equally far from 1500 µs, the app MUST show separate
-  low and high endpoint values.
+- **FR-006**: The app MUST show these values and no others: Max negative
+  −80%, Max positive 80%, Throttle-Idle offset 20%, and Throttle-Cut output
+  value −125% for Xicoy or −100% for any other ECU.
 - **FR-007**: Each instruction step MUST name the menu and setting to change
   and the exact value to enter, in the transmitter's own wording.
 - **FR-008**: Each instruction step that has a matching transmitter menu
@@ -382,9 +381,10 @@ confirm it and check that the summary shows "Setup complete".
 - **FR-019**: The app MUST NOT report "Setup complete" unless the latest
   verify was a clean run (all four states passed back to back, with no
   retries) and the pilot confirmed a hand test of failsafe.
-- **FR-020**: The summary MUST list the switch and CUT position, the
-  targets, the measured values, the date, and the next step (remove the app;
-  run or skip the ECU's Teach RC).
+- **FR-020**: The summary MUST list the switch and CUT position, the ECU
+  type, the targets, the measured values, the date, and the next step:
+  remove the app, then re-learn the ECU (Teach RC). The app MUST NOT
+  suggest skipping Teach RC anywhere.
 
 **Safety and independence**
 
@@ -404,7 +404,8 @@ confirm it and check that the summary shows "Setup complete".
 ### Key Entities
 
 - **Setup**: per model: switch and its CUT position, throttle stick,
-  throttle output, targets, tolerance, wizard step, last result.
+  throttle output, ECU type (which sets the targets), tolerance, wizard
+  step, last result.
 - **Verify result**: per state: target, measured value, pass or fail, and
   for the run: the failsafe confirmation and the date.
 
@@ -428,8 +429,8 @@ confirm it and check that the summary shows "Setup complete".
 - **SC-005**: "Setup complete" never appears unless a clean run passed
   all four states and the failsafe hand test was confirmed, including after a
   run in which a state was retried and after any setup input was changed.
-- **SC-006**: For any valid targets, entering the values the app shows
-  produces those targets within ±10 µs.
+- **SC-006**: For both ECU types, entering the values the app shows
+  produces that type's targets within ±10 µs.
 - **SC-007**: With the app removed from the model, all four states produce
   the same outputs as during verify.
 - **SC-008**: Running the app without making any changes leaves every servo
@@ -437,9 +438,7 @@ confirm it and check that the summary shows "Setup complete".
 - **SC-009**: On a transmitter with no other AG- apps installed, copying
   only this app's files (plus any listed shared modules) is enough to load
   it and complete a full setup and verify.
-- **SC-010**: Targets with an idle position below 10% or above 30% are
-  refused, and targets from 10% up to 15% show the ECU warning, in 100% of
-  boundary tests (e.g. 9.9%, 10%, 14.9%, 15%, 30%, 30.1%).
+- **SC-010**: No screen of the app suggests skipping the ECU's Teach RC.
 
 ## Assumptions
 
@@ -464,9 +463,7 @@ confirm it and check that the summary shows "Setup complete".
 - **ECU-agnostic.** The app works with any ECU that learns its throttle
   range from the receiver signal; it doesn't talk to the ECU. During Teach
   RC the pilot triggers each state and the ECU stores the pulse width it
-  receives, so after Teach RC the ECU relies on each state being repeatable
-  and clearly separated, not on particular µs values. Matching exact
-  targets matters only when the pilot skips Teach RC.
+  receives. The pilot always runs Teach RC after this setup.
 - **Bench use only.** The app is used with the engine unable to start. It
   has no role in flight.
 - **No voice.** The wizard is silent apart from the transmitter's normal
@@ -492,8 +489,8 @@ confirm it and check that the summary shows "Setup complete".
 
 - **Show the model's current settings next to the needed ones** (Aaron,
   2026-10-10). The app would **read** the current model's `.jsn` file on
-  the SD card and show, on each instruction step, "Travel −: 80%, set
-  100%" or "Idle offset: 20% ✓". It could also flag a wrong switch,
+  the SD card and show, on each instruction step, "Throttle-Cut output
+  value: −100%, set −125%" or "Throttle-Idle offset: 20% ✓". It could also flag a wrong switch,
   position or reversed servo before verify runs. Read-only, so
   constitution I still holds: the app never writes the file. The pilot
   still makes every change. Writing the file was considered and rejected:

@@ -18,11 +18,12 @@ Approach:
 - **One file, nothing else.** No assets, no telemetry window, no voice, no
   lib module. The install is `AG-TrbSt.lua` alone (FR-024, research R10).
 - **Read the real output.** `system.getInputs("O<n>")` converted at
-  1500 + 500·v µs. The settings come from targets at 5 µs per percent:
-  travel from cut and full, Throttle Cut always −100%, idle offset =
-  (idle − cut) ÷ 5. The reference setup fits exactly. **Task 1 calibrates
-  this first** in the emulator and on the transmitter, with a stop rule if
-  the output read isn't post-mix (R1, R2).
+  1500 + 500·v µs. **One fixed recipe** (clarification 2026-10-10): Max
+  negative −80% / Max positive 80%, idle offset 20%, Throttle-Cut −100%,
+  or −125% for Xicoy. The pilot picks the ECU type, which sets the targets
+  verify expects (1100 or 1000 / 1200 / 1900 µs). No custom targets. The
+  ECU is always re-learned afterwards. Calibration on the transmitter
+  confirmed the output read is post-mix and the targets match (R1, R2).
 - **Open the menus directly** with `system.openExternal(":servoSetup" |
   ":otherProps" | ":devExplorer")` (API v1.5 p. 74–75, R3). The wizard's
   place lives in locals plus `pSave`, so returning from a menu works
@@ -100,7 +101,7 @@ specs/002-turbine-throttle-setup/
 ├── data-model.md         # setup, wizard position, result, verify run, transitions
 ├── quickstart.md         # calibration, emulator, transmitter, bench
 ├── contracts/
-│   ├── settings-math.md  # targets → settings, validation, test vectors
+│   ├── settings-math.md  # recommended values per ECU type, targets, µs conversion
 │   ├── screens.md        # six screens, rows, F-keys, text
 │   └── verify.md         # sequence, thresholds, diagnosis table
 ├── checklists/requirements.md
@@ -142,8 +143,8 @@ For `/speckit-tasks`. Each step leaves `check.py` passing.
    quickstart section 1. Record the results, and apply the stop rule or
    fallbacks before going on.
 2. **Settings math and validation** ([contract](contracts/settings-math.md)):
-   one function each, the test vectors checked by hand in the emulator,
-   targets and tolerance rows, idle position and messages.
+   the fixed recommended values, Throttle-Cut value and targets per ECU
+   type, the ECU and tolerance rows.
 3. **Learn and the rest of Setup inputs**: Learn with refusals; clearing
    learned signs on reassignment; FR-005a confirm-and-clear.
 4. **Home and guided setup** ([contract](contracts/screens.md)): status,

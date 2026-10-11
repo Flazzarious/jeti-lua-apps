@@ -14,10 +14,18 @@
 local APP_NAME = "Throttle Setup Wizard"
 local APP_VERSION = "0.1.0"
 
--- Output reading -> pulse width, and percent -> pulse width (R1, R2).
+-- Output reading -> pulse width (R1, confirmed on the transmitter).
 local US_CENTER = 1500
 local US_PER_UNIT = 500     -- getInputs("O<n>") returns -1..1
-local US_PER_PCT = 5        -- 1% of servo travel = 5 us
+
+-- The one recommended setup (contracts/settings-math.md). Only the
+-- Throttle-Cut output value depends on the ECU type: 1 Xicoy, 2 any other.
+local REC = {
+  MAX_NEG = -80, MAX_POS = 80, IDLE_OFS = 20,
+  CUT_VAL = { -125, -100 },
+  TARGETS = { { 1000, 1200, 1900 }, { 1100, 1200, 1900 } },  -- cut, idle, full (us)
+}
+local ECU_NAMES = { "--", "Xicoy", "Other" }  -- selectbox values (index = ecu + 1)
 
 -- Transmitter menus opened with system.openExternal (R3, API v1.5 p. 74-75).
 local MENU = { servo = ":servoSetup", other = ":otherProps", dev = ":devExplorer" }
@@ -44,15 +52,15 @@ local V = {
 ------------------------------------------------------------------------------
 
 local KEYS = {
-  "sw", "offSg", "stk", "idlSg", "out", "tCut", "tIdle", "tFull", "tol",
+  "sw", "offSg", "stk", "idlSg", "out", "ecu", "tol",
   "scr", "gStep", "res", "meas", "when",
-}  -- 14 keys (limit 30)
+}  -- 12 keys (limit 30)
 local DEFAULTS = {
-  offSg = 0, idlSg = 0, out = 0, tCut = 1000, tIdle = 1200, tFull = 1900, tol = 10,
+  offSg = 0, idlSg = 0, out = 0, ecu = 0, tol = 10,
   scr = SCR.HOME, gStep = 1, res = RES.NONE, when = 0,
 }  -- sw, stk and meas default to nil
 local RANGES = {
-  offSg = { -1, 1 }, idlSg = { -1, 1 }, out = { 0, 24 }, tol = { 5, 25 },
+  offSg = { -1, 1 }, idlSg = { -1, 1 }, out = { 0, 24 }, ecu = { 0, 2 }, tol = { 5, 25 },
   scr = { 1, 6 }, gStep = { 1, 5 }, res = { 0, 2 },
 }
 
@@ -64,62 +72,19 @@ local function save(key, value)
 end
 
 ------------------------------------------------------------------------------
--- Settings math (contracts/settings-math.md). Each rule lives in one place.
+-- Conversions (contracts/settings-math.md)
 ------------------------------------------------------------------------------
 
 local function toUs(v)
   return math.floor(US_CENTER + US_PER_UNIT * v + 0.5)
 end
 
--- Travel -, Travel +, Throttle Cut output value and idle offset, in percent,
--- that produce the targets (R2; confirmed on two models). Targets are
--- multiples of 5, so every result is a whole percent.
-local function settingsFor(cut, idle, full)
-  return (US_CENTER - cut) // US_PER_PCT, (full - US_CENTER) // US_PER_PCT, -100,
-    (idle - cut) // US_PER_PCT
-end
-
--- Idle position in tenths of a percent, rounded: (idle - cut) / (full - cut).
-local function idleTenths(cut, idle, full)
-  local span = full - cut
-  return (1000 * (idle - cut) + span // 2) // span
-end
-
-local function tenthsText(t)
-  return string.format("%d.%d%%", t // 10, t % 10)
-end
-
-local function idlePosText(cut, idle, full)
-  return "Idle position: " .. tenthsText(idleTenths(cut, idle, full))
-end
-
--- Returns ok, line1, line2. When ok, the lines are the ECU warning or "".
--- Integer arithmetic only, so exactly 10% and 30% are exact (data-model.md).
-local function validateTargets(cut, idle, full)
-  if cut < 900 or idle < 900 or full < 900 or cut > 2100 or idle > 2100 or full > 2100 then
-    return false, "Targets must be 900-2100 us", ""
+local function targetsText(ecu)
+  local t = REC.TARGETS[ecu]
+  if t == nil then
+    return "Targets: --"
   end
-  if cut >= US_CENTER then
-    return false, "Cut must be below 1500 us", ""
-  end
-  if full <= US_CENTER then
-    return false, "Full must be above 1500 us", ""
-  end
-  if not (cut < idle and idle < full) then
-    return false, "Need cut < idle < full", ""
-  end
-  local gap, span = idle - cut, full - cut
-  if 10 * gap < span then
-    return false, "Idle too close to cut:", "ECU may not tell run from stop"
-  end
-  if 10 * gap > 3 * span then
-    return false, "Idle too high: over 30%", "of the cut-full range"
-  end
-  if 100 * gap < 15 * span then
-    return true, "Idle at " .. tenthsText(idleTenths(cut, idle, full)) .. " of range.",
-      "Some ECUs (e.g. Xicoy) want 15%+"
-  end
-  return true, "", ""
+  return "Targets: " .. t[1] .. " / " .. t[2] .. " / " .. t[3] .. " us"
 end
 
 local function clamp(v, lo, hi)
@@ -140,11 +105,6 @@ local function loadSettings()
     if v ~= cfg[key] then
       save(key, DEFAULTS[key])
     end
-  end
-  if not validateTargets(cfg.tCut, cfg.tIdle, cfg.tFull) then
-    save("tCut", DEFAULTS.tCut)
-    save("tIdle", DEFAULTS.tIdle)
-    save("tFull", DEFAULTS.tFull)
   end
 end
 
@@ -223,7 +183,6 @@ end
 local formOpen = false      -- loop may touch form rows only while true (R9)
 local cur = SCR.HOME        -- screen the form shows
 local idx = {}              -- component indices of rows updated after creation
-local pend = {}             -- target values being edited, saved once valid
 
 local LABEL_W = 170
 
@@ -245,42 +204,9 @@ local function canOpenMenus()
   return system.openExternal ~= nil
 end
 
-local function setMsg(line1, line2)
-  if idx.msg1 then
-    form.setProperties(idx.msg1, { label = line1, visible = line1 ~= "" })
-    form.setProperties(idx.msg2, { label = line2, visible = line2 ~= "" })
-  end
-end
-
 -- Placeholder for FR-005a (T028): ask before a change clears a saved result.
 local function allowChange()
   return true
-end
-
--- A target box changed: save all three only when the set is valid.
-local function onTarget(key, value)
-  if not allowChange() then
-    return
-  end
-  pend[key] = value
-  local ok, l1, l2 = validateTargets(pend.tCut, pend.tIdle, pend.tFull)
-  if ok then
-    save("tCut", pend.tCut)
-    save("tIdle", pend.tIdle)
-    save("tFull", pend.tFull)
-    form.setProperties(idx.pos, { label = idlePosText(pend.tCut, pend.tIdle, pend.tFull) })
-  else
-    form.setProperties(idx.pos, { label = "Idle position: --" })
-  end
-  setMsg(l1, l2)
-end
-
-local function addTarget(label, key)
-  form.addRow(2)
-  form.addLabel({ label = label, width = LABEL_W })
-  form.addIntbox(cfg[key], 900, 2100, DEFAULTS[key], 0, 5, function(value)
-    onTarget(key, value)
-  end)
 end
 
 local function buildInputs()
@@ -337,16 +263,18 @@ local function buildInputs()
   idx.us = form.addLabel({ label = "--", alignRight = true })
   hint("Pulse width the ECU gets now.")
 
-  pend.tCut, pend.tIdle, pend.tFull = cfg.tCut, cfg.tIdle, cfg.tFull
-  addTarget("Cut target (us)", "tCut")
-  addTarget("Idle target (us)", "tIdle")
-  addTarget("Full target (us)", "tFull")
+  form.addRow(2)
+  form.addLabel({ label = "ECU", width = LABEL_W })
+  form.addSelectbox(ECU_NAMES, cfg.ecu + 1, false, function(i)
+    if not allowChange() then
+      return
+    end
+    save("ecu", i - 1)
+    form.setProperties(idx.targets, { label = targetsText(cfg.ecu) })
+  end)
+  hint("Xicoy: cut -125%. Others: -100%.")
   form.addRow(1)
-  idx.pos = form.addLabel({ label = idlePosText(cfg.tCut, cfg.tIdle, cfg.tFull) })
-  idx.msg1 = hint("", false)
-  idx.msg2 = hint("", false)
-  local _, l1, l2 = validateTargets(cfg.tCut, cfg.tIdle, cfg.tFull)
-  setMsg(l1, l2)
+  idx.targets = form.addLabel({ label = targetsText(cfg.ecu) })
 
   form.addRow(2)
   form.addLabel({ label = "Tolerance (+/- us)", width = LABEL_W })

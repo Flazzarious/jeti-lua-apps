@@ -1,7 +1,7 @@
 # Data Model: Turbine Throttle Setup
 
 Everything is per model. Persisted values use `system.pSave`/`pLoad`
-(integers, SwitchItems, one integer array; constitution IV). 14 keys.
+(integers, SwitchItems, one integer array; constitution IV). 12 keys.
 
 ## Setup (persisted)
 
@@ -12,36 +12,23 @@ Everything is per model. Persisted values use `system.pSave`/`pLoad`
 | `stk` | SwitchItem | nil | assigned, proportional | Throttle stick (FR-002) |
 | `idlSg` | int | 0 | −1, 1 (0 = not learned) | Sign of `getInputsVal(stk)` at idle end (R5) |
 | `out` | int | 0 | 1–24 (0 = not chosen) | Throttle output `O<n>` (FR-002) |
-| `tCut` | int µs | 1000 | see Validation | Cut target |
-| `tIdle` | int µs | 1200 | see Validation | Idle target |
-| `tFull` | int µs | 1900 | see Validation | Full target |
+| `ecu` | int | 0 | 1 Xicoy, 2 other (0 = not chosen) | ECU type (FR-003): sets the Throttle-Cut value and targets |
 | `tol` | int µs | 10 | 5–25 | Verify tolerance (FR-004) |
 
-Load clamps out-of-range values to defaults. If the loaded targets fail
-validation, all three go back to defaults.
+Load clamps out-of-range values to defaults.
 
-**Setup is complete** when `sw`, `stk`, `out` are set, `offSg` and `idlSg`
-are learned, and the targets are valid. Guided setup and verify stay
-disabled until then.
+**Setup is complete** when `sw`, `stk`, `out` and `ecu` are set and `offSg`
+and `idlSg` are learned. Guided setup and verify stay disabled until then.
 
-### Validation (FR-003, clarification Q3, research R2)
+### Targets (derived from `ecu`, never stored or typed)
 
-Targets are edited in 5 µs steps. Valid when all hold:
+| `ecu` | Throttle-Cut output value | Cut | Idle | Full |
+| --- | --- | --- | --- | --- |
+| 1 Xicoy | −125% | 1000 µs | 1200 µs | 1900 µs |
+| 2 other | −100% | 1100 µs | 1200 µs | 1900 µs |
 
-1. 900 ≤ each ≤ 2100 (narrowed to 1000–2000 if research R1 finds the
-   reading clips at ±1).
-2. cut < 1500 < full ("settings outside what the transmitter allows").
-3. cut < idle < full.
-4. Idle position p = (idle − cut) ÷ (full − cut) with 0.10 ≤ p ≤ 0.30.
-
-Computed with integers: `10 * (idle − cut)` compared with
-`full − cut` and `3 * (full − cut)`, so there are no float edge cases at
-exactly 10% or 30%. **Warning** (not a refusal) when
-`100 * (idle − cut) < 15 * (full − cut)`. The first failing rule gives the
-message ([settings-math.md](contracts/settings-math.md)).
-
-Invalid targets are not saved. The last valid set stays in `pSave`, and
-guided setup and verify are disabled until the targets are fixed.
+Max negative −80%, Max positive 80% and Throttle-Idle offset 20% are the
+same for both ([settings-math.md](contracts/settings-math.md)).
 
 ## Wizard position (persisted, FR-009)
 

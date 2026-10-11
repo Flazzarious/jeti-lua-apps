@@ -1,7 +1,8 @@
 # Contract: Screens
 
 One form, registered under `MENU_APPS` as "Throttle Setup Wizard". Each
-screen is a subform (`form.reinit(n)`) built from form components only
+screen is rebuilt with `form.reinit(1)`; the app's `cur` picks which
+screen. Screens are built from form components only
 (research R9). Text lines are ≤ 32 characters. Live labels update from
 `loop()` only while the form is open, at most every 200 ms, and only when
 the text changes.
@@ -28,9 +29,8 @@ F-key labels are ≤ 7 characters.
 | Learn | label + F3 "Learn" | "Switch to CUT, stick to idle," / "then press Learn menu button." Stores `offSg`, `idlSg` (R5) |
 | Throttle output | selectbox "--", "O1".."O24" | hint: "Output (O1-O24) the ECU's" / "throttle lead is plugged into." |
 | Signal now | label | live: "1102 us" / "choose output" / "no signal"; hint "Pulse width the ECU gets now." |
-| Cut / Idle / Full | intboxes, 900–2100, step 5 | defaults on long press |
-| Idle position | label | "Idle position: 22.2%" |
-| Message | label | refusal or warning ([settings-math.md](settings-math.md)) |
+| ECU | selectbox "--", "Xicoy", "Other" | starts at "--" (not chosen); hint "Xicoy: cut -125%. Others: -100%." |
+| Targets | label | "Targets: 1100 / 1200 / 1900 us" (or 1000 for Xicoy; "--" until chosen) |
 | Tolerance | intbox 5–25, step 1 | "+/- 10 us" |
 
 - Choosing a new switch or stick clears `offSg`/`idlSg` (learn again).
@@ -53,9 +53,9 @@ firmware 6.x in task 1 (spec research item 3) and changed here if needed.
 
 | Step | Menu (Open) | Content |
 | --- | --- | --- |
-| 1 Endpoints | `:servoSetup` | "Servo Setup > Servo No.:" / "your throttle output." / "Max negative: -100%" / "Max positive: 80%" / "Leave the limits at -125/125%." (always both lines, signed as the transmitter shows them) |
-| 2 Throttle Cut | `:otherProps` | "Other Model Options >" / "Throttle Cut" / "Throttle-Cut switch: choose it" / "and move the switch to CUT." / "Throttle-Cut output value: -100%" |
-| 3 Throttle Idle | `:otherProps` | "Other Model Options >" / "Throttle Idle" / "Throttle-Idle switch: same" / "switch, moved to RUN." / "Throttle-Idle offset: 40%" / "Check: in RUN, Idle shows a" / "tick and Cut a cross." |
+| 1 Endpoints | `:servoSetup` | "Servo Setup > Servo No.:" / "your throttle output." / "Max negative: -80%" / "Max positive: 80%" / "Leave the limits at -125/125%." |
+| 2 Throttle Cut | `:otherProps` | "Other Model Options >" / "Throttle Cut" / "Throttle-Cut switch: choose it" / "and move the switch to CUT." / "Throttle-Cut output value: -100%" ("-125%" for Xicoy, with "(Xicoy)") |
+| 3 Throttle Idle | `:otherProps` | "Other Model Options >" / "Throttle Idle" / "Throttle-Idle switch: same" / "switch, moved to RUN." / "Throttle-Idle offset: 20%" / "Check: in RUN, Idle shows a" / "tick and Cut a cross." |
 | 4 Failsafe | `:devExplorer` | "Device Explorer > receiver >" / "throttle output failsafe:" / "OFF (no pulse), or about 1000 us" / "The app can't read this. You'll" / "test it by hand at the end." (FR-010) |
 | 5 Safety switch | none | "Use a JETI 2-position locking" / "switch: pull the lever to flip," / "so it can't be bumped." / "Fit it within easy reach." / "Don't use it for anything else." (FR-011) |
 
@@ -80,8 +80,10 @@ line, four result rows, and the diagnosis (two lines).
 - Status line (as Home).
 - "Safety switch: <label>, CUT at -100%" (or +100%, from `offSg`). The
   label comes from `system.getSwitchInfo(sw).label`.
-- "Targets: 1000 / 1200 / 1900 us"
-- "Measured: 1002 / 1001 / 1199 / 1898"
+- "ECU: Other (cut -100%)" or "ECU: Xicoy (cut -125%)"
+- "Targets: 1100 / 1200 / 1900 us"
+- "Measured: 1102 / 1101 / 1199 / 1898"
 - "Verified: 2026-10-10"
-- Next step: "Remove this app from the model," / "then run the ECU's Teach RC," /
-  "or skip it if the ECU already" / "knows these targets."
+- Next step: "Next: remove this app from the" / "model, then re-learn your ECU" /
+  "(Teach RC). Always re-learn" / "after changing these values." (FR-020,
+  SC-010: never suggest skipping it.)

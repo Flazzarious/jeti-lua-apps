@@ -59,15 +59,16 @@ building the guide.
 
 ## 2. Emulator scenarios
 
-Use the test model, set up for the default targets (travel −100% / +80%,
-cut −100%, idle offset 40%) unless a row says otherwise.
+Use the test model, set up with the recommended values (Max negative −80%,
+Max positive 80%, Throttle-Cut −100%, idle offset 20%) and ECU type
+"Other", unless a row says otherwise.
 
 | # | Scenario | Expected |
 | --- | --- | --- |
 | 2.1 | Fresh app: Home | "Not verified". Guided setup and Verify disabled |
 | 2.2 | Setup inputs: assign switch, stick, output; Learn | Live labels follow switch and stick. Learn with switch in middle (if 3-pos) is refused |
-| 2.3 | Targets: each settings-math test vector | Refusals, warnings and idle position as listed (SC-010) |
-| 2.4 | Guide with defaults | Max negative -100%, Max positive 80%, cut -100%, idle offset 40% shown (US1-1). Custom 1100/1200/1900 shows Max negative -80%, Max positive 80%, -100%, 20% plus the 12.5% warning (US1-2) |
+| 2.3 | ECU: "--", then Xicoy, then Other | Guided setup and verify disabled at "--". Targets label: 1000 / 1200 / 1900 (Xicoy), 1100 / 1200 / 1900 (Other) |
+| 2.4 | Guide, ECU Other then Xicoy | Max negative -80%, Max positive 80%, idle offset 20% for both (US1-1); Throttle-Cut -100% for Other, -125% (Xicoy) for Xicoy (US1-2). No screen suggests skipping Teach RC (SC-010) |
 | 2.5 | Guide: Open on step 2, back out | Wizard on step 2 with same choices (US1-4, FR-009) |
 | 2.6 | Close app, reopen | Same screen and step |
 | 2.7 | Verify, correct setup | Output check and 4 states PASS → Failsafe screen (US2-1) |
@@ -85,7 +86,8 @@ verify, then undo it.
 | Switch assignment reversed | Output check | reverse the switch |
 | Throttle Cut not assigned | Cut overrides stick | Throttle Cut |
 | Max positive 88% (full 1940) | Full | Max positive |
-| Idle offset 45% (idle 1225) | Idle | Idle offset |
+| Idle offset 25% (idle 1225) | Idle | Idle offset |
+| ECU set to Xicoy, cut left at −100% | Cut (reads 1100, expects 1000) | Throttle-Cut value |
 | Wrong output chosen | Output check | choose the throttle output |
 | Throttle servo reversed | Output check | servo reverse |
 | Wrong switch chosen in app | Cut (or Learn mismatch) | switch |

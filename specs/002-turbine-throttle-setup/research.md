@@ -48,7 +48,14 @@ offset holds at a second travel setting (R2: 1000 + 100 = 1100).
 for writing to the log, not reading. Reading the stick and calculating the
 output: no, that would verify the app's own math, not the model.
 
-## R2. Converting targets to settings (CALIBRATE)
+## R2. Converting targets to settings
+
+**Superseded for the app (2026-10-10).** The app no longer converts
+arbitrary targets. It recommends one fixed recipe: Max negative −80% / Max
+positive 80%, idle offset 20%, Throttle-Cut −100%, or −125% for Xicoy (spec
+FR-003, FR-006; [settings-math.md](contracts/settings-math.md)). The rules
+below are kept because they explain and predict the two target sets, and
+they were confirmed by the measurements recorded here.
 
 **Decision.** With 5 µs per percent (R1):
 

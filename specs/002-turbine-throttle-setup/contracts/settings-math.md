@@ -1,10 +1,38 @@
-# Contract: Targets → settings, validation and µs conversion
+# Contract: Recommended settings, targets and µs conversion
 
-One function computes the settings, one validates, and one converts readings.
-Each is the only place its rule lives, so a calibration result (research
-R1, R2) changes a single constant or line.
+The app recommends one fixed set of values. Only the Throttle-Cut output
+value depends on the ECU type (spec FR-003, FR-006; clarification
+2026-10-10). Pilots never type targets.
 
-## µs conversion (R1, CALIBRATE)
+## Recommended settings
+
+| Setting (transmitter wording) | Xicoy | Any other ECU |
+| --- | --- | --- |
+| Servo Setup → Max negative | −80% | −80% |
+| Servo Setup → Max positive | 80% | 80% |
+| Other Model Options → Throttle-Cut output value | **−125%** | **−100%** |
+| Other Model Options → Throttle-Idle offset | 20% | 20% |
+
+Constants in the app: `MAX_NEG = -80`, `MAX_POS = 80`, `IDLE_OFS = 20`,
+and `CUT_VAL = { [1] = -125, [2] = -100 }` indexed by `ecu`.
+
+## Targets verify expects
+
+Derived from the settings with the rules confirmed on four models
+(research R1, R2): 5 µs per percent, Throttle-Cut value scaled by travel,
+idle offset added to the stick's low end.
+
+| | Formula | Xicoy | Other |
+| --- | --- | --- | --- |
+| Cut | 1500 + 5 × cut value × 80 / 100 | 1000 µs | 1100 µs |
+| Idle | 1500 − 5 × 80 + 5 × 20 | 1200 µs | 1200 µs |
+| Full | 1500 + 5 × 80 | 1900 µs | 1900 µs |
+
+The app stores them as a table `TARGETS = { [1] = { 1000, 1200, 1900 },
+[2] = { 1100, 1200, 1900 } }` (checked against these formulas when the
+table is written, not computed at run time).
+
+## µs conversion (R1, confirmed)
 
 ```text
 us(v) = 1500 + 500 * v          -- v from system.getInputs("O<n>"), −1..1
@@ -12,64 +40,12 @@ us(v) = 1500 + 500 * v          -- v from system.getInputs("O<n>"), −1..1
 
 Constants: `US_CENTER = 1500`, `US_PER_UNIT = 500`.
 
-## Settings for the guide (FR-006, R2; confirmed on two models)
+## Measured on Aaron's models (servo monitor or the app)
 
-Input: valid targets `cut`, `idle`, `full` (µs, multiples of 5).
-
-| Output | Formula | Defaults 1000 / 1200 / 1900 → |
-| --- | --- | --- |
-| `travelLo` | (1500 − cut) / 5 | 100 |
-| `travelHi` | (full − 1500) / 5 | 80 |
-| `cutValue` | −100 | −100 |
-| `idleOffset` | (idle − cut) / 5 | 40 |
-
-Constant: `US_PER_PCT = 5`. All results are integers because targets are
-multiples of 5.
-
-The guide always shows two lines in the transmitter's wording and signs
-(Servo Setup, `Screen008.png`): "Max negative: -X%" from `travelLo` and
-"Max positive: Y%" from `travelHi`, even when they're equal
-(clarification Q2).
-
-## Validation (FR-003, clarification Q3)
-
-Rules are checked in this order. The first one that fails gives the
-message, which shows under the target fields:
-
-| # | Rule | Message (≤ 32 chars per line) |
-| --- | --- | --- |
-| 1 | 900 ≤ cut, idle, full ≤ 2100 | "Targets must be 900-2100 us" |
-| 2 | cut < 1500 < full | "Cut must be below 1500 us" / "Full must be above 1500 us" |
-| 3 | cut < idle < full | "Need cut < idle < full" |
-| 4 | 10·(idle − cut) ≥ (full − cut) | "Idle too close to cut:" / "ECU may not tell run from stop" |
-| 5 | 10·(idle − cut) ≤ 3·(full − cut) | "Idle too high: over 30%" / "of the cut-full range" |
-
-If all pass and `100·(idle − cut) < 15·(full − cut)`, show the warning
-"Idle at 12.5% of range." / "Some ECUs (e.g. Xicoy) want 15%+" (the
-percentage computed to one decimal).
-
-"us" stands in for "µs" until `µ` is confirmed in the charset (quickstart
-section 3). The guide switches to `µs` if it renders.
-
-The idle position shows live as "Idle position: 22.2%".
-
-## Test vectors (for SC-006 and SC-010)
-
-| cut | idle | full | Result | Settings |
+| Model | ECU | Settings | Read | Expected |
 | --- | --- | --- | --- | --- |
-| 1000 | 1200 | 1900 | valid, no warning (22.2%; **defaults**, Aaron's Avanti) | −100% / +80%, −100%, 40% |
-| 1100 | 1200 | 1900 | valid + warning (12.5%; Aaron's older setup) | ±80%, −100%, 20% |
-| 1000 | 1150 | 2000 | valid, no warning (15.0%) | ±100%, −100%, 30% |
-| 1100 | 1250 | 2000 | valid (16.7%) | −80% / +100%, −100%, 30% |
-| 1100 | 1180 | 1900 | valid + warning (10.0%, boundary) | ±80%, −100%, 16% |
-| 1100 | 1175 | 1900 | refused rule 4 (9.4%) | none |
-| 1100 | 1340 | 1900 | valid (30.0%, boundary) | ±80%, −100%, 48% |
-| 1100 | 1345 | 1900 | refused rule 5 (30.6%) | none |
-| 1100 | 1220 | 1900 | valid, no warning (15.0%, boundary) | ±80%, −100%, 24% |
-| 1100 | 1215 | 1900 | valid + warning (14.4%) | ±80%, −100%, 23% |
-| 1500 | 1600 | 1900 | refused rule 2 | none |
-| 850 | 1000 | 1900 | refused rule 1 | none |
+| Flash Ultra EVO | Swiwin | −80/80, −100%, 20% | 1100 / 1100 / 1200 / 1900 | other ✓ |
+| Avanti Mini | Xicoy | −80/80, −125%, 20% | 1000 / 1000 / 1200 / 1900 | Xicoy ✓ |
+| Test model | — | −80/80, −100%, 20% | 1100 / 1200 / 1900 | other ✓ |
 
-Targets move in 5 µs steps, so SC-010's 9.9% / 14.9% / 30.1% examples
-can't be entered exactly. The nearest enterable values on each side of
-every boundary are listed above.
+(Order: cut with stick down / cut with stick up / idle / full.)

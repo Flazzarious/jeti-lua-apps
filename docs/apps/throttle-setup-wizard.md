@@ -45,18 +45,16 @@ already set up), run its check:
 4. **Accurate readings.** It waits until the stick is fully at the end and
    held still, then averages the signal, so a stick at 95% doesn't give a
    false result.
-5. **No targets your ECU can't use.** It refuses an idle too close to cut
-   (the ECU may confuse run with stop after learning the radio) and warns
-   when idle is below the 15% of the range Xicoy asks for.
-6. **The numbers for any targets.** If your ECU was taught different
-   values, it works out the travel and idle offset that reproduce them,
-   including uneven travel. No trial and error.
-7. **Failsafe isn't forgotten.** It won't call the setup complete until you
+5. **The right values for your ECU.** One proven setup, the same for every
+   model: only the Throttle-Cut value changes, −125% for Xicoy (which
+   wants idle well clear of cut) and −100% for everything else. No
+   guesswork, no trial and error.
+6. **Failsafe isn't forgotten.** It won't call the setup complete until you
    confirm a hand test of failsafe, the one safety setting no transmitter
    can measure.
-8. **A record.** The summary keeps the switch, targets, measured values and
+7. **A record.** The summary keeps the switch, ECU type, measured values and
    date for the model, and clears itself if you change the setup.
-9. **The same check every time.** Every new model gets the same check, the
+8. **The same check every time.** Every new model gets the same check, the
    same way, in a couple of minutes.
 
 The app **can't change any setting itself**: the JETI Lua interface can
@@ -73,21 +71,30 @@ check: fuel off, or the ECU unplugged from the engine.
    **Throttle Setup Wizard** in *Applications*.
 2. **Setup inputs:** choose your safety switch and your throttle stick
    (assign it as **proportional, P**), put the switch at CUT and the stick
-   at idle (down) and press **Learn**. Choose the throttle output and check
-   the targets (default 1000 / 1200 / 1900 µs).
+   at idle (down) and press **Learn**. Choose the throttle output and your
+   ECU: **Xicoy** or **Other**.
 3. **Guided setup:** five steps, each with the exact values and an **Open**
    button for the right menu. Skip this if the model is already set up.
 4. **Verify:** follow the prompts for each switch and stick position.
 5. **Failsafe:** test it by hand and confirm. The summary then shows
-   "Setup complete" and the next step: your ECU's radio learning, or skip
-   it if the ECU already knows these values.
+   "Setup complete" and the next step: remove the app, then **re-learn your
+   ECU** (Teach RC).
 
 ## The setup by hand
 
-These steps give the app's default targets: **cut 1000 µs, idle 1200 µs,
-full 1900 µs**. That puts idle at 22% of the cut-to-full range, inside what
-Xicoy (15–30%) and KingTech (10–30%) ask for. The app works out the values
-for other targets.
+One setup for every turbine. Only the **Throttle-Cut output value**
+depends on the ECU:
+
+| Setting | Xicoy | All other ECUs (KingTech, Swiwin, JetCat, …) |
+| --- | --- | --- |
+| Max negative / Max positive | −80% / 80% | −80% / 80% |
+| Throttle-Cut output value | **−125%** | **−100%** |
+| Throttle-Idle offset | 20% | 20% |
+| Signal: cut / idle / full | 1000 / 1200 / 1900 µs | 1100 / 1200 / 1900 µs |
+
+Xicoy asks for idle at 15–30% of the cut-to-full range: −125% puts it at
+22%. Brands other than Xicoy, KingTech and Swiwin haven't been tested, but
+−100% is expected to work.
 
 You need a **two-position switch** for the safety switch. A **JETI
 two-position locking switch** for the DS-24 II is highly recommended: you
@@ -107,7 +114,7 @@ shown in RUN (Throttle Cut off, engine allowed to run).*
 
 | Setting | Value |
 | --- | --- |
-| Max negative (low end) | −100% |
+| Max negative (low end) | −80% |
 | Max positive (high end) | 80% |
 
 Leave **Max negative limit** and **Max positive limit** at their defaults
@@ -120,7 +127,14 @@ Leave **Max negative limit** and **Max positive limit** at their defaults
 1. Select **Throttle-Cut switch**. When asked to move a switch, move your
    safety switch **to the position you want for CUT**. That position now
    activates Throttle Cut.
-2. Set **Throttle-Cut output value** to **−100%**.
+2. Set **Throttle-Cut output value** to **−100%**, or **−125%** for a
+   Xicoy ECU.
+
+<img src="https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/main/docs/apps/img/throttle-setup-wizard-cut-100.png" width="240" alt="Throttle Cut on switch Sf with output value -100%, for most ECUs">
+<img src="https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/main/docs/apps/img/throttle-setup-wizard-cut-125-xicoy.png" width="240" alt="Throttle Cut on switch Sf with output value -125%, for Xicoy ECUs">
+
+*Left: −100% for most ECUs. Right: −125% for Xicoy. The ✓ next to
+Throttle-Cut switch means the switch is at CUT right now.*
 
 ### 3. Throttle Idle (RUN position)
 
@@ -128,7 +142,7 @@ Same screen, *Throttle Idle*:
 
 1. Select **Throttle-Idle switch**. Move the **same switch to the other
    position (RUN)**.
-2. Set **Throttle-Idle offset** to **40%**.
+2. Set **Throttle-Idle offset** to **20%**.
 
 **Check it:** with the switch in RUN, the screen shows **✓** next to
 Throttle-Idle switch and **✗** next to Throttle-Cut switch. Flip to CUT and
@@ -152,12 +166,12 @@ ECU must report signal loss.
 
 On the servo monitor the throttle should read:
 
-| Switch | Stick | Monitor | Pulse |
+| Switch | Stick | Other ECUs | Xicoy |
 | --- | --- | --- | --- |
-| CUT | down | −100% | 1000 µs |
-| CUT | **up** | **−100%** | **1000 µs** (cut ignores the stick) |
-| RUN | down | −60% | 1200 µs |
-| RUN | up | +80% | 1900 µs |
+| CUT | down | −80% (1100 µs) | −100% (1000 µs) |
+| CUT | **up** | **−80% (1100 µs)** | **−100% (1000 µs)** (cut ignores the stick) |
+| RUN | down | −60% (1200 µs) | −60% (1200 µs) |
+| RUN | up | +80% (1900 µs) | +80% (1900 µs) |
 
 Or let the app do this for you: that's its **Verify** step.
 
@@ -165,8 +179,8 @@ Or let the app do this for you: that's its **Verify** step.
 
 Run your ECU's radio learning ("Teach RC", "Radio setup") and follow its
 prompts for cut, idle and full: switch at CUT for cut, RUN with the stick
-down for idle, RUN with the stick up for full. If the ECU was already taught
-these exact values, you can skip this.
+down for idle, RUN with the stick up for full. **Always do this** after
+setting up or changing these values, even if the ECU was taught before.
 
 ## Credits and licenses
 
