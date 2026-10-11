@@ -80,6 +80,13 @@ check: fuel off, or the ECU unplugged from the engine.
 5. **Failsafe:** test it by hand and confirm. The summary then shows
    "Setup complete" and the next step: remove the app, then **re-learn your
    ECU** (Teach RC).
+6. **Voice callouts (optional):** see step 7 below.
+
+<img src="https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/main/docs/apps/img/throttle-setup-wizard-home.png" width="240" alt="Throttle Setup Wizard home screen with Setup inputs and Voice callouts">
+<img src="https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/main/docs/apps/img/throttle-setup-wizard-setup-inputs.png" width="240" alt="Setup inputs: engine warning, safety switch Sf at CUT (+100%), throttle stick P4 at idle (-100%), throttle output O1">
+
+*The app's home screen, and Setup inputs showing the safety switch at CUT
+and the stick at idle, live.*
 
 ## The setup by hand
 
@@ -226,6 +233,13 @@ itself, so they keep working after you remove the app.
    isn't: with the switch at CUT, the TURBOFF line shows ✓.
 3. If you already have callouts for this switch, you'll see them there:
    keep them, swap in these files, or use your own.
+
+<img src="https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/main/docs/apps/img/throttle-setup-wizard-voice-callouts.png" width="240" alt="The app's Voice callouts screen: voice folder /Audio/en, TurbOff.wav yes, TurbOn.wav yes">
+<img src="https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/main/docs/apps/img/throttle-setup-wizard-sound-events.png" width="240" alt="Sounds on Event with two lines on switch Sf: TURBON.WAV and TURBOFF.WAV">
+
+*Left: the app after copying (both files "yes", so Copy is greyed out).
+Right: Sounds on Event with both lines. The switch is at CUT, so the
+TURBOFF line shows ✓.*
 
 The callouts use the same voice as the author's Speed Gauge and Flameout
 Alarm apps.
