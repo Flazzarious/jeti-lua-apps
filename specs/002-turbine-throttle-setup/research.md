@@ -427,6 +427,15 @@ the app copies them to `/Audio` when the pilot asks:
    API v1.5 p. 74). JETI's picker lists `/Audio` and `/Audio/<lang>`, the
    same folders `form.addAudioFilebox` uses.
 
+**Found on the transmitter (2026-10-10).** The first copy attempt left no
+file anywhere on the card, and the voice picker didn't show the files.
+Aaron's card keeps pilots' own callouts in **`/Audio/en`** (e.g.
+`Turbine_Off.wav`, `Turbine_On.wav` from 2021), while `/Audio` itself holds
+only JETI's system sounds (`T_Bound.wav`, …) and the language folders. So
+the destination is now `/Audio/<language>` from `system.getLocale()`
+(`/Audio/en` here), and a failed copy names its step on screen ("failed:
+read / create / write / size a/b") so the cause can be seen.
+
 **Open points (transmitter):** that Jeti's `io.read`/`io.write` copy WAV
 bytes exactly (Lua strings are binary-safe, but Jeti's reduced `io` has
 only been used for reading here); that Sounds on event lists files in

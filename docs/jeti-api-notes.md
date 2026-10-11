@@ -186,6 +186,11 @@ the emulator's numbers above:
   filename. Renaming = losing its telemetry windows and settings.
 - `require "mod"` looks in `/Apps/lib/mod.lua`, `/Apps/lib/mod/init.lua`,
   `/Apps/mod.lua`, `/Apps/mod/init.lua`.
+- Pilots' own voice files live in `/Audio/<lang>` (e.g. `/Audio/en`);
+  `/Audio` itself holds JETI's system sounds (`T_*.wav`) and the language
+  folders (Aaron's DS-24 II card, 2026-10-10). Put files meant for the
+  transmitter's voice pickers (Sounds on event) in `/Audio/<lang>`, using
+  `system.getLocale()` for `<lang>`.
 - Audio: relative paths resolve under `/Audio` and `/Audio/<lang>`. Foreground
   playback (`AUDIO_IMMEDIATE`, `AUDIO_QUEUE`) is WAV only; background accepts
   MP3.

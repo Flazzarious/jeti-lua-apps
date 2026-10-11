@@ -334,12 +334,15 @@ end
 -- never plays these: it copies them to /Audio for JETI's Sounds on event.
 ------------------------------------------------------------------------------
 
+-- dest is the voice folder for the transmitter's language, e.g. /Audio/en:
+-- that's where JETI's voice picker looks and where pilots keep their own
+-- callouts (Aaron's transmitter, 2026-10-10). Set in init().
 local VOICE = {
-  src = "/Apps/AG-TrbSt", dest = "/Audio",
+  src = "/Apps/AG-TrbSt", dest = "/Audio/en",
   files = { "TurbOff.wav", "TurbOn.wav" },
   CHUNK = 2048, CHUNKS_PER_LOOP = 4,      -- keeps each loop() call light (R15)
 }
-local vstate = { "no", "no" }             -- per file: "yes", "no", "copying...", "copy failed"
+local vstate = { "no", "no" }             -- per file: "yes", "no", "copying...", "failed: <why>"
 local vsrcOk = false                      -- both of the app's own files are present
 ---@class CopyJob
 ---@field list integer[]  indexes into VOICE.files still to copy
@@ -415,7 +418,7 @@ local function scanVoice()
     if not fileExists(VOICE.src .. "/" .. name) then
       vsrcOk = false
     end
-    if not (job and job.list[job.k] == i) and vstate[i] ~= "copy failed" then
+    if not (job and job.list[job.k] == i) and string.sub(vstate[i], 1, 6) ~= "failed" then
       vstate[i] = fileExists(VOICE.dest .. "/" .. name) and "yes" or "no"
     end
   end
@@ -432,10 +435,11 @@ local function nextFile(j)
   showVoice()
 end
 
--- Close the file being copied and check it; on failure delete the partial copy.
+-- Close the file being copied and check it; on failure delete the partial
+-- copy. `why` is nil on success, else the failed step for the status line.
 ---@param j CopyJob
----@param ok boolean
-local function finishFile(j, ok)
+---@param why string|nil
+local function finishFile(j, why)
   local i = j.list[j.k]
   local name = VOICE.files[i]
   if j.fin then
@@ -444,13 +448,16 @@ local function finishFile(j, ok)
   if j.fout then
     io.close(j.fout)
   end
-  if ok and fileSize(VOICE.dest, name) ~= fileSize(VOICE.src, name) then
-    ok = false
+  if not why then
+    local got, want = fileSize(VOICE.dest, name), fileSize(VOICE.src, name)
+    if got ~= want then
+      why = "size " .. tostring(got) .. "/" .. tostring(want)
+    end
   end
-  if not ok and j.created then
+  if why and j.created then
     removeFile(VOICE.dest .. "/" .. name)
   end
-  vstate[i] = ok and "yes" or "copy failed"
+  vstate[i] = why and ("failed: " .. why) or "yes"
   nextFile(j)
 end
 
@@ -467,10 +474,14 @@ local function stepCopy(j)
       return
     end
     j.fin = openFile(VOICE.src .. "/" .. name, "r")
-    j.fout = j.fin and openFile(dest, "w") or nil
+    if not j.fin then
+      finishFile(j, "read")
+      return
+    end
+    j.fout = openFile(dest, "w")
     j.created = j.fout ~= nil
-    if not (j.fin and j.fout) then
-      finishFile(j, false)
+    if not j.fout then
+      finishFile(j, "create")
       return
     end
     vstate[i] = "copying..."
@@ -479,11 +490,11 @@ local function stepCopy(j)
   for _ = 1, VOICE.CHUNKS_PER_LOOP do
     local data = io.read(j.fin, VOICE.CHUNK)
     if data == nil or data == "" then
-      finishFile(j, true)
+      finishFile(j, nil)
       return
     end
     if not io.write(j.fout, data) then
-      finishFile(j, false)
+      finishFile(j, "write")
       return
     end
   end
@@ -509,14 +520,16 @@ local function buildVoice()
   hint("Say 'Turbine off' at CUT and")
   hint("'Turbine on' at RUN, using the")
   hint("transmitter's Sounds on event.")
+  hint("Voice folder: " .. VOICE.dest)
   idx.vs = {}
   for i, name in ipairs(VOICE.files) do
     form.addRow(2)
-    form.addLabel({ label = name .. " in /Audio", width = LABEL_W })
+    form.addLabel({ label = name, width = 120 })
     idx.vs[i] = form.addLabel({ label = vstate[i], alignRight = true })
   end
   hint("Voice files not installed.", not vsrcOk)
-  hint("Copy puts them in /Audio.")
+  hint("Copy puts them in the voice")
+  hint("folder above.")
   hint("Sounds on event: add the")
   hint("safety switch at CUT with")
   hint("TurbOff.wav, and at RUN with")
@@ -589,7 +602,7 @@ local function onKey(keyCode)
     end
   elseif cur == SCR.VOICE then
     if keyCode == KEY_2 and canCopy() then
-      if form.question("Copy voice files to /Audio?", "TurbOff.wav and TurbOn.wav.",
+      if form.question("Copy voice files?", "TurbOff.wav, TurbOn.wav to " .. VOICE.dest,
           "Files already there are kept.") == 1 then
         startCopy()
       end
@@ -643,6 +656,10 @@ end
 ------------------------------------------------------------------------------
 
 local function init()
+  local lang = system.getLocale()
+  if type(lang) == "string" and lang ~= "" then
+    VOICE.dest = "/Audio/" .. lang
+  end
   loadSettings()
   refreshOutCode()
   cur = cfg.scr
@@ -656,7 +673,7 @@ local function loop()
     if not ok then
       print("TrbSt copy: " .. tostring(err))
       if job then
-        finishFile(job, false)
+        finishFile(job, "error")
       end
     end
   end
@@ -678,7 +695,7 @@ end
 local function destroy()
   formOpen = false
   if job then                -- don't leave a half-written file in /Audio
-    pcall(finishFile, job, false)
+    pcall(finishFile, job, "stopped")
     job = nil
   end
 end

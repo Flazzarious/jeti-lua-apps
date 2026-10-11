@@ -154,8 +154,8 @@ their own switch (FR-001).
   the safety switch, and how? → A: Yes, optional, through **JETI's own
   "Sounds on event"**, not played by the app (Aaron, 2026-10-10). The app
   ships the two phrases in the same Piper "Amy" voice as Speed Gauge and
-  Flameout Alarm, copies them to the card's `/Audio` folder on request if
-  they aren't there, and opens Sounds on event with instructions. JETI's
+  Flameout Alarm, copies them to the card's voice folder (`/Audio/<language>`,
+  e.g. `/Audio/en`) on request if they aren't there, and opens Sounds on event with instructions. JETI's
   menu shows callouts already assigned, so the pilot can keep them or pick
   these or their own files. The callouts keep working after the app is
   removed.
@@ -284,8 +284,8 @@ confirm it and check that the summary shows "Setup complete".
 ### User Story 4 - Voice callouts for the safety switch (Priority: P3, optional)
 
 A pilot who wants to hear the switch opens "Voice callouts". The app shows
-whether its two voice files are in the card's `/Audio` folder, offers to
-copy them there, and explains how to assign them in JETI's *Sounds on
+whether its two voice files are in the card's voice folder
+(`/Audio/<language>`, e.g. `/Audio/en`), offers to copy them there, and explains how to assign them in JETI's *Sounds on
 event*: "Turbine off" when the safety switch goes to CUT, "Turbine on" when
 it goes to RUN. An "Open" action takes the pilot straight to Sounds on
 event, where any callouts already assigned are shown and can be kept or
@@ -295,16 +295,16 @@ changed, and where the pilot may choose their own files instead.
 useful safety habit, but the throttle setup works without it.
 
 **Independent Test**: On the transmitter, with no `TurbOff.wav` /
-`TurbOn.wav` in `/Audio`, open Voice callouts, copy the files, open Sounds
+`TurbOn.wav` in `/Audio/en`, open Voice callouts, copy the files, open Sounds
 on event, assign them to the safety switch, and hear "Turbine off" / "Turbine
 on" when flipping it, with the app removed from the model.
 
 **Acceptance Scenarios**:
 
-1. **Given** the files are missing from `/Audio`, **When** the pilot
-   chooses to copy them, **Then** both appear in `/Audio` and the screen
+1. **Given** the files are missing from the voice folder, **When** the
+   pilot chooses to copy them, **Then** both appear there and the screen
    says so.
-2. **Given** a file with the same name is already in `/Audio`, **When**
+2. **Given** a file with the same name is already in the voice folder, **When**
    the pilot chooses to copy, **Then** that file is left unchanged.
 3. **Given** the app's own voice files are missing (not installed),
    **Then** the screen says so and offers no copy; nothing is changed.
@@ -460,8 +460,9 @@ on" when flipping it, with the app removed from the model.
 - **FR-026**: The app MUST include two voice files, "Turbine off" and
   "Turbine on", in the same Piper "Amy" voice as Speed Gauge and Flameout
   Alarm, in its own asset folder (`/Apps/AG-TrbSt/`, constitution V).
-- **FR-027**: The app MUST show whether `/Audio/TurbOff.wav` and
-  `/Audio/TurbOn.wav` exist, and on the pilot's request copy the missing
+- **FR-027**: The app MUST show whether `TurbOff.wav` and `TurbOn.wav`
+  exist in the voice folder for the transmitter's language
+  (`/Audio/<language>`, e.g. `/Audio/en`), and on the pilot's request copy the missing
   ones from its asset folder. It MUST NOT overwrite a file that already
   exists, and MUST copy nothing if its own files are missing.
 - **FR-028**: The app MUST tell the pilot how to assign the files in
@@ -511,7 +512,7 @@ on" when flipping it, with the app removed from the model.
 - **SC-010**: No screen of the app suggests skipping the ECU's Teach RC.
 - **SC-011**: After copying, both callouts can be picked in Sounds on event
   and play on the transmitter when the safety switch changes position,
-  with the app removed from the model. A file already in `/Audio` is never
+  with the app removed from the model. A file already in the voice folder is never
   modified.
 
 ## Assumptions
@@ -543,8 +544,9 @@ on" when flipping it, with the app removed from the model.
 - **Voice.** The wizard itself is silent apart from the transmitter's
   normal sounds; a spoken guide is out of scope. The optional switch
   callouts (User Story 4) are played by the transmitter's Sounds on event,
-  not by the app. JETI's audio picker lists `/Audio` (and `/Audio/<lang>`),
-  which is why the files are copied there.
+  not by the app. Pilots' own callouts live in `/Audio/<language>` (Aaron's
+  are in `/Audio/en`; `/Audio` itself holds JETI's system sounds), so the
+  files are copied there.
 - **Screen.** Instruction and verify screens are designed for the measured
   window and font sizes in `docs/jeti-api-notes.md`; the form canvas size
   will be measured during planning.

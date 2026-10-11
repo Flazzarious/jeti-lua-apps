@@ -211,7 +211,8 @@ Hear **"Turbine off"** when you flip the safety switch to CUT and
 itself, so they keep working after you remove the app.
 
 1. In the app, open **Voice callouts** and press **Copy**. It puts
-   `TurbOff.wav` and `TurbOn.wav` in the card's `/Audio` folder. Files
+   `TurbOff.wav` and `TurbOn.wav` in the card's voice folder for your
+   language (e.g. `/Audio/en`), where JETI looks for voice files. Files
    already there are never replaced.
 2. Press **Open** to go to *Sounds on event*. Add your safety switch at
    **CUT** with `TurbOff.wav`, and at **RUN** with `TurbOn.wav`.
@@ -227,7 +228,7 @@ Throttle Setup Wizard: MIT license, Copyright (c) 2026 Aaron George.
 
 Voice callouts: generated with **Piper** text-to-speech using the voice
 model **"Amy"** by Mycroft / Rhasspy. The sound files (in
-`/Apps/AG-TrbSt/`, and the copies in `/Audio`) are licensed
+`/Apps/AG-TrbSt/`, and the copies in `/Audio/<language>`) are licensed
 **CC BY-SA 4.0**.
 
 Xicoy's advice on digital trims is from the Xicoy TurboJet Engines User

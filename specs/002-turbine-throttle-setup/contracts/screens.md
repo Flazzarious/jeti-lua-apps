@@ -83,8 +83,9 @@ last step. Rows:
 
 - "Say 'Turbine off' at CUT and" / "'Turbine on' at RUN, using the" /
   "transmitter's Sounds on event."
-- Status, one line per file: "TurbOff.wav in /Audio: yes" / "no" /
-  "copying..." / "copy failed".
+- "Voice folder: /Audio/en" (from `system.getLocale()`), then a status
+  line per file: "yes" / "no" / "copying..." / "failed: read|create|
+  write|size a/b".
 - If the app's own files are missing: "Voice files not installed." and no
   Copy button (FR-027).
 - Instructions: "Sounds on event: add the" / "safety switch at CUT with" /
@@ -93,8 +94,8 @@ last step. Rows:
 - Credit: "Voice: Piper, Amy (CC BY-SA 4.0)." (FONT_MINI, FR-029)
 
 F-keys: F1 "Back", F2 "Copy" (shown only when a file is missing from
-`/Audio` and the app's own files exist; asks `form.question("Copy voice
-files to /Audio?")` first), F3 "Open" (`:soundEvent`). F5 is not used.
+the voice folder and the app's own files exist; asks `form.question("Copy voice
+files?")` first), F3 "Open" (`:soundEvent`). F5 is not used.
 
 ## 6. Summary (FR-020)
 
