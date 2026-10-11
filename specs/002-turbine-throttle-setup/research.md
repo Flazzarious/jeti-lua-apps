@@ -36,6 +36,14 @@ fits the same rule.
 3. Agreement within ±5 µs at 5+ points (SC-003), in the emulator and on
    the DS-24 II.
 
+**Measured on the transmitter (Aaron, 2026-10-10, test model, app's
+"Signal now"; travel ±100%, cut −100%, idle offset 20%):** CUT + stick
+down 1000, **CUT + stick up 1000**, RUN + stick down 1100, RUN + stick up
+2000 µs. Open point 1 is **confirmed**: `O<n>` is the final output after
+Throttle Cut (the stop rule doesn't trigger). With ±100% travel, readings
+run 1000–2000 µs as `1500 + 500 * v` predicts, and idle = low end + 5 ×
+offset holds at a second travel setting (R2: 1000 + 100 = 1100).
+
 **Alternatives.** Logging the output with `registerLogVariable`: no, it's
 for writing to the log, not reading. Reading the stick and calculating the
 output: no, that would verify the app's own math, not the model.
