@@ -23,9 +23,9 @@ F-key labels are ≤ 7 characters.
 | Row | Component | Notes |
 | --- | --- | --- |
 | Warning | two labels | "ENGINE MUST NOT BE ABLE TO START" / "(fuel off or ECU unplugged)" (FR-023) |
-| Safety switch | inputbox, not proportional | live: "OFF" / "RUN" / "middle" / "not learned", plus raw percent, e.g. "OFF (-100%)" |
+| Safety switch | inputbox, not proportional | live: "CUT" / "RUN" / "middle" / "not learned", plus raw percent, e.g. "CUT (-100%)" |
 | Throttle stick | inputbox, proportional | live: "idle" / "full" / "middle" / "not learned", plus raw percent, e.g. "middle (+3%)" |
-| Learn | label + F3 "Learn" | "Switch to OFF, stick to idle," / "then press Learn menu button." Stores `offSg`, `idlSg` (R5) |
+| Learn | label + F3 "Learn" | "Switch to CUT, stick to idle," / "then press Learn menu button." Stores `offSg`, `idlSg` (R5) |
 | Throttle output | selectbox "--", "O1".."O24" | hint: "Output (O1-O24) the ECU's" / "throttle lead is plugged into." |
 | Signal now | label | live: "1102 us" / "choose output" / "no signal"; hint "Pulse width the ECU gets now." |
 | Cut / Idle / Full | intboxes, 900–2100, step 5 | defaults on long press |
@@ -54,7 +54,7 @@ firmware 6.x in task 1 (spec research item 3) and changed here if needed.
 | Step | Menu (Open) | Content |
 | --- | --- | --- |
 | 1 Endpoints | `:servoSetup` | "Model > Servo setup > [throttle]" / "Travel -: 100%" / "Travel +: 80%" (one "Travel: +/-X%" line when equal; `±` only if the charset check passes) |
-| 2 Throttle Cut | `:otherProps` | "Other Model Options >" / "Throttle Cut" / "Throttle-Cut switch: choose it" / "and move the switch to OFF." / "Throttle-Cut output value: -100%" |
+| 2 Throttle Cut | `:otherProps` | "Other Model Options >" / "Throttle Cut" / "Throttle-Cut switch: choose it" / "and move the switch to CUT." / "Throttle-Cut output value: -100%" |
 | 3 Throttle Idle | `:otherProps` | "Other Model Options >" / "Throttle Idle" / "Throttle-Idle switch: same" / "switch, moved to RUN." / "Throttle-Idle offset: 40%" / "Check: in RUN, Idle shows a" / "tick and Cut a cross." |
 | 4 Failsafe | `:devExplorer` | "Device Explorer > receiver >" / "throttle output failsafe:" / "OFF (no pulse), or about 1000 us" / "The app can't read this. You'll" / "test it by hand at the end." (FR-010) |
 | 5 Safety switch | none | "Use a JETI 2-position locking" / "switch: pull the lever to flip," / "so it can't be bumped." / "Fit it within easy reach." / "Don't use it for anything else." (FR-011) |
@@ -78,7 +78,7 @@ line, four result rows, and the diagnosis (two lines).
 ## 6. Summary (FR-020)
 
 - Status line (as Home).
-- "Safety switch: <label>, OFF at -100%" (or +100%, from `offSg`). The
+- "Safety switch: <label>, CUT at -100%" (or +100%, from `offSg`). The
   label comes from `system.getSwitchInfo(sw).label`.
 - "Targets: 1000 / 1200 / 1900 us"
 - "Measured: 1002 / 1001 / 1199 / 1898"

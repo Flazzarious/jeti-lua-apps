@@ -38,9 +38,9 @@ monitor.
 | --- | --- | --- | --- | --- |
 | a | Travel ±100%, no cut/idle | low / mid / high | −100 / 0 / +100% | 1000 / 1500 / 2000 ±5 µs |
 | b | Travel ±125%, limit 125% | low / high | −125 / +125% | 875 / 2125, or clipped at 1000 / 2000? (R1.2) |
-| c | Reference: ±80%, cut −100%, idle 20% | OFF; RUN low; RUN high | −80 / −60 / +80% | 1100 / 1200 / 1900 ±5 µs |
-| d | Avanti: ±80%, cut −125%, idle 20% | OFF; RUN low | −100%; −60% (measured) | 1000; 1200 ±5 µs |
-| e | Same as c | OFF, stick high | −80% (cut after mixing, R1.1) | 1100 ±5 µs |
+| c | Reference: ±80%, cut −100%, idle 20% | CUT; RUN low; RUN high | −80 / −60 / +80% | 1100 / 1200 / 1900 ±5 µs |
+| d | Avanti: ±80%, cut −125%, idle 20% | CUT; RUN low | −100%; −60% (measured) | 1000; 1200 ±5 µs |
+| e | Same as c | CUT, stick high | −80% (cut after mixing, R1.1) | 1100 ±5 µs |
 
 Also check, and record:
 

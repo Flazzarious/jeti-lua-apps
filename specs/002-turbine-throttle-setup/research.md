@@ -82,13 +82,13 @@ blocked. So the cut value is scaled by travel (−100% × 0.8), and cut
 overrides the stick (verify state 2).
 
 **Measured, Flash Ultra EVO (Swiwin ECU; firmware 6.06; servo monitor, %
-view):** OFF low −80%, OFF high −80%, RUN low **−60%**, RUN high +80%,
+view):** CUT low −80%, CUT high −80%, RUN low **−60%**, RUN high +80%,
 i.e. 1100 / 1100 / 1200 / 1900 µs. Idle = −80 + 20, so **the idle offset
 is added after travel**, in output percent (scaled by travel it would be
 −64%). The idle-offset formula stands.
 
 **Measured, Avanti Mini (Xicoy ECU; travel −80/80, cut −125%, idle 20%):**
-OFF low −100%, OFF high −100%, RUN low **−60%**, RUN high +80%, i.e.
+CUT low −100%, CUT high −100%, RUN low **−60%**, RUN high +80%, i.e.
 1000 / 1000 / 1200 / 1900 µs. Two conclusions:
 
 1. The cut value is scaled by travel (−125% × 0.8 = −100%), and it
@@ -156,15 +156,15 @@ from a menu reopens the form, re-runs its init, or leaves it untouched.
 IV). `pSave` covers a power cycle or reopening the app. Saves commit at
 model switch or power-off, which is fine for a wizard.
 
-## R5. Choosing the switch, its OFF position and the stick's idle end
+## R5. Choosing the switch, its CUT position and the stick's idle end
 
 **Decision.**
 
 - **Switch:** `form.addInputbox(item, false, ...)`, read with
   `system.getInputsVal(item)`.
 - **Stick:** `form.addInputbox(item, true, ...)` (proportional).
-- **OFF position and stick idle end are learned together:** one screen
-  asks "Put the switch in OFF and the throttle stick at idle, then press
+- **CUT position and stick idle end are learned together:** one screen
+  asks "Put the switch in CUT and the throttle stick at idle, then press
   Learn". The app stores the sign of each reading (`offSign`, `idleSign`,
   each ±1).
 - **Refusals.** A switch reading near 0 (middle of a 3-position switch) is
@@ -175,7 +175,7 @@ model switch or power-off, which is fine for a wizard.
 which way a stick reads with a given stick mode and calibration, varies
 and isn't documented. Learning both from the pilot's own hands removes the
 question and costs one press. It also matches how the pilot thinks
-("this is OFF").
+("this is CUT").
 
 **Found on the transmitter (2026-10-10).** The stick has to be assigned
 as **proportional** in the inputbox's dialog. `addInputbox(item, true)`
@@ -183,7 +183,7 @@ only *allows* it; assigned as a switch, the stick never reads "middle".
 Learn refuses a stick whose `getSwitchInfo(stk).proportional` is false,
 and the screen hints "Assign it as proportional (P)."
 
-**Alternatives.** A "+/−" selectbox for OFF: error-prone, since the pilot
+**Alternatives.** A "+/−" selectbox for CUT: error-prone, since the pilot
 doesn't know which sign is which. Assuming stick low = −1: wrong for
 inverted assignments.
 
@@ -213,8 +213,8 @@ spec's order:
    RUN is then really cut, which holds the output at the cut target
    whatever the stick does ("Switch RUN gave cut: reverse the switch
    assignment").
-1. Cut (OFF, idle stick)
-2. Cut overrides stick (OFF, full stick)
+1. Cut (CUT, idle stick)
+2. Cut overrides stick (CUT, full stick)
 3. Idle (RUN, idle stick)
 4. Full (RUN, full stick)
 
@@ -228,7 +228,7 @@ check is the only place the stick moves the output in a known direction,
 so it has to be its own step in RUN.
 
 **Alternative considered.** Idle → Full → Cut-overrides → Cut, which needs
-one hand movement per step and builds the "flip to OFF at full stick"
+one hand movement per step and builds the "flip to CUT at full stick"
 emergency habit. Rejected because it moves the reversed-switch failure to
 a different state than the spec describes. It could be revisited after
 bench testing.
@@ -238,7 +238,7 @@ bench testing.
 **Decision.** For each state, the app waits until:
 
 - the switch is in the required position (`getInputsVal(sw) * offSign ≥
-  0.5` for OFF, `≤ −0.5` for RUN);
+  0.5` for CUT, `≤ −0.5` for RUN);
 - the stick is at the required end (`getInputsVal(stk) * idleSign ≥ 0.95`
   for idle, `≤ −0.95` for full);
 - both have been steady for **500 ms**: stick within ±0.01 and output

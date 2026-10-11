@@ -27,8 +27,8 @@ Approach:
   ":otherProps" | ":devExplorer")` (API v1.5 p. 74–75, R3). The wizard's
   place lives in locals plus `pSave`, so returning from a menu works
   whatever the firmware does (R4).
-- **Learn OFF and idle from the pilot's hands.** One "Learn" press stores
-  the switch's OFF sign and the stick's idle sign (R5).
+- **Learn CUT and idle from the pilot's hands.** One "Learn" press stores
+  the switch's CUT sign and the stick's idle sign (R5).
 - **Verify = output check + the spec's four states.** It waits for
   position and 500 ms of steadiness, averages 10 samples, and diagnoses
   failures from a fixed table. A retry is for diagnosis only. Only a clean

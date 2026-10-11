@@ -16,7 +16,7 @@ failsafe) and then proves the result by checking the live throttle output"
 
 **Turbine Throttle Setup** is a transmitter app that walks a turbine pilot
 through setting up the throttle channel so a single two-position safety
-switch selects between engine OFF (Throttle Cut) and engine RUN (Throttle
+switch selects between CUT (Throttle Cut, engine off) and RUN (Throttle
 Idle), and then checks that the throttle channel really produces the right
 pulse widths in every switch and stick position.
 
@@ -51,7 +51,7 @@ This is the proven manual procedure the app guides, with its default values:
 
 1. Set the throttle channel endpoints to ±80%.
 2. Assign Throttle Cut to a two-position switch, in the position chosen as
-   engine OFF.
+   CUT (engine off).
 3. Set the Throttle Cut value to −100%.
 4. Assign Throttle Idle to the same switch, in the engine RUN position.
 5. Set the Throttle Idle offset to 20%.
@@ -83,9 +83,9 @@ the top-right panel, next to SE (the long blue lever). The red switch on the
 top edge is not the throttle switch. Photo:
 [`assets/safety-switch-sf.jpg`](assets/safety-switch-sf.jpg). The photo
 shows SF in the **RUN** position: Throttle Cut off, engine allowed to run
-(Aaron, 2026-10-10). The other position is OFF (Throttle Cut on). Note the
-wording: pilots often say "cut off" for RUN, while this spec's "OFF" means
-engine off. This is an example
+(Aaron, 2026-10-10). The other position is CUT (Throttle Cut on). The app
+calls the positions CUT and RUN rather than "off" and "on", because pilots
+often say "cut off" for RUN. This is an example
 for testing and screenshots, not a default: the app lets every pilot choose
 their own switch (FR-001).
 
@@ -95,8 +95,9 @@ their own switch (FR-001).
   transmitter's servo monitor shows it in percent: µs = 1500 + 5 × %.
 - **Targets**: the three pulse widths the pilot wants: cut, idle and full.
   Defaults 1000 / 1200 / 1900 µs.
-- **OFF / RUN position**: the two positions of the chosen safety switch.
-  OFF selects Throttle Cut; RUN selects Throttle Idle.
+- **CUT / RUN position**: the two positions of the chosen safety switch.
+  CUT selects Throttle Cut (engine off); RUN selects Throttle Idle. (Not
+  "off", which pilots also use for "cut off", i.e. RUN.)
 - **Verify state**: one combination of switch position and stick position
   that the app measures. There are four (see User Story 2).
 - **Idle position**: where idle sits between cut and full, as a share of
@@ -132,7 +133,7 @@ their own switch (FR-001).
   1100 / 1200 / 1900 (12.5%, which would warn). Aaron expects it to suit
   the other ECUs too.
 - Q: What happens to a saved result when the pilot later changes a setup
-  input? → A: Any change to a setup input (switch, OFF position, stick,
+  input? → A: Any change to a setup input (switch, CUT position, stick,
   output, targets, tolerance) clears the saved result to "Not verified",
   after a confirm prompt that says so. Context from Aaron: the app is used
   once per new model; re-running on the same model is rare, and a model
@@ -143,7 +144,7 @@ their own switch (FR-001).
 ### User Story 1 - Guided setup (Priority: P1)
 
 A pilot setting up a new turbine model opens the app, chooses the safety
-switch, which of its positions is OFF, and the throttle stick and throttle
+switch, which of its positions is CUT, and the throttle stick and throttle
 output, and accepts or edits the targets. The app then shows one step per
 screen, each with the menu to go to, the exact value to enter for the chosen
 targets, and an "Open menu" action that takes the pilot straight to that
@@ -185,8 +186,8 @@ output and shows the target, the measured value and pass or fail:
 
 | Verify state | Switch | Stick | Expected |
 | --- | --- | --- | --- |
-| Cut | OFF | idle (low) | cut target |
-| Cut overrides stick | OFF | full (high) | cut target |
+| Cut | CUT | idle (low) | cut target |
+| Cut overrides stick | CUT | full (high) | cut target |
 | Idle | RUN | idle (low) | idle target |
 | Full | RUN | full (high) | full target |
 
@@ -256,10 +257,10 @@ confirm it and check that the summary shows "Setup complete".
 
 ### Edge Cases
 
-- **Switch assigned backwards** (OFF gives idle, RUN gives cut): the output
+- **Switch assigned backwards** (CUT gives idle, RUN gives cut): the output
   check stops with "Switch RUN gave cut. Reverse the switch assignment."
 - **Cut doesn't override the stick** (output rises with the stick while
-  OFF): the cut-overrides-stick state fails and points to Throttle Cut.
+  CUT): the cut-overrides-stick state fails and points to Throttle Cut.
 - **Endpoints that don't match the values shown** (e.g. full reads
   1940 µs): the full state fails and shows expected vs. measured. Uneven
   low and high endpoints are not a fault when the targets call for them.
@@ -308,7 +309,7 @@ confirm it and check that the summary shows "Setup complete".
 **Setup inputs**
 
 - **FR-001**: The app MUST let the pilot choose the safety switch and which
-  of its two positions is OFF (Throttle Cut).
+  of its two positions is CUT (Throttle Cut).
 - **FR-002**: The app MUST let the pilot choose the throttle stick and the
   throttle output channel to measure.
 - **FR-003**: The app MUST let the pilot set the three targets (cut, idle,
@@ -373,7 +374,7 @@ confirm it and check that the summary shows "Setup complete".
 - **FR-019**: The app MUST NOT report "Setup complete" unless the latest
   verify was a clean run (all four states passed back to back, with no
   retries) and the pilot confirmed a hand test of failsafe.
-- **FR-020**: The summary MUST list the switch and OFF position, the
+- **FR-020**: The summary MUST list the switch and CUT position, the
   targets, the measured values, the date, and the next step (remove the app;
   run or skip the ECU's Teach RC).
 
@@ -394,7 +395,7 @@ confirm it and check that the summary shows "Setup complete".
 
 ### Key Entities
 
-- **Setup**: per model: switch and its OFF position, throttle stick,
+- **Setup**: per model: switch and its CUT position, throttle stick,
   throttle output, targets, tolerance, wizard step, last result.
 - **Verify result**: per state: target, measured value, pass or fail, and
   for the run: the failsafe confirmation and the date.

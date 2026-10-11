@@ -4,8 +4,8 @@ A step-by-step guide to setting up a turbine's throttle on a JETI
 **DS-24 II / DC-24 II**, and an app that walks you through it and then
 **checks the result** by measuring the throttle signal.
 
-One two-position safety switch selects **engine OFF** (Throttle Cut) or
-**engine RUN** (Throttle Idle). The throttle stick then runs from idle to
+One two-position safety switch selects **CUT** (Throttle Cut, engine off) or
+**RUN** (Throttle Idle, engine allowed to run). The throttle stick then runs from idle to
 full. The ECU learns three positions from the transmitter: cut, idle and
 full.
 
@@ -24,7 +24,7 @@ for other targets.
 You need a **two-position switch** for the safety switch. A **JETI
 two-position locking switch** for the DS-24 II is highly recommended: you
 have to pull the lever out before it will flip, so it can't be bumped to
-RUN on the bench or knocked to OFF in flight. Fit it where you can reach it
+RUN on the bench or knocked to CUT in flight. Fit it where you can reach it
 fast in an emergency, and don't use it for anything else.
 
 ![The short silver locking switch SF, used as the throttle safety switch, next to SE on a DS-24 II](https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/main/docs/apps/img/throttle-setup-wizard-switch.jpg)
@@ -41,12 +41,12 @@ shown in RUN (Throttle Cut off, engine allowed to run).*
 | Travel − (low end) | 100% |
 | Travel + (high end) | 80% |
 
-### 2. Throttle Cut (engine OFF)
+### 2. Throttle Cut (CUT position)
 
 *Advanced Properties → Other Model Options → Throttle Cut*:
 
 1. Select **Throttle-Cut switch**. When asked to move a switch, move your
-   safety switch **to the position you want for OFF**. That position now
+   safety switch **to the position you want for CUT**. That position now
    activates Throttle Cut.
 2. Set **Throttle-Cut output value** to **−100%**.
 
@@ -59,7 +59,7 @@ Same screen, *Throttle Idle*:
 2. Set **Throttle-Idle offset** to **40%**.
 
 **Check it:** with the switch in RUN, the screen shows **✓** next to
-Throttle-Idle switch and **✗** next to Throttle-Cut switch. Flip to OFF and
+Throttle-Idle switch and **✗** next to Throttle-Cut switch. Flip to CUT and
 they swap. If both show the same mark, one of them was assigned in the
 wrong position: assign it again.
 
@@ -79,8 +79,8 @@ On the servo monitor the throttle should read:
 
 | Switch | Stick | Monitor | Pulse |
 | --- | --- | --- | --- |
-| OFF | down | −100% | 1000 µs |
-| OFF | **up** | **−100%** | **1000 µs** (cut ignores the stick) |
+| CUT | down | −100% | 1000 µs |
+| CUT | **up** | **−100%** | **1000 µs** (cut ignores the stick) |
 | RUN | down | −60% | 1200 µs |
 | RUN | up | +80% | 1900 µs |
 
@@ -92,7 +92,7 @@ values, you can skip this.
 
 ## What the app does
 
-- **Asks for** your safety switch, which position is OFF, the throttle stick,
+- **Asks for** your safety switch, which position is CUT, the throttle stick,
   the throttle output and your targets (default 1000 / 1200 / 1900 µs). It
   refuses targets an ECU can't use, such as idle too close to cut.
 - **Shows each step** with the exact values for your targets, and opens the

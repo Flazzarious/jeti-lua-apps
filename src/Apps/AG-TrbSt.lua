@@ -196,7 +196,7 @@ local function switchText(v)
   elseif cfg.offSg == 0 then
     return "not learned"
   elseif v * cfg.offSg >= V.SW_BAND then
-    return "OFF"
+    return "CUT"
   elseif v * cfg.offSg <= -V.SW_BAND then
     return "RUN"
   end
@@ -316,7 +316,7 @@ local function buildInputs()
   form.addLabel({ label = "  Position", width = LABEL_W })
   idx.stk = form.addLabel({ label = "--", alignRight = true })
 
-  hint("Switch to OFF and stick to")
+  hint("Switch to CUT and stick to")
   hint("idle (down), then press the")
   hint("Learn menu button.")
   idx.learn = hint("", false)
@@ -375,7 +375,7 @@ local function stickIsProportional()
   return info == nil or info.proportional ~= false
 end
 
--- F3 on Setup inputs: store the OFF sign and the stick's idle sign (R5).
+-- F3 on Setup inputs: store the CUT sign and the stick's idle sign (R5).
 local function learn()
   local text
   local sv, kv = readSwitch(), readStick()
@@ -390,7 +390,7 @@ local function learn()
   elseif allowChange() then
     save("offSg", sv > 0 and 1 or -1)
     save("idlSg", kv > 0 and 1 or -1)
-    text = "Learned: OFF and idle."
+    text = "Learned: CUT and idle."
   else
     return
   end

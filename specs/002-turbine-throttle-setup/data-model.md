@@ -8,7 +8,7 @@ Everything is per model. Persisted values use `system.pSave`/`pLoad`
 | Key | Type | Default | Valid | Meaning |
 | --- | --- | --- | --- | --- |
 | `sw` | SwitchItem | nil | assigned | Safety switch (FR-001) |
-| `offSg` | int | 0 | −1, 1 (0 = not learned) | Sign of `getInputsVal(sw)` in OFF (research R5); also shown as the OFF position, −100% or +100% |
+| `offSg` | int | 0 | −1, 1 (0 = not learned) | Sign of `getInputsVal(sw)` in CUT (research R5); also shown as the CUT position, −100% or +100% |
 | `stk` | SwitchItem | nil | assigned, proportional | Throttle stick (FR-002) |
 | `idlSg` | int | 0 | −1, 1 (0 = not learned) | Sign of `getInputsVal(stk)` at idle end (R5) |
 | `out` | int | 0 | 1–24 (0 = not chosen) | Throttle output `O<n>` (FR-002) |

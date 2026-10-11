@@ -7,12 +7,12 @@ Covers FR-013 to FR-019, User Story 2 and research R7/R8.
 | k | State | Switch | Stick | Expected |
 | --- | --- | --- | --- | --- |
 | 0 | Output check | RUN | idle, then full | output rises by ≥ ½ (full − idle target) |
-| 1 | Cut | OFF | idle | cut target |
-| 2 | Cut overrides stick | OFF | full | cut target |
+| 1 | Cut | CUT | idle | cut target |
+| 2 | Cut overrides stick | CUT | full | cut target |
 | 3 | Idle | RUN | idle | idle target |
 | 4 | Full | RUN | full | full target |
 
-Each prompt names the required position, e.g. "Switch OFF, stick at
+Each prompt names the required position, e.g. "Switch CUT, stick at
 FULL". The prompt line shows "Waiting...", "Hold steady..." or
 "Measuring..." as the phase moves on.
 
@@ -22,7 +22,7 @@ Constants (one table, tuned on the bench):
 
 | Name | Value | Meaning |
 | --- | --- | --- |
-| `SW_BAND` | 0.5 | `getInputsVal(sw) * offSign ≥ 0.5` is OFF, `≤ −0.5` is RUN |
+| `SW_BAND` | 0.5 | `getInputsVal(sw) * offSign ≥ 0.5` is CUT, `≤ −0.5` is RUN |
 | `END_BAND` | 0.95 | `getInputsVal(stk) * idleSign ≥ 0.95` is idle end, `≤ −0.95` is full end |
 | `STEADY_MS` | 500 | position held and steady this long before sampling |
 | `STICK_JITTER` | 0.01 | max stick movement during steady window |
