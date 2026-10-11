@@ -146,8 +146,21 @@ task 1 updates its comment with the menu constants (source: API p. 74–75).
 Idle (Channel: 1)" has "Throttle-Idle switch" and "Throttle-Idle offset".
 Each switch row shows ✓ when that function is active and ✗ when not, so
 with both on one switch they always show opposite marks. The guide text
-uses these labels (FR-007). Servo setup and failsafe labels are still to
-be confirmed.
+uses these labels (FR-007).
+
+**Servo Setup labels (Aaron, 2026-10-10, `Screen008.png`).** "Servo No."
+selects the output, shown as function name plus output number (e.g.
+"Engine 1 (1)"). Rows: "Subtrim", "Max positive", "Max negative" (shown
+signed, e.g. −100%), "Max positive limit", "Max negative limit" (defaults
+125% / −125%), "Reverse", "Delay positive/negative". A bar at the top
+shows the live output in percent. So "Travel −/+" in this research means
+Max negative / Max positive on screen. Failsafe labels are still to be
+confirmed.
+
+**Measured (transmitter, 2026-10-10).** `openExternal(":servoSetup")`
+opens the Servo Setup screen; pressing Esc there returns straight to the
+app's Setup inputs screen. R4's resume design is still kept for reopening
+the app later.
 
 **Open point (task 1).** The call is asynchronous. What happens to the
 app's form when the pilot backs out of the menu isn't documented. The

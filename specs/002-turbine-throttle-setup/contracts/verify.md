@@ -49,12 +49,12 @@ Checked top to bottom for the failing state. `near(x, t)` means
 | Output check | output span < ½ (full − idle target) | "Output doesn't move with stick." / "Choose the throttle output." |
 | Output check | output at full < output at idle | "Throttle reversed." / "Check Servo setup > Reverse." |
 | Cut (1) | m > cut + tol | "Cut too high. Throttle Cut" / "Output value should be -100%." |
-| Cut (1) | otherwise | "Cut low. Check Travel - (X%)" / "and Throttle Cut value (-100%)." |
+| Cut (1) | otherwise | "Cut low. Check Max negative" / "(-X%) and Throttle-Cut value." |
 | Cut overrides (2) | near(m, full target) | "Cut doesn't override stick." / "Check Throttle Cut switch." |
 | Cut overrides (2) | otherwise | "Cut changes with stick." / "Check Throttle Cut settings." |
 | Idle (3) | near(m, cut target) | "Switch RUN gave cut." / "Check Throttle Idle switch." |
 | Idle (3) | otherwise | "Idle off by N us. Check Idle" / "offset (X%) and throttle trim." |
-| Full (4) | otherwise | "Full off by N us. Check" / "Travel + (X%) and trim." |
+| Full (4) | otherwise | "Full off by N us. Check Max" / "positive (X%) and trim." |
 
 X is the value from [settings-math.md](settings-math.md). N is
 measured − expected, with a sign.

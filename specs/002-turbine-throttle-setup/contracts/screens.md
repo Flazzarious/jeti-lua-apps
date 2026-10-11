@@ -53,7 +53,7 @@ firmware 6.x in task 1 (spec research item 3) and changed here if needed.
 
 | Step | Menu (Open) | Content |
 | --- | --- | --- |
-| 1 Endpoints | `:servoSetup` | "Model > Servo setup > [throttle]" / "Travel -: 100%" / "Travel +: 80%" (one "Travel: +/-X%" line when equal; `±` only if the charset check passes) |
+| 1 Endpoints | `:servoSetup` | "Servo Setup > Servo No.:" / "your throttle output." / "Max negative: -100%" / "Max positive: 80%" / "Leave the limits at -125/125%." (always both lines, signed as the transmitter shows them) |
 | 2 Throttle Cut | `:otherProps` | "Other Model Options >" / "Throttle Cut" / "Throttle-Cut switch: choose it" / "and move the switch to CUT." / "Throttle-Cut output value: -100%" |
 | 3 Throttle Idle | `:otherProps` | "Other Model Options >" / "Throttle Idle" / "Throttle-Idle switch: same" / "switch, moved to RUN." / "Throttle-Idle offset: 40%" / "Check: in RUN, Idle shows a" / "tick and Cut a cross." |
 | 4 Failsafe | `:devExplorer` | "Device Explorer > receiver >" / "throttle output failsafe:" / "OFF (no pulse), or about 1000 us" / "The app can't read this. You'll" / "test it by hand at the end." (FR-010) |

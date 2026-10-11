@@ -67,7 +67,7 @@ cut −100%, idle offset 40%) unless a row says otherwise.
 | 2.1 | Fresh app: Home | "Not verified". Guided setup and Verify disabled |
 | 2.2 | Setup inputs: assign switch, stick, output; Learn | Live labels follow switch and stick. Learn with switch in middle (if 3-pos) is refused |
 | 2.3 | Targets: each settings-math test vector | Refusals, warnings and idle position as listed (SC-010) |
-| 2.4 | Guide with defaults | Travel -100% / +80%, cut -100%, idle offset 40% shown (US1-1). Custom 1100/1200/1900 shows +/-80%, -100%, 20% plus the 12.5% warning (US1-2) |
+| 2.4 | Guide with defaults | Max negative -100%, Max positive 80%, cut -100%, idle offset 40% shown (US1-1). Custom 1100/1200/1900 shows Max negative -80%, Max positive 80%, -100%, 20% plus the 12.5% warning (US1-2) |
 | 2.5 | Guide: Open on step 2, back out | Wizard on step 2 with same choices (US1-4, FR-009) |
 | 2.6 | Close app, reopen | Same screen and step |
 | 2.7 | Verify, correct setup | Output check and 4 states PASS → Failsafe screen (US2-1) |
@@ -84,7 +84,7 @@ verify, then undo it.
 | --- | --- | --- |
 | Switch assignment reversed | Output check | reverse the switch |
 | Throttle Cut not assigned | Cut overrides stick | Throttle Cut |
-| Travel + 88% (full 1940) | Full | Travel + |
+| Max positive 88% (full 1940) | Full | Max positive |
 | Idle offset 45% (idle 1225) | Idle | Idle offset |
 | Wrong output chosen | Output check | choose the throttle output |
 | Throttle servo reversed | Output check | servo reverse |

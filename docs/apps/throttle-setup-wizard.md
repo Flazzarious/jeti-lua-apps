@@ -40,7 +40,7 @@ already set up), run its check:
    most, and it's easy never to check.
 3. **It tells you what to fix.** Not just "fail", but which setting:
    "Switch RUN gave cut: reverse the switch assignment", "Full off by
-   +40 us: check Travel +", "Throttle reversed: check servo reverse",
+   +40 us: check Max positive", "Throttle reversed: check servo reverse",
    "Output doesn't move: choose the throttle output".
 4. **Accurate readings.** It waits until the stick is fully at the end and
    held still, then averages the signal, so a stick at 95% doesn't give a
@@ -102,12 +102,16 @@ shown in RUN (Throttle Cut off, engine allowed to run).*
 
 ### 1. Throttle travel
 
-*Model → Servo Setup*, the throttle output (e.g. channel 1):
+*Model → Servo Setup*, then choose your throttle output in **Servo No.**
+(e.g. "Throttle (1)" or "Engine 1 (1)"):
 
 | Setting | Value |
 | --- | --- |
-| Travel − (low end) | 100% |
-| Travel + (high end) | 80% |
+| Max negative (low end) | −100% |
+| Max positive (high end) | 80% |
+
+Leave **Max negative limit** and **Max positive limit** at their defaults
+(−125% / 125%), **Subtrim** at 0% and **Reverse** at No.
 
 ### 2. Throttle Cut (CUT position)
 

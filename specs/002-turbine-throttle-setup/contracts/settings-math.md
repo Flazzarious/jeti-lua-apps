@@ -26,8 +26,9 @@ Input: valid targets `cut`, `idle`, `full` (µs, multiples of 5).
 Constant: `US_PER_PCT = 5`. All results are integers because targets are
 multiples of 5.
 
-When `travelLo == travelHi` the guide shows one line, "Travel: +/-80%".
-Otherwise it shows two lines, "Travel -: 80%" and "Travel +: 100%"
+The guide always shows two lines in the transmitter's wording and signs
+(Servo Setup, `Screen008.png`): "Max negative: -X%" from `travelLo` and
+"Max positive: Y%" from `travelHi`, even when they're equal
 (clarification Q2).
 
 ## Validation (FR-003, clarification Q3)

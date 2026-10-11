@@ -238,6 +238,8 @@ The app file returns a table: `init`, `loop`, `destroy` (5.00+), `author`,
   Assigned as a switch, a stick reads only its switched states. Check
   `system.getSwitchInfo(item).proportional` (transmitter, 2026-10-10,
   Throttle Setup Wizard).
+- `system.openExternal(":servoSetup")` opens Servo Setup over the app's
+  form; Esc returns to the same form screen (transmitter, 2026-10-10).
 - `system.getInputs("O<n>")` reads servo outputs: a ±100% travel throttle
   read 1000–2000 µs as `1500 + 500 * v` (transmitter, 2026-10-10).
 
