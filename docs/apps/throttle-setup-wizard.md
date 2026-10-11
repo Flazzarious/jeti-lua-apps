@@ -204,9 +204,31 @@ prompts for cut, idle and full: switch at CUT for cut, RUN with the stick
 down for idle, RUN with the stick up for full. **Always do this** after
 setting up or changing these values, even if the ECU was taught before.
 
+### 7. Voice callouts (optional)
+
+Hear **"Turbine off"** when you flip the safety switch to CUT and
+**"Turbine on"** when you flip it to RUN. The transmitter plays them
+itself, so they keep working after you remove the app.
+
+1. In the app, open **Voice callouts** and press **Copy**. It puts
+   `TurbOff.wav` and `TurbOn.wav` in the card's `/Audio` folder. Files
+   already there are never replaced.
+2. Press **Open** to go to *Sounds on event*. Add your safety switch at
+   **CUT** with `TurbOff.wav`, and at **RUN** with `TurbOn.wav`.
+3. If you already have callouts for this switch, you'll see them there:
+   keep them, swap in these files, or use your own.
+
+The callouts use the same voice as the author's Speed Gauge and Flameout
+Alarm apps.
+
 ## Credits and licenses
 
 Throttle Setup Wizard: MIT license, Copyright (c) 2026 Aaron George.
+
+Voice callouts: generated with **Piper** text-to-speech using the voice
+model **"Amy"** by Mycroft / Rhasspy. The sound files (in
+`/Apps/AG-TrbSt/`, and the copies in `/Audio`) are licensed
+**CC BY-SA 4.0**.
 
 Xicoy's advice on digital trims is from the Xicoy TurboJet Engines User
 Manual (v1.5, 2024); idle ranges from the Xicoy and KingTech manuals.

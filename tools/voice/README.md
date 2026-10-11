@@ -98,6 +98,32 @@ The self-check exits 1 if a file is missing, a cycle file isn't exactly
 5.000 s, the callout runs over 2.5 s, or the voice part of `cycletl.wav`
 runs over 4.0 s. The files are committed, under CC BY-SA 4.0.
 
+## Throttle Setup Wizard callouts
+
+`make_turbine.py` writes Throttle Setup Wizard's optional switch callouts
+to `src/Apps/AG-TrbSt/` (spec 002, FR-026; research R14):
+
+| File | Says | Used for |
+| --- | --- | --- |
+| `TurbOff.wav` | "Turbine off" | safety switch to CUT |
+| `TurbOn.wav` | "Turbine on" | safety switch to RUN |
+
+Same voice and calm pace as Flameout Alarm's announcements (speed 1.5, no
+effects), plus `CREDITS.txt`. The files are committed. The app never plays
+them: it copies them to the transmitter's `/Audio` folder on request, and
+the pilot assigns them in *Sounds on event*.
+
+```powershell
+python tools/voice/make_turbine.py --model C:\path\to\en_US-amy-medium.onnx
+```
+
+Options: `--out`, `--rate` (default 22050) and `--speed` (default 1.5).
+The self-check fails if a file is missing or longer than 1.5 s (first run,
+2026-10-10: 0.75 s and 0.70 s).
+
+For a new app's voice, follow the `jeti-voice` skill
+(`.claude/skills/jeti-voice/`).
+
 ## Licensing
 
 - **Voice model:** "Amy" (`en_US-amy-medium`) by Mycroft / Rhasspy is
