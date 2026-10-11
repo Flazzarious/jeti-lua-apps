@@ -607,15 +607,22 @@ local function buildHome()
   local ready = setupComplete()
   form.addRow(1)
   form.addLink(function() goTo(SCR.INPUTS) end, { label = "Setup inputs" })
-  form.addRow(1)
-  form.addLink(function() goTo(SCR.GUIDE) end, { label = "Guided setup", enabled = ready })
-  form.addRow(1)
-  form.addLink(function() goTo(SCR.VERIFY) end, { label = "Verify", enabled = ready })
-  form.addRow(1)
-  form.addLink(function() goTo(SCR.SUMMARY) end, { label = "Summary", enabled = cfg.res > RES.NONE })
+  -- Links that can't be used yet are left out: the firmware draws a
+  -- disabled link like an active one (transmitter, 2026-10-10).
+  if ready then
+    form.addRow(1)
+    form.addLink(function() goTo(SCR.GUIDE) end, { label = "Guided setup" })
+    form.addRow(1)
+    form.addLink(function() goTo(SCR.VERIFY) end, { label = "Verify" })
+  end
+  if cfg.res > RES.NONE then
+    form.addRow(1)
+    form.addLink(function() goTo(SCR.SUMMARY) end, { label = "Summary" })
+  end
   form.addRow(1)
   form.addLink(function() goTo(SCR.VOICE) end, { label = "Voice callouts (optional)" })
-  hint("Complete Setup inputs first.", not ready)
+  hint("Complete Setup inputs to unlock", not ready)
+  hint("Guided setup and Verify.", not ready)
 end
 
 ------------------------------------------------------------------------------
@@ -1074,7 +1081,7 @@ local function buildSummary()
   if type(m) == "table" and #m == 4 then
     hint(string.format("Measured: %d/%d/%d/%d", m[1], m[2], m[3], m[4]))
   end
-  if cfg.when > 0 then
+  if cfg.when > 0 and cfg.res ~= RES.COMPLETE then   -- COMPLETE shows it in the status
     hint("Verified: " .. fmtDate(cfg.when))
   end
   form.addRow(1)

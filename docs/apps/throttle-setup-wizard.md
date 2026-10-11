@@ -82,11 +82,30 @@ check: fuel off, or the ECU unplugged from the engine.
    ECU** (Teach RC).
 6. **Voice callouts (optional):** see step 7 below.
 
-<img src="img/throttle-setup-wizard-home.png" width="240" alt="Throttle Setup Wizard home screen with Setup inputs and Voice callouts">
+### Screens
+
+<img src="img/throttle-setup-wizard-home.png" width="240" alt="Home: Setup complete, verified 2026-10-10, with links to Setup inputs, Guided setup, Verify, Summary and Voice callouts">
 <img src="img/throttle-setup-wizard-setup-inputs.png" width="240" alt="Setup inputs: engine warning, safety switch Sf at CUT (+100%), throttle stick P4 at idle (-100%), throttle output O1">
 
-*The app's home screen, and Setup inputs showing the safety switch at CUT
-and the stick at idle, live.*
+*Home after a completed setup, and Setup inputs showing the safety switch
+at CUT and the stick at idle, live.*
+
+<img src="img/throttle-setup-wizard-guide-1.png" width="240" alt="Guided setup step 1 of 5: Servo Setup, Max negative -80%, Max positive 80%, leave the limits at -125/125%">
+<img src="img/throttle-setup-wizard-guide-2.png" width="240" alt="Guided setup step 2 of 5: Other Model Options, Throttle Cut, Throttle-Cut output value -100%">
+<img src="img/throttle-setup-wizard-guide-3.png" width="240" alt="Guided setup step 3 of 5: Throttle Idle on the same switch at RUN, Throttle-Idle offset 20%">
+<img src="img/throttle-setup-wizard-guide-4.png" width="240" alt="Guided setup step 4 of 5: receiver Fail-Safe enabled 1.5s, throttle OutPin mode Out OFF">
+<img src="img/throttle-setup-wizard-guide-5.png" width="240" alt="Guided setup step 5 of 5: use a JETI 2-position locking switch within easy reach">
+
+*Guided setup: five steps, each with the exact value to enter and an
+**Open** button that jumps to that menu.*
+
+<img src="img/throttle-setup-wizard-verify-check.png" width="240" alt="Verify, output check: switch RUN (not cut), stick idle then full; Do: now move the stick fully up">
+<img src="img/throttle-setup-wizard-verify-passed.png" width="240" alt="Verify: 4 of 4 Full, all four passed, press Next">
+<img src="img/throttle-setup-wizard-summary.png" width="240" alt="Summary: setup complete, safety switch Sf, ECU Other (cut -100%), targets 1100/1200/1900, measured 1100/1100/1202/1900, next: remove the app and re-learn the ECU">
+
+*Verify: each test shows what it needs (Set), where your switch and stick
+are now (Now) and what to do (Do). Then the summary, with the measured
+values and the next step.*
 
 ## The setup by hand
 

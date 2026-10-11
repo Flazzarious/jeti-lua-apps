@@ -27,13 +27,13 @@ Taken on a DS-24 II transmitter.
 <img src="docs/apps/img/flameout-alarm-flameout.png" width="200" alt="Flameout Alarm showing the red FLAMEOUT alarm at 0 RPM">
 <img src="docs/apps/img/flameout-alarm-disarmed.png" width="200" alt="Flameout Alarm disarmed at 35,000 RPM">
 
-**Throttle Setup Wizard** (in development): setup inputs, voice callouts,
-the transmitter's Sounds on Event. Full guide:
+**Throttle Setup Wizard** (in development): a guided step, verify passed,
+the summary. Full guide:
 [Throttle Setup Wizard](docs/apps/throttle-setup-wizard.md).
 
-<img src="docs/apps/img/throttle-setup-wizard-setup-inputs.png" width="200" alt="Throttle Setup Wizard Setup inputs: safety switch Sf at CUT, throttle stick P4 at idle, output O1">
-<img src="docs/apps/img/throttle-setup-wizard-voice-callouts.png" width="200" alt="Throttle Setup Wizard Voice callouts: TurbOff.wav and TurbOn.wav copied to /Audio/en">
-<img src="docs/apps/img/throttle-setup-wizard-sound-events.png" width="200" alt="Sounds on Event with TURBON.WAV and TURBOFF.WAV on switch Sf">
+<img src="docs/apps/img/throttle-setup-wizard-guide-2.png" width="200" alt="Throttle Setup Wizard guided step 2: Throttle-Cut output value -100%">
+<img src="docs/apps/img/throttle-setup-wizard-verify-passed.png" width="200" alt="Throttle Setup Wizard Verify: all four passed">
+<img src="docs/apps/img/throttle-setup-wizard-summary.png" width="200" alt="Throttle Setup Wizard Summary: setup complete with measured values">
 
 ### Speed Gauge
 
