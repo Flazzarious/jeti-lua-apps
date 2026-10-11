@@ -699,19 +699,34 @@ end
 ------------------------------------------------------------------------------
 
 local PH = { IDLE = 1, CHECK = 2, WAIT = 3, SETTLE = 4, SAMPLE = 5, FAILED = 6, PASSED = 7 }
+-- What each test needs, shown on its "Test" and "Set" lines (screen layout:
+-- Test / Set / Now / Do, so the pilot sees the question apart from the
+-- live switch and stick positions; Aaron, 2026-10-10).
+local SW_CUT = "Switch: CUT (engine off)"
+local SW_RUN = "Switch: RUN (not cut)"
 local STATES = {   -- t: index into REC.TARGETS[ecu] (1 cut, 2 idle, 3 full)
-  { name = "Cut", cut = true, idle = true, t = 1, prompt = "Switch CUT, stick IDLE" },
-  { name = "Cut override", cut = true, idle = false, t = 1, prompt = "Switch CUT, stick FULL" },
-  { name = "Idle", cut = false, idle = true, t = 2, prompt = "Switch RUN, stick IDLE" },
-  { name = "Full", cut = false, idle = false, t = 3, prompt = "Switch RUN, stick FULL" },
+  { name = "Cut", cut = true, idle = true, t = 1, test = "1 of 4: Cut", set1 = SW_CUT, set2 = "Stick: IDLE (down)" },
+  { name = "Cut override", cut = true, idle = false, t = 1, test = "2 of 4: Cut override", set1 = SW_CUT, set2 = "Stick: FULL (up)" },
+  { name = "Idle", cut = false, idle = true, t = 2, test = "3 of 4: Idle", set1 = SW_RUN, set2 = "Stick: IDLE (down)" },
+  { name = "Full", cut = false, idle = false, t = 3, test = "4 of 4: Full", set1 = SW_RUN, set2 = "Stick: FULL (up)" },
 }
-local TXT = {
-  check = "RUN: stick to IDLE, then FULL", start = "Press Start.",
-  toCut = "Move the switch to CUT", toRun = "Move the switch to RUN",
-  toIdle = "Move the stick fully to IDLE", toFull = "Move the stick fully to FULL",
-  steady = "Hold steady...", measuring = "Measuring...", none = "",
-  passed = "All four passed.", retried1 = "All passed after a retry.",
-  retried2 = "Run all four again to save.", failed = "Failed. Fix it, then Retry.",
+local CHECK_INFO = { test = "Output check", set1 = SW_RUN, set2 = "Stick: IDLE (down), then FULL" }
+local READY_INFO = { test = "Ready", set1 = "Checks the throttle in each", set2 = "switch and stick position." }
+
+-- "Do" lines: two constant strings each, never built per loop.
+local DO = {
+  start = { "Press Start to begin.", "" },
+  toCut = { "Safety switch to CUT", "(cut: engine off)" },
+  toRun = { "Safety switch to RUN", "(not cut: engine may run)" },
+  toIdle = { "Move the stick fully DOWN", "(idle) and hold it there." },
+  toFull = { "Move the stick fully UP", "(full) and hold it there." },
+  checkFull = { "Now move the stick fully UP", "(full)." },
+  steady = { "Hold still...", "" },
+  measuring = { "Measuring...", "" },
+  inputs = { "Check Setup inputs.", "" },
+  passed = { "All four passed.", "Press Next." },
+  retried = { "All passed after a retry.", "Restart for a clean run." },
+  failed = { "Failed: reason below.", "Fix it, then press Retry." },
 }
 
 local run = { phase = PH.IDLE, k = 0, retried = false, m = {}, row = {}, why1 = "", why2 = "" }
@@ -829,29 +844,25 @@ local function savePass()
 end
 
 -- One verify step, at most every SAMPLE_MS while the Verify screen is open.
--- Returns the prompt and phase text to show (constant strings).
-local function stepVerify(now)
+-- Returns the "Do" pair to show (a constant from DO).
+local function stepVerify(now, sv, kv, ov)
   local p = run.phase
   if p == PH.IDLE then
-    return TXT.start, TXT.none
+    return DO.start
   elseif p == PH.FAILED then
-    return TXT.failed, TXT.none
+    return DO.failed
   elseif p == PH.PASSED then
-    if run.retried then
-      return TXT.retried1, TXT.retried2
-    end
-    return TXT.passed, TXT.none
+    return run.retried and DO.retried or DO.passed
   end
-  local sv, kv, ov = readSwitch(), readStick(), readOut()
   if sv == nil or kv == nil or ov == nil then
-    return "Check Setup inputs.", TXT.none
+    return DO.inputs
   end
   local us = US_CENTER + US_PER_UNIT * ov
   local tg = REC.TARGETS[cfg.ecu]
 
   if p == PH.CHECK then                 -- output check (R7, FR-017)
     if not switchIs(false, sv) then
-      return TXT.check, TXT.toRun
+      return DO.toRun
     end
     if stickAt(true, kv) then
       run.chkIdle = us
@@ -873,7 +884,12 @@ local function stepVerify(now)
         setPhase(PH.WAIT)
       end
     end
-    return TXT.check, run.chkIdle and TXT.toFull or TXT.toIdle
+    if run.phase == PH.FAILED then
+      return DO.failed
+    elseif run.phase ~= PH.CHECK then
+      return DO.steady
+    end
+    return run.chkIdle and DO.checkFull or DO.toIdle
   end
 
   local st = STATES[run.k]
@@ -882,16 +898,16 @@ local function stepVerify(now)
     if inPos then
       run.t0, run.refOut, run.refStk = now, us, kv
       setPhase(PH.SETTLE)
-      return st.prompt, TXT.steady
+      return DO.steady
     end
     if not switchIs(st.cut, sv) then
-      return st.prompt, st.cut and TXT.toCut or TXT.toRun
+      return st.cut and DO.toCut or DO.toRun
     end
-    return st.prompt, st.idle and TXT.toIdle or TXT.toFull
+    return st.idle and DO.toIdle or DO.toFull
   end
   if not inPos then                    -- position lost: wait again (FR-015)
     setPhase(PH.WAIT)
-    return st.prompt, TXT.none
+    return DO.steady
   end
   if p == PH.SETTLE then
     if math.abs(kv - run.refStk) > V.STICK_JITTER or math.abs(us - run.refOut) > V.OUT_JITTER_US then
@@ -900,12 +916,12 @@ local function stepVerify(now)
       run.n, run.sum = 0, 0
       setPhase(PH.SAMPLE)
     end
-    return st.prompt, TXT.steady
+    return DO.steady
   end
   -- SAMPLE: average SAMPLE_N readings, SAMPLE_MS apart (R8)
   run.n, run.sum = run.n + 1, run.sum + us
   if run.n < V.SAMPLE_N then
-    return st.prompt, TXT.measuring
+    return DO.measuring
   end
   local m = math.floor(run.sum / run.n + 0.5)
   local target = tg[st.t]
@@ -925,7 +941,14 @@ local function stepVerify(now)
   else
     fail(diagnose(run.k, m))
   end
-  return st.prompt, TXT.none
+  return DO.steady
+end
+
+-- A labelled row ("Test:", "Set:", "Now:", "Do:") whose value changes.
+local function addInfoRow(name, font)
+  form.addRow(2)
+  form.addLabel({ label = name, width = 50, font = FONT_MINI })
+  return form.addLabel({ label = "", font = font or FONT_NORMAL })
 end
 
 local function buildVerify()
@@ -933,12 +956,14 @@ local function buildVerify()
   form.addRow(1)
   form.addLabel({ label = "ENGINE MUST NOT BE ABLE TO START", font = FONT_BOLD })
   hint("(fuel off or ECU unplugged)")
-  hint("Center throttle trim.")
-  hint("Checks this flight mode only.")
-  form.addRow(1)
-  idx.vPrompt = form.addLabel({ label = TXT.start, font = FONT_BOLD })
-  form.addRow(1)
-  idx.vPhase = form.addLabel({ label = TXT.none })
+  hint("Center throttle trim. Checks")
+  hint("this flight mode only.")
+  idx.vTest = addInfoRow("Test:", FONT_BOLD)
+  idx.vSet1 = addInfoRow("Set:")
+  idx.vSet2 = addInfoRow("")
+  idx.vNow = addInfoRow("Now:")
+  idx.vDo1 = addInfoRow("Do:", FONT_BOLD)
+  idx.vDo2 = addInfoRow("")
   hint("State           target  measured")
   idx.vRow = {}
   for k = 1, 4 do
@@ -951,7 +976,7 @@ local function buildVerify()
   end
   idx.vWhy1 = hint(run.why1, run.why1 ~= "")
   idx.vWhy2 = hint(run.why2, run.why2 ~= "")
-  run.shownPrompt, run.shownPhase = nil, nil
+  run.shownInfo, run.shownDo, run.shownSw, run.shownStk = nil, nil, nil, nil
   setButtonsVerify()
 end
 
@@ -980,20 +1005,35 @@ local function verifyKey(keyCode)
   end
 end
 
--- Live prompt and phase lines, only when their text changes.
+-- Run one verify step and refresh the Test / Set / Now / Do rows, each only
+-- when what it shows has changed.
 local function updateVerify(now)
   if now - (run.lastWork or 0) < V.SAMPLE_MS then
     return
   end
   run.lastWork = now
-  local prompt, phase = stepVerify(now)
-  if prompt ~= run.shownPrompt then
-    run.shownPrompt = prompt
-    form.setProperties(idx.vPrompt, { label = prompt })
+  local sv, kv, ov = readSwitch(), readStick(), readOut()
+  local act = stepVerify(now, sv, kv, ov)
+
+  local info = STATES[run.k] or CHECK_INFO
+  if run.phase == PH.IDLE then
+    info = READY_INFO
   end
-  if phase ~= run.shownPhase then
-    run.shownPhase = phase
-    form.setProperties(idx.vPhase, { label = phase })
+  if info ~= run.shownInfo then
+    run.shownInfo = info
+    form.setProperties(idx.vTest, { label = info.test })
+    form.setProperties(idx.vSet1, { label = info.set1 })
+    form.setProperties(idx.vSet2, { label = info.set2 })
+  end
+  if act ~= run.shownDo then
+    run.shownDo = act
+    form.setProperties(idx.vDo1, { label = act[1] })
+    form.setProperties(idx.vDo2, { label = act[2] })
+  end
+  local sw, stk = switchText(sv), stickText(kv)
+  if sw ~= run.shownSw or stk ~= run.shownStk then
+    run.shownSw, run.shownStk = sw, stk
+    form.setProperties(idx.vNow, { label = "switch " .. sw .. ", stick " .. stk })
   end
 end
 
@@ -1192,11 +1232,11 @@ local function loop()
   if not formOpen then
     return
   end
-  if cur == SCR.VERIFY and idx.vPrompt then
+  if cur == SCR.VERIFY and idx.vTest then
     local ok, err = pcall(updateVerify, system.getTimeCounter())
     if not ok then
       print("TrbSt verify: " .. tostring(err))
-      idx.vPrompt = nil       -- stop retrying every loop
+      idx.vTest = nil         -- stop retrying every loop
     end
   elseif cur == SCR.INPUTS and idx.us then
     local ok, err = pcall(updateInputs, system.getTimeCounter())
