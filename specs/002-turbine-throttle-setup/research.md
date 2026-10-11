@@ -43,6 +43,14 @@ down 1000, **CUT + stick up 1000**, RUN + stick down 1100, RUN + stick up
 Throttle Cut (the stop rule doesn't trigger). With ±100% travel, readings
 run 1000–2000 µs as `1500 + 500 * v` predicts, and idle = low end + 5 ×
 offset holds at a second travel setting (R2: 1000 + 100 = 1100).
+With the recommended setup (−80/80, idle 20%) the app read 1100 / 1200 /
+1900 at Throttle-Cut −100% and 1000 / 1200 / 1900 at −125% (Xicoy), both
+exactly the targets in [settings-math.md](contracts/settings-math.md).
+
+**Failsafe:** the manual test (ECU powered, fuel off, transmitter off, ECU
+reports signal loss) is confirmed as the right check (Aaron, 2026-10-10).
+Where the failsafe value is set on 6.x (Servo Setup or Device Explorer) is
+still to be confirmed for the guide's wording.
 
 **Alternatives.** Logging the output with `registerLogVariable`: no, it's
 for writing to the log, not reading. Reading the stick and calculating the

@@ -47,5 +47,6 @@ Constants: `US_CENTER = 1500`, `US_PER_UNIT = 500`.
 | Flash Ultra EVO | Swiwin | −80/80, −100%, 20% | 1100 / 1100 / 1200 / 1900 | other ✓ |
 | Avanti Mini | Xicoy | −80/80, −125%, 20% | 1000 / 1000 / 1200 / 1900 | Xicoy ✓ |
 | Test model | — | −80/80, −100%, 20% | 1100 / 1200 / 1900 | other ✓ |
+| Test model | — | −80/80, −125%, 20% | 1000 / 1200 / 1900 | Xicoy ✓ |
 
 (Order: cut with stick down / cut with stick up / idle / full.)
