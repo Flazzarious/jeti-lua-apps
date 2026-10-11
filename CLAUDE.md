@@ -17,6 +17,7 @@ other work. Remove an item once he says it's done.
 | App (menu name) | Script | Spec | Based on |
 | --- | --- | --- | --- |
 | Speed Gauge | `src/Apps/AG-SpdGa.lua` | `specs/001-speed-gauge/` | DFM Speed Announcer (Dave McQueeney, MIT) |
+| Throttle Setup Wizard | `src/Apps/AG-TrbSt.lua` | `specs/002-turbine-throttle-setup/` | original |
 | Flameout Alarm | `src/Apps/AG-FlmOt.lua` | `specs/003-flameout-alarm/` | original |
 
 Keep this table current when an app is added.
@@ -52,6 +53,9 @@ or shorten an existing credit or license notice.
   structure.
 - `src/Apps/lib/`: shared modules. Check here before writing a helper another
   app may already have.
+- Voice callouts or other speech files: follow the `jeti-voice` skill
+  (`.claude/skills/jeti-voice/`) so every app uses the same Piper "Amy"
+  voice, file format and credits.
 
 ## Layout and naming (constitution V and VII)
 

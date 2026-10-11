@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title>Throttle Setup Wizard</title>
+    </head>
+    <body style="padding:10px;float:left;max-width:500px;">
+        <h1>Throttle Setup Wizard</h1>
+        <p>Set up a turbine's throttle on one <b>safety switch</b>, and
+        <b>prove it works</b> before the engine ever starts. For the
+        DS-24 II / DC-24 II.</p>
+        <img src="img/throttle-setup-wizard-verify-passed.png" alt="Verify: all four passed" width="480">
+        <h3>One switch instead of the trim</h3>
+        <p>Many pilots still stop and arm their turbine by clicking the
+        throttle trim fully down and up. Xicoy's manual warns that digital
+        trims cause an unstable idle and a delay in shutting the engine off.
+        One two-position safety switch is simpler and safer:
+        <b>CUT</b> (Throttle Cut, engine off) or <b>RUN</b> (Throttle Idle,
+        the engine may run). You only have to set it up correctly once, and
+        that's what this app is for.</p>
+        <h3>What the app does for you</h3>
+        <ul>
+            <li><b>Proof, not assumption:</b> measures the real throttle
+            signal with the switch at CUT and RUN and the stick at idle and
+            full, and shows pass or fail.</li>
+            <li><b>Tests the dangerous case:</b> switch at CUT with the stick
+            at full must stay at cut.</li>
+            <li><b>Tells you what to fix:</b> e.g. "Switch RUN gave cut:
+            reverse the switch assignment", "Full off by +40 us: check Max
+            positive".</li>
+            <li><b>The right values for your ECU:</b> Max negative/positive
+            -80/80, Throttle-Idle offset 20%, Throttle-Cut output value -100%
+            (-125% for Xicoy). Tested with KingTech, Swiwin and Xicoy.</li>
+            <li><b>Opens each menu for you</b> from the guided steps.</li>
+            <li><b>Failsafe isn't forgotten:</b> you confirm a hand test
+            before the setup is called complete.</li>
+            <li><b>Optional voice callouts:</b> "Turbine off" and "Turbine
+            on" for the transmitter's Sounds on Event.</li>
+        </ul>
+        <img src="img/throttle-setup-wizard-guide-2.png" alt="Guided setup step 2: Throttle-Cut output value" width="480">
+        <p><b>Read and instruct only.</b> The app can't change any setting:
+        you make each change, it tells you exactly what and proves it worked.
+        Use it on the bench with the engine unable to start (fuel off or ECU
+        unplugged). Once the setup passes, remove the app from the model and
+        <b>always re-learn your ECU</b> (Teach RC).</p>
+        <h3>Using it</h3>
+        <ol>
+            <li>Add <b>AG-TrbSt</b> in <i>Applications - User Applications</i>,
+            then open <b>Throttle Setup Wizard</b>.</li>
+            <li><b>Setup inputs:</b> choose the safety switch and the throttle
+            stick (assign it as proportional, P), put the switch at CUT and
+            the stick at idle and press <b>Learn</b>. Choose the throttle
+            output and your ECU (Xicoy or Other).</li>
+            <li><b>Guided setup:</b> five steps with the exact values and an
+            <b>Open</b> button for each menu.</li>
+            <li><b>Verify</b>, then the <b>failsafe</b> hand test and the
+            summary.</li>
+        </ol>
+        <p>Version: <b>0.1.0</b></p>
+        <p>Compatibility: <b>DC/DS-24II</b>, firmware 6.x. Older DC/DS
+        transmitters should work but are untested.</p>
+        <p>Voice callouts: Piper text-to-speech with the "Amy" voice by
+        Mycroft / Rhasspy; the sound files are licensed CC BY-SA 4.0.
+        Throttle Setup Wizard: MIT license, Copyright (c) 2026 Aaron
+        George.</p>
+        <p>Full guide, source and credits:
+        <a href="https://github.com/Flazzarious/jeti-lua-apps/blob/main/docs/apps/throttle-setup-wizard.md">github.com/Flazzarious/jeti-lua-apps</a></p>
+    </body>
+</html>

@@ -458,8 +458,12 @@ function system.isPlayback() end
 ---@param disableOutput boolean
 function system.setVario(value, shortTone, disableOutput) end
 
----V5.01+. Opens a .txt/.html/.png/.jpg in the system viewer (async).
----@param path string Absolute path.
+---V5.01+. Opens a file (.txt/.html/.png/.jpg viewer, .wav/.mp3 player) or a
+---system menu, asynchronously: returns at once. Menu names start with ":",
+---e.g. ":servoSetup" (Servo setup and gains), ":otherProps" (Other model
+---options, throttle cut etc.), ":devExplorer" (Device Explorer).
+---Source: JETI DC/DS Lua API v1.5 p. 74-75 (full list there).
+---@param path string Absolute file path, or a ":menu" name.
 function system.openExternal(path) end
 
 ---V5.01+

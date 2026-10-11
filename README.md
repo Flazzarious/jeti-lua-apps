@@ -9,6 +9,7 @@ spec-driven workflow (GitHub Spec Kit + Claude Code) in VS Code.
 | --- | --- | --- | --- | --- |
 | Speed Gauge | [`AG-SpdGa.lua`](src/Apps/AG-SpdGa.lua) | Released (0.3.0) | [001](specs/001-speed-gauge/spec.md) | DFM Speed Announcer by Dave McQueeney (MIT) |
 | Flameout Alarm | [`AG-FlmOt.lua`](src/Apps/AG-FlmOt.lua) | Released (0.1.0) | [003](specs/003-flameout-alarm/spec.md) | Original |
+| Throttle Setup Wizard | [`AG-TrbSt.lua`](src/Apps/AG-TrbSt.lua) | Released (0.1.0) | [002](specs/002-turbine-throttle-setup/spec.md) | Original |
 
 ### Screenshots
 
@@ -25,6 +26,14 @@ Taken on a DS-24 II transmitter.
 <img src="docs/apps/img/flameout-alarm-armed.png" width="200" alt="Flameout Alarm armed, RPM bar at 60,000">
 <img src="docs/apps/img/flameout-alarm-flameout.png" width="200" alt="Flameout Alarm showing the red FLAMEOUT alarm at 0 RPM">
 <img src="docs/apps/img/flameout-alarm-disarmed.png" width="200" alt="Flameout Alarm disarmed at 35,000 RPM">
+
+**Throttle Setup Wizard:** a guided step, verify passed,
+the summary. Full guide:
+[Throttle Setup Wizard](docs/apps/throttle-setup-wizard.md).
+
+<img src="docs/apps/img/throttle-setup-wizard-guide-2.png" width="200" alt="Throttle Setup Wizard guided step 2: Throttle-Cut output value -100%">
+<img src="docs/apps/img/throttle-setup-wizard-verify-passed.png" width="200" alt="Throttle Setup Wizard Verify: all four passed">
+<img src="docs/apps/img/throttle-setup-wizard-summary.png" width="200" alt="Throttle Setup Wizard Summary: setup complete with measured values">
 
 ### Speed Gauge
 
@@ -187,6 +196,41 @@ The sounds in `src/Apps/AG-FlmOt/` are generated with
 [`tools/voice/make_flameout.py`](tools/voice/README.md) and licensed CC BY-SA
 4.0, not MIT. Install = `AG-FlmOt.lua` plus the `AG-FlmOt/` folder.
 
+### Throttle Setup Wizard
+
+Sets up a turbine's throttle on **one two-position safety switch**: **CUT**
+(Throttle Cut, engine off) or **RUN** (Throttle Idle, the engine may run).
+It's simpler and safer than the old habit of clicking the throttle trim down
+to stop and up to arm; Xicoy's manual warns that digital trims cause an
+unstable idle and a slow emergency shutdown.
+
+The app guides the transmitter's own setup and then **proves it** by
+measuring the throttle signal:
+
+- **One recommended setup:** Max negative/positive −80/80, Throttle-Idle
+  offset 20%, Throttle-Cut output value **−100%** (**−125% for Xicoy**).
+  Tested with KingTech, Swiwin and Xicoy ECUs; should work with most others.
+- **Guided setup:** five steps with the exact values, each with an **Open**
+  button that jumps to the transmitter menu.
+- **Verify:** an output check, then the four switch/stick positions,
+  including CUT with the stick at full. Each failure names the setting to
+  fix.
+- **Failsafe:** the receiver's throttle output on **Out OFF**, confirmed by a
+  hand test before the setup counts as complete.
+- **Optional voice callouts** "Turbine off" / "Turbine on", copied to the
+  transmitter's voice folder for its Sounds on Event.
+
+**It only reads and instructs.** It can't change any setting (constitution
+I): the pilot makes each change. Use it on the bench with the engine unable
+to start, remove it from the model once the setup passes, and **always
+re-learn the ECU** (Teach RC) afterwards. Full guide, including the setup by
+hand: [Throttle Setup Wizard](docs/apps/throttle-setup-wizard.md).
+
+The voice files in `src/Apps/AG-TrbSt/` are generated with
+[`tools/voice/make_turbine.py`](tools/voice/README.md) and licensed CC BY-SA
+4.0, not MIT. Install = `AG-TrbSt.lua` plus the `AG-TrbSt/` folder. Tested on
+the DS-24 II; older DC/DS transmitters should work but are untested.
+
 ## Install with JETI Studio
 
 1. In JETI Studio open **File → Configuration**, and add this line to the
@@ -201,8 +245,8 @@ The sounds in `src/Apps/AG-FlmOt/` are generated with
 
 Each app installs exactly its released version (its files come from the
 release tag). Descriptions: [Speed Gauge](docs/apps/speed-gauge.md),
-[Flameout Alarm](docs/apps/flameout-alarm.md) (in JETI Studio once its
-`Apps.json` entry is published).
+[Flameout Alarm](docs/apps/flameout-alarm.md),
+[Throttle Setup Wizard](docs/apps/throttle-setup-wizard.md).
 
 For maintainers: after tagging a release, run
 `python tools/publish/make_apps_json.py`, commit `Apps.json` and merge it to
