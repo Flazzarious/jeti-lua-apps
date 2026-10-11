@@ -379,6 +379,60 @@ Open buttons are hidden and the step text still names the menu.
 **Rationale.** The layout and line lengths are designed and tested on the
 24 series only. A clear notice satisfies FR-025 for everything else.
 
+## R14. The voice files (FR-026, FR-029)
+
+**Decision.** A new generator, `tools/voice/make_turbine.py`, writes
+`src/Apps/AG-TrbSt/TurbOff.wav` ("Turbine off"), `TurbOn.wav` ("Turbine
+on") and `CREDITS.txt`. It reuses `make_voice.py`'s helpers (`synthesize`,
+`trim`, `normalize`, `resample`, `write_wav`, `write_text`) without
+changing them, exactly as `make_flameout.py` does, at Flameout's calm pace
+(speed 1.5, no effects): mono, 16-bit, 22.05 kHz, peak −1 dBFS, which the
+DS-24 II is known to play (Speed Gauge, 2026-10-03). Self-check: both files
+exist and each is ≤ 1.5 s. The files are committed (CC BY-SA 4.0, credited
+in `CREDITS.txt`, `CREDITS.md`, the README and the app's Voice callouts
+screen, constitution VIII).
+
+**Rationale.** Same voice, same pace and same toolchain as the other apps,
+so all callouts sound like one system. 8.3 names, because the files keep
+the same name when copied to `/Audio`.
+
+## R15. Getting the files into `/Audio` (FR-027, FR-028)
+
+**Decision.** The files ship in the app's own folder (constitution V) and
+the app copies them to `/Audio` when the pilot asks:
+
+1. **Check.** A file "exists" if `io.open` succeeds with the absolute path
+   or, in the emulator, the same path without the leading "/" (api-notes:
+   the emulator's `io.open` needs relative paths).
+2. **Copy, never overwrite.** For each file missing from `/Audio`:
+   `io.open(src, "r")`, `io.open(dest, "w")`, then `io.read` / `io.write`
+   in **2 KB chunks, a few chunks per `loop()` call**, so no single call
+   comes near the CPU limit (a ~40 KB file takes well under a second).
+3. **Verify.** Compare sizes with `dir("/Audio")` and `dir("/Apps/AG-TrbSt")`.
+   On a mismatch or any error, close, `io.remove(dest)` and report "Copy
+   failed". An existing file is never opened for writing.
+4. **Assign.** The pilot assigns the files in *Sounds on event*, opened
+   with `system.openExternal(":soundEvent")` ("Sounds on event/switch",
+   API v1.5 p. 74). JETI's picker lists `/Audio` and `/Audio/<lang>`, the
+   same folders `form.addAudioFilebox` uses.
+
+**Open points (transmitter):** that Jeti's `io.read`/`io.write` copy WAV
+bytes exactly (Lua strings are binary-safe, but Jeti's reduced `io` has
+only been used for reading here); that Sounds on event lists files in
+`/Audio`; and what Sounds on event's screen and labels look like (for the
+step text). Fallback if copying doesn't work: the guide tells the pilot to
+copy the two files to `/Audio` with JETI Studio or the PC.
+
+**Constitution.** Principle I: writing a sound file can't affect the model.
+Principle V: the app's sounds still live in `AG-TrbSt/`; the copies in
+`/Audio` are made at the pilot's request and are the pilot's from then on.
+
+**Alternatives.** Installing straight to `/Audio` from Apps.json
+(destination can be any card path): rejected, it puts app files outside
+the app's folder (constitution V). The app playing the callouts itself:
+rejected by Aaron, because the app is meant to be removed after setup and
+it couldn't see callouts already set in Sounds on event.
+
 ---
 
 Sources (web, 2026-10-10):

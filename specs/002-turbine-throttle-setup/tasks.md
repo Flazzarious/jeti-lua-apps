@@ -20,7 +20,7 @@ built and checked on its own.
 ## Format: `[ID] [P?] [Story] Description`
 
 - **[P]**: Can run in parallel (different files, no dependencies)
-- **[Story]**: Which user story this task belongs to (US1–US3)
+- **[Story]**: Which user story this task belongs to (US1–US4)
 - **MANUAL**: Needs a person at JETI Studio or the transmitter. An agent
   can't run the emulator (CLAUDE.md): it prepares the build, deploys it to
   the emulator, lists what to check, and leaves the box unticked until
@@ -84,6 +84,24 @@ built and checked on its own.
 - [X] T009 Record T008's results: update research R1 and R3 in `specs/002-turbine-throttle-setup/research.md` (mark "CALIBRATE" items as measured, with numbers and the firmware version), add a "Throttle outputs and menus" section to `docs/jeti-api-notes.md` (`getInputs("O<n>")` is post-mix or not, clipping, µs agreement, `openExternal` return behavior, menu names on 6.x), and if names or ranges differ, update `specs/002-turbine-throttle-setup/contracts/screens.md`, `contracts/settings-math.md` and the constants in `src/Apps/AG-TrbSt.lua` to match
 
 **Checkpoint**: Settings load and save, the math is checked, the Setup inputs screen shows live switch, stick and output values, and the readout is calibrated.
+
+---
+
+## Phase 2B: User Story 4 - Voice callouts (Priority: P3, optional; built first at Aaron's request)
+
+**Goal**: "Turbine off" / "Turbine on" in the Amy voice, copied to `/Audio` on request, with a screen that explains and opens JETI's Sounds on event.
+
+**Independent Test**: On the transmitter, copy the files from the Voice callouts screen, assign them in Sounds on event, remove the app, and hear the callouts when flipping the safety switch (spec US4, SC-011).
+
+- [X] T038 [P] [US4] Create `tools/voice/make_turbine.py` (Python 3.9, MIT header like `tools/voice/make_flameout.py`) per research R14: import `synthesize`, `trim`, `normalize`, `resample`, `write_wav`, `write_text` and `PEAK` from `make_voice.py` (add `tools/voice` to `sys.path`; do not modify `make_voice.py`). Arguments: `--model` (required), `--out` (default `src/Apps/AG-TrbSt`), `--rate` (default 22050), `--speed` (default 1.5). Phrases: `TurbOff.wav` "Turbine off", `TurbOn.wav` "Turbine on", synthesized at `length_scale = 1/speed`, then `trim`, `normalize`, resample to `--rate`. Write `CREDITS.txt` adapted from `make_flameout.py` ("Throttle Setup Wizard (AG-TrbSt) - voice callouts", Piper MIT, Amy CC BY-SA 4.0). Self-check, exit 1 on failure: both files exist and each is <= 1.5 s
+- [ ] T039 [US4] Run `python tools/voice/make_turbine.py --model <path>` (ask Aaron for the path to `en_US-amy-medium.onnx`) and confirm the self-check passes. Commit `src/Apps/AG-TrbSt/` (FR-026, CC BY-SA 4.0)
+- [ ] T040 [US4] MANUAL: Aaron listens to `TurbOff.wav` and `TurbOn.wav` on the PC: same voice and pace as Speed Gauge and Flameout Alarm. Approve or ask for changes
+- [ ] T041 [US4] Add the Voice callouts screen (`SCR.VOICE = 7`) to `src/Apps/AG-TrbSt.lua` per section 7 of `contracts/screens.md`: constants `VOICE = { dir = "/Apps/AG-TrbSt/", dest = "/Audio/", files = { "TurbOff.wav", "TurbOn.wav" } }`; `fileExists(path)` trying the absolute path, then without the leading "/" (emulator, R15); status lines per file; Home link "Voice callouts (optional)"; F1 Back, F3 Open (`system.openExternal(":soundEvent")`, hidden if `openExternal` is nil); the credit line (FR-029). Extend `RANGES.scr` to 1-7
+- [ ] T042 [US4] Add the copy to `src/Apps/AG-TrbSt.lua` per research R15: F2 "Copy" only when a file is missing from `/Audio` and both source files exist; `form.question("Copy voice files to /Audio?")` from the key handler; then a copy job run from `loop()` in 2 KB chunks, at most 4 chunks per call (`io.read(f, 2048)` / `io.write`), one file at a time, never opening an existing destination for writing; after each file compare sizes from `dir()`; on error or mismatch `io.close` both, `io.remove(dest)`, status "copy failed". Status shows "copying..." while running. The job keeps running if the form closes and stops cleanly in `destroy()`
+- [ ] T043 [P] [US4] Credits and docs: add a "Throttle Setup Wizard" section to `tools/voice/README.md` (what `make_turbine.py` makes and how to run it); add the voice credit to `CREDITS.md` (Piper MIT, Amy CC BY-SA 4.0, files in `/Apps/AG-TrbSt/`); add an optional "Voice callouts" step to `docs/apps/throttle-setup-wizard.md` (copy the files, then *Sounds on event*: safety switch at CUT → TurbOff.wav, at RUN → TurbOn.wav; keep existing callouts or use your own) with the voice credit
+- [ ] T044 [US4] MANUAL: on the transmitter (quickstart): with no `TurbOff.wav`/`TurbOn.wav` in `/Audio`, copy from the app; check both files in `/Audio` match the originals' sizes and play; check Sounds on event lists them and note its labels (for T043's text); assign them to the safety switch, remove the app, and hear the callouts (SC-011). Also check that an existing `/Audio/TurbOff.wav` is not overwritten
+
+**Checkpoint**: Voice callouts work on the transmitter without the app on the model.
 
 ---
 
@@ -161,6 +179,7 @@ built and checked on its own.
 
 - **Setup (Phase 1)**: T001 and T002 have no dependencies.
 - **Foundational (Phase 2)**: depends on T002. T003 → T004 → T005 → T006 → T007 → T008 (MANUAL) → T009. **T008 gates everything after it**: its stop rule can change the spec.
+- **US4 (Phase 2B)**: depends on Phase 2 (the form). Built before US1 at Aaron's request. T038 → T039 → T040 (MANUAL) → T041 → T042 → T044 (MANUAL); T043 any time after T039. US1's guide (T012) links to the Voice callouts screen from its last step.
 - **US1 (Phase 3)**: depends on Phase 2.
 - **US2 (Phase 4)**: depends on Phase 2. Uses Home (T010) and `setupComplete` (T011) to reach Verify, so build T010–T011 first if US2 is done before the rest of US1.
 - **US3 (Phase 5)**: depends on US2 (it needs a saved pass).

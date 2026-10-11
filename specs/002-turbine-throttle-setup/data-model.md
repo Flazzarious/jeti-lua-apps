@@ -34,7 +34,7 @@ same for both ([settings-math.md](contracts/settings-math.md)).
 
 | Key | Type | Default | Meaning |
 | --- | --- | --- | --- |
-| `scr` | int | 1 | Screen to reopen: 1 Home, 2 Inputs, 3 Guide, 4 Verify, 5 Failsafe, 6 Summary |
+| `scr` | int | 1 | Screen to reopen: 1 Home, 2 Inputs, 3 Guide, 4 Verify, 5 Failsafe, 6 Summary, 7 Voice callouts |
 | `gStep` | int | 1 | Guide step 1–5 |
 
 Verify always reopens at its start screen: a half-finished run is never

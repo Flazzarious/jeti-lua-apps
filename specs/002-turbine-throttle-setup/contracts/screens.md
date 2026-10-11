@@ -13,9 +13,10 @@ F-key labels are ≤ 7 characters.
 
 - Status: "Not verified" / "Incomplete - failsafe not confirmed" /
   "Setup complete 2026-10-10" (data-model).
-- Links: "Setup inputs", "Guided setup", "Verify", "Summary". Guided setup
-  and Verify are disabled until setup is complete. Summary is disabled
-  while `res = 0`.
+- Links: "Setup inputs", "Guided setup", "Verify", "Summary", "Voice
+  callouts (optional)". Guided setup and Verify are disabled until setup is
+  complete. Summary is disabled while `res = 0`. Voice callouts is always
+  available.
 - On a transmitter that isn't a DC/DS-24: only "Throttle Setup Wizard
   needs a DC/DS-24" (R13).
 
@@ -74,6 +75,26 @@ line, four result rows, and the diagnosis (two lines).
 - F1 "Not yet": leaves `res = 1` and goes to Summary showing "Incomplete -
   failsafe not confirmed".
 - F5 "Yes": `res = 2`, goes to Summary.
+
+## 7. Voice callouts (optional, User Story 4, FR-026 to FR-029)
+
+Reached from a Home link "Voice callouts (optional)" and from the guide's
+last step. Rows:
+
+- "Say 'Turbine off' at CUT and" / "'Turbine on' at RUN, using the" /
+  "transmitter's Sounds on event."
+- Status, one line per file: "TurbOff.wav in /Audio: yes" / "no" /
+  "copying..." / "copy failed".
+- If the app's own files are missing: "Voice files not installed." and no
+  Copy button (FR-027).
+- Instructions: "Sounds on event: add the" / "safety switch at CUT with" /
+  "TurbOff.wav, and at RUN with" / "TurbOn.wav. Keep any callouts" /
+  "you already have, or use your" / "own files."
+- Credit: "Voice: Piper, Amy (CC BY-SA 4.0)." (FONT_MINI, FR-029)
+
+F-keys: F1 "Back", F2 "Copy" (shown only when a file is missing from
+`/Audio` and the app's own files exist; asks `form.question("Copy voice
+files to /Audio?")` first), F3 "Open" (`:soundEvent`). F5 is not used.
 
 ## 6. Summary (FR-020)
 
