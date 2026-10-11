@@ -9,7 +9,9 @@
 -- the model once the setup has passed (FR-022).
 --
 -- Design: specs/002-turbine-throttle-setup/ (plan.md, research.md,
--- data-model.md, contracts/). Research decisions are cited as R1..R13.
+-- data-model.md, contracts/). Research decisions are cited as R1..R15.
+-- The optional voice files in /Apps/AG-TrbSt/ are CC BY-SA 4.0 (Piper,
+-- "Amy"), not MIT; see that folder's CREDITS.txt (FR-029).
 
 local APP_NAME = "Throttle Setup Wizard"
 local APP_VERSION = "0.1.0"
@@ -101,9 +103,9 @@ local function loadSettings()
     cfg[key] = system.pLoad(key, DEFAULTS[key])
   end
   for key, r in pairs(RANGES) do
-    local v = clamp(cfg[key], r[1], r[2])
-    if v ~= cfg[key] then
-      save(key, DEFAULTS[key])
+    local v = cfg[key]
+    if type(v) ~= "number" or clamp(v, r[1], r[2]) ~= v then
+      save(key, DEFAULTS[key])        -- wrong type or out of range: back to the default
     end
   end
 end
@@ -327,7 +329,7 @@ local function learn()
   local text
   local sv, kv = readSwitch(), readStick()
   if sv == nil or kv == nil then
-    text = "Choose the switch and stick first."
+    text = "Choose switch and stick first."
   elseif not stickIsProportional() then
     text = "Stick must be proportional (P)."
   elseif math.abs(sv) < V.SW_BAND then
@@ -347,7 +349,8 @@ end
 
 ------------------------------------------------------------------------------
 -- Voice callouts (optional; spec User Story 4, research R14, R15). The app
--- never plays these: it copies them to /Audio for JETI's Sounds on event.
+-- never plays these: it copies them to /Audio/<language> for JETI's Sounds
+-- on event.
 ------------------------------------------------------------------------------
 
 -- dest is the voice folder for the transmitter's language, e.g. /Audio/en:
