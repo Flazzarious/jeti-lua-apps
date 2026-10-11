@@ -156,10 +156,25 @@ now does the trim's old job.
 
 ### 4. Failsafe
 
-The ECU must see signal loss when the transmitter is off or out of range,
-and shut the engine down. In the receiver's settings (*Device Explorer →
-your receiver*), set the throttle output's failsafe to **Off** (no pulse),
-or to a value well below cut (about 1000 µs or less).
+If the receiver loses the transmitter's signal (out of range, a flat
+transmitter battery, interference), it must not keep the throttle where it
+was. The ECU has to see the signal disappear, so it can shut the engine
+down.
+
+*Model → Device Explorer → your receiver → Failsafe*:
+
+1. Make sure **Failsafe** is **enabled**, and leave the failsafe delay at
+   its default (about 1.5 s) unless your ECU's manual says otherwise.
+2. Find the **throttle output** (the same output number as in Servo
+   Setup, e.g. output 1).
+3. Set its mode to **Off** (no pulse). This is the simplest and safest
+   choice for a turbine: with no signal, the ECU runs its own shutdown.
+   *Never leave the throttle on **Hold**:* the engine would stay at
+   whatever throttle it had when the link was lost.
+   (Alternative: **Fail Safe** with the position at or below cut, e.g. the
+   stick down with the safety switch at CUT.)
+4. Save or store the failsafe settings to the receiver before you leave
+   the menu.
 
 Then **test it**: ECU powered, fuel off, switch the transmitter off. The
 ECU must report signal loss.

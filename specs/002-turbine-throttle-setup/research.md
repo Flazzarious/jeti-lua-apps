@@ -49,8 +49,19 @@ exactly the targets in [settings-math.md](contracts/settings-math.md).
 
 **Failsafe:** the manual test (ECU powered, fuel off, transmitter off, ECU
 reports signal loss) is confirmed as the right check (Aaron, 2026-10-10).
-Where the failsafe value is set on 6.x (Servo Setup or Device Explorer) is
-still to be confirmed for the guide's wording.
+**Where failsafe is set (web research and Aaron's notes, 2026-10-10):**
+*Model → Device Explorer → receiver → Failsafe*. Failsafe must be enabled,
+with a failsafe delay (about 1.5 s typical). Each output has a mode: Hold
+(keep the last position), Off / "Out Off" (no pulse) or Fail Safe (go to a
+stored position). For a turbine throttle, **Off** is the simplest and
+safest: the ECU sees no signal and runs its own shutdown. Fail Safe works
+only with a position at or below cut. Hold must never be used. Save or
+store the failsafe settings before leaving the Device Explorer menu.
+Exact on-screen labels on 6.x are still to be checked against a
+screenshot. Sources: [RCU Forums, "Where do you set the throttle fail
+safe?"](https://www.rcuniverse.com/forum/rc-jets-120/11655078-where-do-you-set-throttle-fail-safe.html),
+[JETI FAQ](https://www.jetimodel.com/support/faq/), [JETI DS-12 manual
+(failsafe via Device Explorer)](https://www.jetimodel.com/uloz/-3.pdf/).
 
 **Alternatives.** Logging the output with `registerLogVariable`: no, it's
 for writing to the log, not reading. Reading the stick and calculating the
