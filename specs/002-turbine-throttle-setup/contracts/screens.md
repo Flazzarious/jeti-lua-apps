@@ -88,11 +88,13 @@ last step. Rows:
   write|size a/b".
 - If the app's own files are missing: "Voice files not installed." and no
   Copy button (FR-027).
-- Instructions: "Then press Open. In Sounds on" / "event add TWO events, one per" /
-  "switch position:" / "1. Safety switch at CUT," / "   file TurbOff.wav" /
-  "2. Safety switch at RUN," / "   file TurbOn.wav" / "Keep any callouts you already" /
-  "have, or use your own files." (Sounds on event needs one event per
-  position; the app can't add them, research R15.)
+- Instructions: "Then press Open. In Sounds on" / "Event press + twice: one line" /
+  "per switch position." / "1. Switch: move safety switch" / "   to CUT. File: TURBOFF.WAV" /
+  "2. Switch: move it to RUN." / "   File: TURBON.WAV" / "Keep any callouts you already" /
+  "have, or use your own files." Labels from the transmitter's "Sounds on
+  Event" screen (columns Switch / File / Delay / Repeat, F3 "+" adds a line,
+  file names shown in capitals; `Screen017.png`). Sounds on event needs one
+  line per position; the app can't add them (research R15).
 - Credit: "Voice: Piper, Amy (CC BY-SA 4.0)." (FONT_MINI, FR-029)
 
 F-keys: F1 "Back", F2 "Copy" (shown only when a file is missing from

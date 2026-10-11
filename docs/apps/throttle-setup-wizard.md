@@ -214,10 +214,16 @@ itself, so they keep working after you remove the app.
    `TurbOff.wav` and `TurbOn.wav` in the card's voice folder for your
    language (e.g. `/Audio/en`), where JETI looks for voice files. Files
    already there are never replaced.
-2. Press **Open** to go to *Sounds on event* and add **two events**, one
-   for each switch position:
-   1. your safety switch at **CUT**, with the file `TurbOff.wav`;
-   2. the same switch at **RUN**, with the file `TurbOn.wav`.
+2. Press **Open** to go to *Sounds on Event*. Press **+** twice to add
+   **two lines**, one for each switch position:
+   1. **Switch**: choose it and move your safety switch to **CUT**.
+      **File**: `TURBOFF.WAV`.
+   2. **Switch**: choose it and move the same switch to **RUN**.
+      **File**: `TURBON.WAV`.
+
+   The transmitter shows the file names in capitals. Next to each switch,
+   **✓** means that line's position is active right now and **✗** that it
+   isn't: with the switch at CUT, the TURBOFF line shows ✓.
 3. If you already have callouts for this switch, you'll see them there:
    keep them, swap in these files, or use your own.
 
