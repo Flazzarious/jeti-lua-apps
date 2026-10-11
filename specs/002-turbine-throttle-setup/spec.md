@@ -68,6 +68,15 @@ what they are doing.
 A locking two-position safety switch, mounted where it is easy to reach in an
 emergency, is recommended.
 
+**Aaron's transmitter (example configuration, 2026-10-10).** On his DS-24 II
+the throttle safety switch is **SF**, the short silver two-position toggle on
+the top-right panel, next to SE (the long blue lever). The red switch on the
+top edge is not the throttle switch. Photo:
+[`assets/safety-switch-sf.jpg`](assets/safety-switch-sf.jpg). Which SF
+position is OFF (Throttle Cut) is still to be confirmed. This is an example
+for testing and screenshots, not a default: the app lets every pilot choose
+their own switch (FR-001).
+
 ### Terms used in this spec
 
 - **Pulse width**: the throttle channel's output, in microseconds (µs), as
