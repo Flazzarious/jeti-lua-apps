@@ -831,7 +831,7 @@ local function setPhase(p)
 end
 
 local function startRun()
-  run.k, run.retried, run.m, run.why1, run.why2 = 0, false, {}, "", ""
+  run.k, run.retried, run.m, run.why1, run.why2, run.failDo = 0, false, {}, "", "", nil
   run.chkIdle, run.chkFull = nil, nil
   for k = 1, 4 do
     run.row[k] = resultRow(k)
@@ -842,6 +842,7 @@ end
 
 local function fail(line1, line2)
   run.why1, run.why2 = line1, line2
+  run.failDo = { line1, line2 }      -- shown in the Do rows, where the eye is (built once)
   showRows()
   setPhase(PH.FAILED)
 end
@@ -861,7 +862,7 @@ local function stepVerify(now, sv, kv, ov)
   if p == PH.IDLE then
     return DO.start
   elseif p == PH.FAILED then
-    return DO.failed
+    return run.failDo or DO.failed
   elseif p == PH.PASSED then
     return run.retried and DO.retried or DO.passed
   end
@@ -896,7 +897,7 @@ local function stepVerify(now, sv, kv, ov)
       end
     end
     if run.phase == PH.FAILED then
-      return DO.failed
+      return run.failDo or DO.failed
     elseif run.phase ~= PH.CHECK then
       return DO.steady
     end
