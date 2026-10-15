@@ -24,7 +24,8 @@ gauge for the JETI **DS-24 II / DC-24 II**.
   ![Speed Gauge single size, on the main screen](https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/main/docs/apps/img/speed-gauge-single.png)
 - **Air density correction** (optional) shows true airspeed from your field
   elevation and the temperature: standard, entered by hand, or read live
-  from a sensor such as the MSpeed's.
+  from a sensor such as the MSpeed's. See
+  [how air density correction works](speed-gauge-air-density.md).
 - Works with a pitot airspeed sensor (e.g. JETI MSpeed) or a GPS speed.
 
 ## Requirements
