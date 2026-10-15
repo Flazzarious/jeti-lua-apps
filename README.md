@@ -123,7 +123,9 @@ the **temperature**:
 
 Stall, landing and "airspeed alive" keep using the sensor's own speed,
 because those limits depend on air pressure, not true speed. Leave
-correction off if your sensor already corrects for air density.
+correction off if your sensor already corrects for air density. The
+formulas, a worked example and a table of corrections are in
+[How air density correction works](docs/apps/speed-gauge-air-density.md).
 
 **Voice.** Speed Gauge speaks in its own voice (Piper "Amy"), in
 `src/Apps/AG-SpdGa/voice/`. Those files are licensed CC BY-SA 4.0, not MIT
