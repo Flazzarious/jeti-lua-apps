@@ -289,6 +289,16 @@ remain open.
 
 ---
 
+## Phase 14: 0.3.1 — "Speak number only" covers the max callout (2026-10-21)
+
+**Purpose**: A pilot with "Speak number only" on reported units on every callout. Those came from DFM Speed Announcer, still installed alongside; Speed Gauge's own max-speed callout did always speak the unit, though. Spec FR-008, FR-019a, clarification session 2026-10-21
+
+- [X] T092 [US1] In `checkCallout` in `src/Apps/AG-SpdGa.lua`, leave the unit out of the max-speed callout when `numOnly == 1`: app voice "max" + number; transmitter voice `system.playNumber(n, 0)`. The startup announcement keeps its unit. `contracts/audio-events.md`, `data-model.md`, quickstart 13d2, README and `docs/apps/speed-gauge.md` updated
+- [X] T093 Bump `APP_VERSION` to 0.3.1 in `src/Apps/AG-SpdGa.lua`
+- [ ] T094 MANUAL: on the transmitter, with "Speak number only" on, confirm routine callouts are the number only and the max callout is "max N" with no unit (quickstart 13d2; the emulator plays no Lua audio)
+
+---
+
 ## Dependencies & Execution Order
 
 ### Phase Dependencies

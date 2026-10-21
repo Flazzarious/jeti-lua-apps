@@ -158,6 +158,7 @@ Callout due when all hold:
  - now >= lastSpokenAt + interval   (R9)
  - armed (FR-009; continuous mode no longer bypasses it)
  Short form (number only) if numOnly, belowLanding (or never above), or continuous.
+ Max callout: no unit if numOnly (FR-019a, 2026-10-21).
 ```
 
 A crossing while no switch is on does not fire and the warning stays armed,

@@ -82,6 +82,8 @@ Callouts:
   new peak, if it beats the last announced max by at least the callout
   sensitivity. The max resets at every start-up and with **Reset max
   speed**.
+- **Speak number only** leaves the unit out of the speed and max callouts
+  ("85", "max 201"). The startup announcement keeps it.
 - A callout never starts while another is still playing.
 
 Warnings, with stick vibration:

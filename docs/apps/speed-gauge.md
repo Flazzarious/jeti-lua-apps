@@ -13,7 +13,7 @@ gauge for the JETI **DS-24 II / DC-24 II**.
 - **Callouts wait for flight:** nothing is spoken until the model first
   passes "Callouts start above" (default 30 mph), and never below 5 mph.
 - **Max speed callout:** "max 201 miles per hour" shortly after each new
-  peak.
+  peak ("max 201" with *Speak number only*).
 - **Warnings:** stall (at most twice per slowdown), overspeed and "airspeed
   alive", with stick vibration.
 - **Gauge** for the main screen: a speed bar (single size), a small dial
