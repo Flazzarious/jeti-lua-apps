@@ -34,6 +34,12 @@ gauge for the JETI **DS-24 II / DC-24 II**.
   transmitters the callouts and warnings work, and the gauge window shows
   a notice instead.
 - A telemetry sensor that reports speed.
+- **Only one speed announcer.** If you used **DFM Speed Announcer**
+  before, remove it in *Applications → User Applications*. With both
+  installed, both speak the speed: you hear two voices, and DFM's callouts
+  include the unit even when Speed Gauge's "Speak number only" is on. The
+  same applies to any other speed announcer app, and to a voice
+  announcement of the speed sensor set up in the transmitter's own menus.
 
 ## Installing
 

@@ -466,6 +466,11 @@ settings screen must say the voice files are missing.
 
 ### Edge Cases
 
+- **DFM Speed Announcer (or another speed announcer) still installed.**
+  Both apps announce the speed, and the other app's callouts follow its own
+  settings, e.g. units even with "Speak number only" on here. Speed Gauge
+  can't tell another app is running; the README and description page tell
+  pilots to remove the old app (seen by a pilot, 2026-10-21).
 - **Voice files partly installed** (e.g. the copy to the SD card was
   interrupted). Any callout whose files aren't all present falls back for
   that callout only; the app never plays half a phrase.

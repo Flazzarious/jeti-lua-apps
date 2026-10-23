@@ -135,6 +135,13 @@ formulas, a worked example and a table of corrections are in
 regenerates them. The **Voice** setting switches to the transmitter's own
 voice, and without the voice files the app uses that automatically.
 
+**Switching from DFM Speed Announcer?** Remove it (Applications → User
+Applications) before flying with Speed Gauge. If both are installed, both
+announce the speed, and DFM's callouts come in the transmitter's voice with
+units, even when Speed Gauge's "Speak number only" is on. The same goes for
+any other speed announcer app, and for a voice announcement of the speed
+sensor set up in the transmitter's own menus.
+
 Install = `AG-SpdGa.lua`, the `AG-SpdGa/` folder, and `lib/ag_dens.lua` and
 `lib/ag_gauge.lua`. Details in [spec 001](specs/001-speed-gauge/spec.md) and
 the [description page](docs/apps/speed-gauge.md).
