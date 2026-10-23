@@ -96,6 +96,7 @@ Defaults: mph, landing 60, stall 45, overspeed 200.
 | 13 | Set speed that takes > 2 s to speak repeatedly | No backlog; callouts wait | FR-007 |
 | 13c | Continuous switch on, speed 3 mph (after arming) | Silent | FR-008b |
 | 13d | Rise to 150, then slow | About 1 s after the peak: "max 150 miles per hour"; a later peak of 155 isn't announced (less than +10), 165 is | FR-019a |
+| 13d2 | "Speak number only" on; rise to 150, then slow | "max 150", no unit. Startup still says "stall speed warning at 45 miles per hour" | FR-019a, FR-008 |
 | 13e | Shortest 8 s, then longest 5 s; then shortest 10 with longest 8 | Longest stops at 8 (can't go below shortest); raising shortest to 10 raises longest to 10 | FR-005 |
 
 Gauge (run each in the single, double and full-screen windows; compare with
