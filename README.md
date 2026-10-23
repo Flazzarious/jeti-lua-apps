@@ -7,7 +7,7 @@ spec-driven workflow (GitHub Spec Kit + Claude Code) in VS Code.
 
 | App | Script | Status | Spec | Based on |
 | --- | --- | --- | --- | --- |
-| Speed Gauge | [`AG-SpdGa.lua`](src/Apps/AG-SpdGa.lua) | Released (0.3.0) | [001](specs/001-speed-gauge/spec.md) | DFM Speed Announcer by Dave McQueeney (MIT) |
+| Speed Gauge | [`AG-SpdGa.lua`](src/Apps/AG-SpdGa.lua) | Released (0.3.1) | [001](specs/001-speed-gauge/spec.md) | DFM Speed Announcer by Dave McQueeney (MIT) |
 | Flameout Alarm | [`AG-FlmOt.lua`](src/Apps/AG-FlmOt.lua) | Released (0.1.0) | [003](specs/003-flameout-alarm/spec.md) | Original |
 | Throttle Setup Wizard | [`AG-TrbSt.lua`](src/Apps/AG-TrbSt.lua) | Released (0.1.0) | [002](specs/002-turbine-throttle-setup/spec.md) | Original |
 

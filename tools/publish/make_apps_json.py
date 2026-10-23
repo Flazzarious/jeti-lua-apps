@@ -54,7 +54,7 @@ APPS = [
     {
         "name": "Speed Gauge (DC/DS-24II)",
         "script": "AG-SpdGa",
-        "tag": "AG-SpdGa-v0.3.0",
+        "tag": "AG-SpdGa-v0.3.1",
         "author": "Aaron George (based on DFM Speed Announcer by Dave McQueeney)",
         "hw": HW_DCDS24_II,
         "description": "docs/apps/speed-gauge.html",
