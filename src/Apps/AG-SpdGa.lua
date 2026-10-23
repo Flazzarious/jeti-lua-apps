@@ -18,7 +18,7 @@ local gauge = require("ag_gauge")
 local dens = require("ag_dens")
 
 local APP_NAME = "Speed Gauge"
-local APP_VERSION = "0.3.0"
+local APP_VERSION = "0.3.1"
 local AUDIO_DIR = "/Apps/AG-SpdGa/"
 local TICK_MS = 100         -- loop logic runs at most 10x per second (R9)
 -- The JETI Studio emulator draws each window's title bar inside the reported
@@ -525,17 +525,23 @@ local function checkCallout(now, onSw, contSw)
   -- Max speed (FR-019a): once the session max hasn't risen for pk.holdMs, and
   -- beats the last announced max by at least the callout sensitivity (so
   -- small creeps in cruise don't chatter), say "max", the number and unit.
+  -- "Speak number only" drops the unit here too (FR-019a, 2026-10-21).
   if pk.at ~= nil and now - pk.at >= pk.holdMs and maxRounded >= pk.said + cfg.sens
     and not system.isPlayback() then
     pk.at, pk.said = nil, maxRounded
     lastSpokenAt = now
+    local withUnit = cfg.numOnly ~= 1
     local nf = numFile(maxRounded)
     if nf then
       system.playFile(VOICE.max, AUDIO_QUEUE)
       system.playFile(nf, AUDIO_QUEUE)
-      system.playFile(snd.unit, AUDIO_QUEUE)
-    else
+      if withUnit then
+        system.playFile(snd.unit, AUDIO_QUEUE)
+      end
+    elseif withUnit then
       system.playNumber(maxRounded, 0, unitSpoken)   -- the voice pack has no "max"
+    else
+      system.playNumber(maxRounded, 0)
     end
     return
   end

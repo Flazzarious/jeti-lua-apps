@@ -101,6 +101,17 @@ principle I).
   half-of-landing-speed rule. Stall and overspeed warnings are unaffected
   (FR-009).
 
+### Session 2026-10-21 (0.3.1)
+
+- Q: A pilot with "Speak number only" on still heard units. (The routine
+  callouts turned out to come from DFM Speed Announcer, still installed
+  alongside; Speed Gauge's own routine callouts were already number only.)
+  Should "Speak number only" also cover the max-speed callout, which always
+  spoke the unit? → A: Yes. With it on, the max callout is "max 120"; in
+  the transmitter's voice, which has no "max", it is the bare number. The
+  startup announcement ("stall speed warning at 45 miles per hour") keeps
+  its unit: it plays once and confirms the units setting (FR-008, FR-019a).
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Hear speed during flight (Priority: P1)
@@ -455,6 +466,11 @@ settings screen must say the voice files are missing.
 
 ### Edge Cases
 
+- **DFM Speed Announcer (or another speed announcer) still installed.**
+  Both apps announce the speed, and the other app's callouts follow its own
+  settings, e.g. units even with "Speak number only" on here. Speed Gauge
+  can't tell another app is running; the README and description page tell
+  pilots to remove the old app (seen by a pilot, 2026-10-21).
 - **Voice files partly installed** (e.g. the copy to the SD card was
   interrupted). Any callout whose files aren't all present falls back for
   that callout only; the app never plays half a phrase.
@@ -539,6 +555,8 @@ settings screen must say the voice files are missing.
   be spoken unless "speak number only" is set, or the speed is below landing
   speed (only while "Landing speed callouts" is on), or continuous mode is
   on (short callouts when timing matters, matching the original).
+  "Speak number only" also drops the unit from the max-speed callout
+  (FR-019a), but not from the startup announcement (FR-028) (2026-10-21).
 - **FR-008b**: No speed callout MUST ever be spoken below 5 mph, or its
   equivalent in the selected units (8 km/h, 4.3 kt, 2.2 m/s, 7.3 ft/s); it
   isn't needed and is annoying (added 2026-10-04). Warnings are unaffected.
@@ -629,7 +647,9 @@ settings screen must say the voice files are missing.
   never overlapping (FR-007). Without the app voice it is the number and
   unit only, because the transmitter's voice pack has no "max" (added
   2026-10-04 at the user's request; 1 s was the user's suggestion and
-  holds because the max is already spike-filtered, R5).
+  holds because the max is already spike-filtered, R5). With **"Speak
+  number only"** on, the unit is left out: "max" and the number, or the
+  bare number without the app voice (2026-10-21).
 
 **Air density**
 

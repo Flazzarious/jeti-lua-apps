@@ -13,7 +13,7 @@ gauge for the JETI **DS-24 II / DC-24 II**.
 - **Callouts wait for flight:** nothing is spoken until the model first
   passes "Callouts start above" (default 30 mph), and never below 5 mph.
 - **Max speed callout:** "max 201 miles per hour" shortly after each new
-  peak.
+  peak ("max 201" with *Speak number only*).
 - **Warnings:** stall (at most twice per slowdown), overspeed and "airspeed
   alive", with stick vibration.
 - **Gauge** for the main screen: a speed bar (single size), a small dial
@@ -34,6 +34,12 @@ gauge for the JETI **DS-24 II / DC-24 II**.
   transmitters the callouts and warnings work, and the gauge window shows
   a notice instead.
 - A telemetry sensor that reports speed.
+- **Only one speed announcer.** If you used **DFM Speed Announcer**
+  before, remove it in *Applications → User Applications*. With both
+  installed, both speak the speed: you hear two voices, and DFM's callouts
+  include the unit even when Speed Gauge's "Speak number only" is on. The
+  same applies to any other speed announcer app, and to a voice
+  announcement of the speed sensor set up in the transmitter's own menus.
 
 ## Installing
 
