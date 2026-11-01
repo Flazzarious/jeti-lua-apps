@@ -305,6 +305,22 @@ and repeat.
 
 ---
 
+### Layout reference
+
+Approved layout sketches (Aaron, 2026-10-25), original work committed with
+this spec. They show arrangement and colours, not final proportions: the
+transmitter's windows are 150 × 23 and 150 × 68, so spacing is tuned there.
+
+- Small window: `assets/layout-small-window.svg` (`.png` preview)
+- Double window: `assets/layout-double-window.svg` (`.png` preview)
+
+![Small window layout](assets/layout-small-window.png)
+
+![Double window layout](assets/layout-double-window.png)
+
+The original inspiration (a watermarked stock image of three segmented
+batteries) is not committed; the sketches replace it.
+
 ### Edge Cases
 
 - **Consumed mAh exceeds rated capacity.** Gauge shows 0% (red, outline
@@ -630,7 +646,7 @@ and repeat.
   per app, integers or short strings, arrays up to 32 values. Per-battery
   settings will need to be packed into arrays; the plan must fit them.
 - **Artwork** is original (Aaron's sample image is a stock image used as a
-  style reference only). Runtime drawing is the expected approach, since the
+  style reference only; the committed layout sketches above replace it). Runtime drawing is the expected approach, since the
   same code can draw both orientations.
 - **Voice** can only be tested on the transmitter; the emulator plays no Lua
   audio.
