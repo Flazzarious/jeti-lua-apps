@@ -103,6 +103,28 @@ filename becomes permanent at first release (constitution V).
   checked 3 s after the pack is first seen, and never repeats for that pack.
 - A custom name must fit above the upright battery graphic.
 
+### Session 2026-11-01
+
+- Q: When a callout falls back to the transmitter's voice, how does the
+  pilot know which pack it is about? → A: Each battery has an optional
+  "transmitter voice name" audio file, picked from the transmitter's
+  `/Audio` files, played before the number; without one, the fallback is
+  number and unit only.
+- Q: Should the app speak when a battery's telemetry is lost? → A: No.
+  Telemetry loss is shown only (grey gauge, "NO TELEM"); nothing is spoken,
+  and "telemetry lost" is not in the voice set.
+- Q: Is the max-current callout's "on/off switch" a per-battery setting, a
+  transmitter switch, or both? → A: A per-battery on/off setting only
+  (on for Flight packs, off for others); no transmitter switch. It matters
+  mostly for Flight packs.
+- Q: When several of this app's callouts are due at once, which plays
+  first? → A: Fixed severity order: low voltage, high current, capacity
+  level, pack not full, max current; within a kind, battery 1 before 4.
+  A waiting max-current callout is replaced by a newer max or dropped on
+  reset.
+- Q: Are the FR-006 and FR-007 default tables right for v1? → A: Yes,
+  accepted as drafted.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - See how full a pack is (Priority: P1)
@@ -274,7 +296,8 @@ and repeat.
 1. **Given** the voice files are installed and Voice is "Battery Capacity",
    **Then** "receiver two, 30 percent" plays as one continuous phrase.
 2. **Given** a number above 500 or a missing file, **Then** that callout is
-   spoken by the transmitter's voice, never skipped.
+   spoken by the transmitter's voice, never skipped, starting with the
+   battery's transmitter voice name file if one is picked.
 3. **Given** the voice files are missing, **Then** settings shows "voice
    files missing" and callouts use the transmitter's voice.
 4. **Given** Speed Gauge or another app is speaking, **Then** this app's
@@ -307,6 +330,8 @@ and repeat.
 - **Two batteries share one sensor.** Allowed; each reads its own value.
 - **Repeat interval shorter than the callout.** The next callout waits for
   the current one; no overlap or queue build-up.
+- **Several callouts due at once** (e.g. two packs low and a current
+  alarm). They play one at a time in the FR-034a severity order.
 - **Lowest level disabled while repeating.** Repeating stops; the next lowest
   enabled level becomes the repeating one without replaying.
 - **Callout levels edited mid-session.** Levels re-arm from the current %.
@@ -352,8 +377,8 @@ and repeat.
 **Smart defaults**
 
 - **FR-006**: Choosing chemistry and cell count MUST fill the per-cell full,
-  nominal, warning and cutoff voltages from this table (draft values, to be
-  confirmed in `/speckit-clarify`):
+  nominal, warning and cutoff voltages from this table (confirmed
+  2026-11-01):
 
   | Chemistry | Full | Nominal | Warning | Cutoff |
   | --- | --- | --- | --- | --- |
@@ -365,7 +390,7 @@ and repeat.
 
 - **FR-007**: Choosing a category MUST fill the suggested chemistry, colour
   bands, capacity callout levels and current-alarm visibility from this
-  table (draft values):
+  table (confirmed 2026-11-01):
 
   | Category | Suggested chemistry | Bands: yellow / orange / red below | Callout slots 1 / 2 / 3 / 4 | Current alarm settings |
   | --- | --- | --- | --- | --- |
@@ -410,8 +435,8 @@ and repeat.
   reuses the last computed values. Flashing uses the system clock so it
   stays smooth.
 - **FR-015**: A battery whose sensor is lost MUST grey out and show
-  "NO TELEM", with callouts for it suppressed and a distinct "telemetry
-  lost" indication.
+  "NO TELEM", with callouts for it suppressed. Telemetry loss is shown only,
+  never spoken (power-up, landing and pack swaps all drop telemetry).
 
 **Capacity callouts**
 
@@ -459,8 +484,9 @@ and repeat.
   staying unchanged for 1 s.
 - **FR-026**: A new session max MUST be spoken ("[pack], max [n] amps") once
   it hasn't risen for 1 s, if it beats the last announced max by at least
-  the max callout sensitivity (default 5 A). An optional on/off switch gates
-  it. Defaults: on for Flight packs, off for other categories.
+  the max callout sensitivity (default 5 A). A per-battery on/off setting
+  gates it: on for Flight packs, off for other categories. There is no
+  transmitter switch for it.
 - **FR-027**: The session max MUST reset at app start, when the model
   changes, from a "Reset max current" settings entry, and when a new pack is
   detected on that battery. It is not saved. There is no on-demand "speak
@@ -481,7 +507,7 @@ and repeat.
 - **FR-030**: All speech MUST use one app voice, Speed Gauge's Piper "Amy",
   as separate pre-generated files: numbers 0–500; "percent", "amps",
   "volts", "volts per cell"; "point"; "max", "high current", "low voltage",
-  "pack not full", "telemetry lost", "battery"; and one name per category
+  "pack not full", "battery"; and one name per category
   ("flight", "receiver", "E C U", "lights", "brakes", "landing gear",
   "aux", plus "one" to "four" for numbered packs via the number files).
   A Custom category speaks "battery".
@@ -493,9 +519,20 @@ and repeat.
 - **FR-033**: At startup the app MUST check the voice files. Any callout it
   can't fully speak in the app voice (missing file, number above 500) MUST
   fall back to the transmitter's voice for the whole phrase; a fallback MUST
-  never silence a callout.
+  never silence a callout. The transmitter's voice speaks only the number
+  and unit, so each battery MUST offer an optional "transmitter voice name"
+  audio file (picked from the transmitter's audio files, default none) that
+  plays first in any transmitter-voice callout for that battery. The same
+  applies when Voice is set to "Transmitter". Without that file, the
+  fallback is the number and unit only.
 - **FR-034**: A new callout MUST NOT start while any playback is active; this
   app never interrupts another app. Flameout Alarm keeps priority.
+- **FR-034a**: When several of this app's callouts are due at once, they
+  MUST play in this order: low voltage, high current, capacity level, pack
+  not full, max current; within one kind, battery 1 before battery 4. A
+  waiting max-current callout MUST be replaced (not queued twice) when a
+  higher max is confirmed for that battery, and dropped if that battery's
+  max is reset; every other callout waits its turn and is never dropped.
 - **FR-035**: The voice files MUST be generated by the repo's voice script
   from the same model and settings as Speed Gauge (normal pace), committed
   with the app, and credited (Piper MIT, Amy CC BY-SA 4.0) in the folder,
@@ -518,7 +555,7 @@ and repeat.
   voltage sensor, current sensor, band thresholds, 4 callout slots, repeat
   interval and max count, low-voltage mode / threshold / delay, current
   alarm threshold / delay / repeat, max callout on/off and sensitivity,
-  new-pack check on/off and threshold.
+  new-pack check on/off and threshold, transmitter voice name file.
 - **Category definition**: name, default label, spoken name, suggested
   chemistry, bands, callout levels, current-alarm visibility, max callout
   default.
@@ -527,8 +564,7 @@ and repeat.
 - **Pack session state** (not saved): % remaining, last values, which levels
   have fired, repeat counters, low-voltage state, session max and last
   announced max, new-pack check done.
-- **App settings**: voice choice, "speak number only", small-window battery,
-  optional max callout switch.
+- **App settings**: voice choice, "speak number only", small-window battery.
 
 ## Success Criteria *(mandatory)*
 
@@ -598,7 +634,9 @@ and repeat.
   same code can draw both orientations.
 - **Voice** can only be tested on the transmitter; the emulator plays no Lua
   audio.
-- Smart-default tables are draft values pending confirmation.
+- Smart-default tables (FR-006, FR-007) were confirmed on 2026-11-01. For
+  LiFe and NiMH, the flat voltage curve makes a voltage-only gauge coarse in
+  mid-range; the bench check for SC-004 will show how close it gets.
 - Full-screen windows are out of scope for v1.
 
 ## Out of Scope (v1)
@@ -616,7 +654,7 @@ and repeat.
 2. **Capacity sensors Aaron uses** (MUI, Central Box, receiver voltage, ESC
    telemetry, Powerbox and other converters): unit strings, scaling,
    decimals, update rate, power-up and loss behaviour.
-3. **Defaults tables** (FR-006, FR-007): confirm values.
+3. **Defaults tables** (FR-006, FR-007): confirmed 2026-11-01.
 4. **Voltage-to-% curves**: source a resting curve per chemistry; smoothing;
    ignore high-current samples when a current sensor exists.
 5. **Update rate and drawing cost** for 4 gauges; whether 1 s is responsive
