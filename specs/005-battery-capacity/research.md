@@ -156,7 +156,7 @@ bench test can settle; each has a quickstart check and a fallback.
 
 ## R5. Persistence layout (FR-005, Open question 7, constitution IV)
 
-- **Decision:** 16 `pSave` keys: four app keys and three per battery slot.
+- **Decision:** 18 `pSave` keys: six app keys and three per battery slot (16 at plan time; the window titles, FR-009a, added 2 on 2026-11-01).
 
   | Key | Type | Content |
   | --- | --- | --- |
@@ -164,6 +164,7 @@ bench test can settle; each has a quickstart check and a fallback.
   | `voice` | int | 0 unset, 1 app voice, 2 transmitter (Speed Gauge R14) |
   | `numOnly` | int | "Speak number only" 0/1 |
   | `smallB` | int | battery shown in the small window, 1–4 |
+  | `title1`, `title2` | string | window titles (FR-009a, added 2026-11-01; 18 keys in all) |
   | `b1p` … `b4p` | int array (20) | pack: category, label number, chemistry, cells, mAh, three sensors, voltages, bands, edited mask |
   | `b1a` … `b4a` | int array (18) | alarms: levels, repeat, low voltage, current alarm, max callout, new-pack check, show-all |
   | `b1s` … `b4s` | string array (5) | custom name, voice-name file, three sensor labels |

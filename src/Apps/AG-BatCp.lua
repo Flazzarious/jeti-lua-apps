@@ -108,6 +108,9 @@ local L = {
   -- small window: battery on its side
   sx = 1, sy = 1, sw = 82, sh = 21, capX = 83, capY = 7, capW = 3, capH = 9,
   sfx = 3, sfy = 3, sfw = 78, sfh = 17, sPctY = 2, stx = 90, sLabelY = -1, sValY = 10,
+  -- double window: upright batteries, offsets within a slot
+  dLabelY = 0, dCapW = 10, dCapY = 12, dCapH = 3, dx = 5, dy = 15, dw = 26, dh = 40,
+  dfx = 7, dfw = 22, dfBottom = 53, dfh = 36, dPctY = 40, dLineY = 56, dNoY = 24, dTelY = 36,
 }
 
 ------------------------------------------------------------------------------
@@ -153,7 +156,11 @@ local KEY = {
   s = { "b1s", "b2s", "b3s", "b4s" },
 }
 
-local cfg = { cfgV = 1, voice = 0, numOnly = 0, smallB = 1 }   -- app keys
+-- Window titles (FR-009a): "" means the default.
+local TITLE = { "Battery", "Batteries" }
+local TITLE_MAX = 20
+
+local cfg = { cfgV = 1, voice = 0, numOnly = 0, smallB = 1, title1 = "", title2 = "" }   -- app keys
 local bat = {}              -- bat[k] = { p = {...}, a = {...}, s = {...} }, k = 1..#bat
 
 local function clamp(v, lo, hi)
@@ -267,6 +274,13 @@ local function loadSettings()
   cfg.voice = clamp(system.pLoad("voice", 0), 0, 2)
   cfg.numOnly = clamp(system.pLoad("numOnly", 0), 0, 1)
   cfg.smallB = system.pLoad("smallB", 1)
+  for n = 1, 2 do
+    local t = system.pLoad("title" .. n, "")
+    if type(t) ~= "string" then
+      t = ""
+    end
+    cfg["title" .. n] = string.sub(t, 1, TITLE_MAX)
+  end
   bat = {}
   local compacted = false
   for k = 1, 4 do
@@ -436,7 +450,7 @@ local function newSession()
     npDueT = nil, npDone = true,
     pend = {}, pendV = {}, spokeT = 0,
     -- cached display strings and the values they were built from
-    txtPct = TXT.dash, txtSmall = "", shownPct = -1, shownV = -1, shownI = -1,
+    txtPct = TXT.dash, txtSmall = "", txtLine = "", shownPct = -1, shownV = -1, shownI = -1,
   }
   for i = 1, K.N do
     s.pend[i], s.pendV[i] = false, 0
@@ -806,6 +820,15 @@ local function updateStrings(k)
       text = text .. (i == -2 and "--A" or string.format("%.1fA", i / 10))
     end
     s.txtSmall = text
+    -- Double window line (FR-011): current when a current sensor is
+    -- assigned ("--" when lost), else pack voltage, else blank.
+    if i ~= -1 then
+      s.txtLine = i == -2 and TXT.dash or string.format("%.1f A", i / 10)
+    elseif v ~= -1 then
+      s.txtLine = v == -2 and TXT.dash or string.format("%.1f V", v / 10)
+    else
+      s.txtLine = ""
+    end
   end
 end
 
@@ -820,7 +843,7 @@ local cur = 0
 local formOpen = false      -- loop may touch form rows only while true
 local idx = {}              -- component indices of rows updated after creation
 local keepRow = nil         -- focused row to restore after a rebuild
-local note = { short = false, band = false }   -- one-off notes for this form session
+local note = { short = false, band = false, title = false }   -- one-off notes for this form session
 local LABEL_W = 180
 
 -- Sensor lists for the open battery screen (R1): one getSensors() pass.
@@ -1060,6 +1083,23 @@ local function initMain()
       saveApp("smallB", i)
     end)
   end
+  -- Window titles (FR-009a). Windows are registered at start-up, so a new
+  -- title shows after the next model load.
+  for n = 1, 2 do
+    local key = "title" .. n
+    form.addRow(2)
+    form.addLabel({ label = n == 1 and "Small window title" or "Double window title", width = LABEL_W })
+    local title = cfg[key] --[[@as string]]
+    form.addTextbox(title ~= "" and title or TITLE[n], TITLE_MAX, function(text)
+      if text == TITLE[n] then
+        text = ""
+      end
+      saveApp(key, text)
+      note.title = true
+      refresh()
+    end)
+  end
+  hint("New titles show after the model is reloaded.", note.title)
   if SIM then                 -- debug only (R13): pick a scripted profile for battery 1
     form.addRow(2)
     form.addLabel({ label = "SIM profile", width = 120 })
@@ -1318,7 +1358,7 @@ end
 local function closeForm()
   formOpen = false
   idx = {}
-  note.short, note.band = false, false
+  note.short, note.band, note.title = false, false, false
   cur = 0
 end
 
@@ -1450,17 +1490,52 @@ local function printSmall(w, h)
   end
 end
 
--- Double window (150 x 68): up to four upright batteries. Until US3 it
--- lists each battery's label and %.
+-- One upright battery in slot k of the double window (FR-011). Slots keep
+-- their four-battery positions; unused slots draw nothing.
+local function drawUpright(ox, k)
+  local s = ss[k]
+  local live = s.tel == TEL.LIVE
+  local x0 = ox + 1 + (k - 1) * L.slotW
+  local cx = x0 + L.slotW // 2
+  if live then
+    setColor(fg)
+  else
+    setColor(fg, 100)
+  end
+  drawCentered(cx, L.dLabelY, dv[k].label, FONT_MINI)
+  outlineColor(s, live)
+  lcd.drawFilledRectangle(cx - L.dCapW // 2, L.dCapY, L.dCapW, L.dCapH)
+  lcd.drawRectangle(x0 + L.dx, L.dy, L.dw, L.dh, 2)
+  if live then
+    local fh = (L.dfh * s.pct + 50) // 100
+    local fy = L.dfBottom - fh
+    if fh > 0 then
+      setColor(BAND[s.band])
+      lcd.drawFilledRectangle(x0 + L.dfx, fy, L.dfw, fh)
+    end
+    local tx = cx - lcd.getTextWidth(FONT_MINI, s.txtPct) // 2
+    drawSplitText(tx, L.dPctY, s.txtPct, FONT_MINI, x0 + L.dfx, fy, L.dfw, fh, s.band)
+    setColor(fg)
+  else
+    setColor(fg, 100)
+    if s.tel == TEL.LOST then
+      drawCentered(cx, L.dNoY, TXT.no, FONT_MINI)
+      drawCentered(cx, L.dTelY, TXT.telem, FONT_MINI)
+    else
+      drawCentered(cx, L.dTelY, TXT.dash, FONT_MINI)
+    end
+  end
+  drawCentered(cx, L.dLineY, s.txtLine, FONT_MINI)
+end
+
+-- Double window (150 x 68): up to four upright batteries.
 local function printDouble(w, h)
   local ox = windowSetup(w, h)
   if not ox then
     return
   end
-  setColor(fg)
   for k = 1, #bat do
-    lcd.drawText(ox + 2, (k - 1) * 14, dv[k].label, FONT_MINI)
-    lcd.drawText(ox + 60, (k - 1) * 14, ss[k].txtPct, FONT_MINI)
+    drawUpright(ox, k)
   end
   if DEBUG_CPU then
     local cpu = system.getCPU()
@@ -1483,8 +1558,8 @@ local function init()
   app.fastT, app.slowT = now, now
 
   system.registerForm(1, MENU_APPS, APP_NAME, initForm, keyForm, nil, closeForm)
-  system.registerTelemetry(1, "Battery", 1, printSmall)
-  system.registerTelemetry(2, "Batteries", 2, printDouble)
+  system.registerTelemetry(1, cfg.title1 ~= "" and cfg.title1 or TITLE[1], 1, printSmall)
+  system.registerTelemetry(2, cfg.title2 ~= "" and cfg.title2 or TITLE[2], 2, printDouble)
 end
 
 local function loop()

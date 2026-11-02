@@ -3,9 +3,12 @@
 Two windows (the most one app may register):
 
 ```lua
-system.registerTelemetry(1, "Battery", 1, printSmall)     -- small: one battery (FR-009, FR-010)
-system.registerTelemetry(2, "Batteries", 2, printDouble)  -- double: up to four (FR-009, FR-011)
+system.registerTelemetry(1, title1, 1, printSmall)   -- small: one battery (FR-009, FR-010)
+system.registerTelemetry(2, title2, 2, printDouble)  -- double: up to four (FR-009, FR-011)
 ```
+
+Titles default to "Battery" and "Batteries" and are editable (FR-009a);
+registered once in `init()`, so a new title shows after the next start.
 
 Design sketches: [../assets/](../assets/) (arrangement and colours only;
 where they differ, this contract and the FRs win). Decisions: research R10.

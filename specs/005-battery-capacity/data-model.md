@@ -61,6 +61,8 @@ when `pct < bandY`, else green ("below" in FR-007 is strict).
 | `voice` | int | 0–2 | 0 | 0 unset → app voice if files present; 1 app; 2 transmitter (FR-032) |
 | `numOnly` | int | 0/1 | 0 | Speak number only (FR-031) |
 | `smallB` | int | 1–4 | 1 | battery in the small window (FR-009); clamped to configured count |
+| `title1` | string | ≤ 20 chars | "Battery" | small window title (FR-009a); "" = default |
+| `title2` | string | ≤ 20 chars | "Batteries" | double window title (FR-009a); "" = default |
 
 ### Per battery N = 1–4: `bNp` (pack), int array
 
@@ -107,7 +109,7 @@ when `pct < bandY`, else green ("below" in FR-007 is strict).
 | 2 | voiceName | "" | transmitter voice name file from `form.addAudioFilebox` (FR-033) |
 | 3–5 | capLbl, vLbl, iLbl | "" | sensor labels for "(not found)" display only |
 
-**Totals:** 4 + 3 × 4 = **16 keys** (limit 30).
+**Totals:** 6 + 3 × 4 = **18 keys** (limit 30).
 
 ### Load rules
 

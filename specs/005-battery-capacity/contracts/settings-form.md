@@ -13,6 +13,8 @@ model switch or power-off).
 | 1 | Battery 1…n | `addLink` per battery | text: "RX-1  Receiver  LiFe 2S"; opens subform 1 + k |
 | 2 | Add battery | `addLink` | hidden at 4 batteries; creates the next slot with Receiver defaults and opens it (category is the first row) |
 | 3 | Small window shows | `addSelectbox` of battery labels | `smallB` |
+| 3a | Small window title | `addTextbox`, max 20 | `title1`; "" = "Battery" (FR-009a) |
+| 3b | Double window title | `addTextbox`, max 20 | `title2`; "" = "Batteries"; hint "New titles show after the model is reloaded." |
 | 4 | Voice | `addSelectbox` {"Battery Capacity", "Transmitter"} | FR-032; first entry disabled with "(files missing)" when `voiceOk` is false |
 | 5 | Speak number only | `addCheckbox` | FR-031 |
 | 6 | Status | `addLabel`, `FONT_MINI` | "Voice files missing: transmitter voice in use" when relevant |

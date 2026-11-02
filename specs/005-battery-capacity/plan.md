@@ -27,7 +27,7 @@ Approach:
   smoothed and held under load (R3).
 - **New pack vs brown-out** from a three-state telemetry tracker and a
   20-point rise check, cross-checked by voltage when available (R4).
-- **16 `pSave` keys**: four app keys plus a pack array, an alarm array and a
+- **18 `pSave` keys**: six app keys (incl. the window titles) plus a pack array, an alarm array and a
   string array per battery (R5).
 - **Pending-flag callout scheduler**, no queue: FR-034a's priority order,
   one phrase per dispatch, nothing queues twice, transmitter fallback with
@@ -46,7 +46,7 @@ Approach:
 
 **Primary Dependencies**: JETI DC/DS Lua API v1.5 as declared in `types/jeti.lua` (full list in research R14; no new stubs). New lib module `ag_peak` ([contract](contracts/lib-modules.md)). Generator only (not deployed): `piper-tts` with `en_US-amy-medium` (`C:\Users\aaron\piper-voices\`), `tools/voice/make_voice.py`'s helpers, Speed Gauge's committed number files
 
-**Storage**: `system.pSave`/`pLoad`, per model, 16 keys ([data-model.md](data-model.md)). No files written by the app. 518 voice files plus `CREDITS.txt` and `index.txt` in `src/Apps/AG-BatCp/voice/` (about 20 MB, CC BY-SA 4.0), committed
+**Storage**: `system.pSave`/`pLoad`, per model, 18 keys ([data-model.md](data-model.md)). No files written by the app. 518 voice files plus `CREDITS.txt` and `index.txt` in `src/Apps/AG-BatCp/voice/` (about 20 MB, CC BY-SA 4.0), committed
 
 **Testing**: `python tools/check.py`; LuaLS diagnostics; generator self-check; emulator scenarios with Emulated Telemetry and `SIM` profiles; transmitter checks for sound, layout, themes and sensor units; bench check of the voltage curves ([quickstart.md](quickstart.md))
 
@@ -56,7 +56,7 @@ Approach:
 
 **Performance Goals**: capacity callout within 1 s of the crossing (SC-007); alarms within delay + 1 s (SC-008, SC-009); max spoken within 1 s + 1 tick of the peak (SC-010); print functions under 10% CPU per call with four batteries; no CPU-limit errors over 30 minutes (SC-014)
 
-**Constraints**: no allocation in `loop()` or print functions except rebuilding cached strings on the 1 s tick when values change; `system.getSensor*` called through `system` each time; `lcd` only in print functions; `form` only while the form is open; ≤ 30 persisted keys (16 used); ≤ 200 file-level locals (constants, tables and per-battery state grouped in tables); intbox values ≤ 32 767; no `os`/`debug`/`coroutine`/`bit32`; never `registerControl`/`setControl`/`setProperty`
+**Constraints**: no allocation in `loop()` or print functions except rebuilding cached strings on the 1 s tick when values change; `system.getSensor*` called through `system` each time; `lcd` only in print functions; `form` only while the form is open; ≤ 30 persisted keys (18 used); ≤ 200 file-level locals (constants, tables and per-battery state grouped in tables); intbox values ≤ 32 767; no `os`/`debug`/`coroutine`/`bit32`; never `registerControl`/`setControl`/`setProperty`
 
 **Scale/Scope**: app about 1,400–1,800 lines (Speed Gauge is 1,643, Flameout about 1,000); `ag_peak` about 40 lines; generator about 150 lines; 518 WAVs
 
@@ -71,7 +71,7 @@ or turned into transmitter and bench checks with a fallback:
 | 4 Voltage curves | R3: resting tables, smoothing, load hold; B1 bench check |
 | 5 Update rate | R2: 200 ms + 1 s; E8/T7 CPU |
 | 6 New-pack tuning | R4: constants; T5 |
-| 7 Settings fit | R5: 16 keys |
+| 7 Settings fit | R5: 18 keys |
 | 8 Stub check | R14: nothing missing |
 
 Findings that differed from the spec's wording, accepted by Aaron and
@@ -96,7 +96,7 @@ written into the spec (FR-003, FR-006, edge cases, Clarifications) on
 | I. Nothing flight-critical | PASS | Reads sensors, plays audio, draws. No `registerControl`, `setControl`, `setProperty`, gpio or serial. Doesn't replace the transmitter's own receiver-voltage alarm. If the app stops, nothing about the model changes (FR-036) |
 | II. Everything local | PASS | All symbols `local`; constants, category/chemistry tables, layout numbers and per-battery state grouped in tables to stay well under 200 locals; one final `return`. `ag_peak` returns its table only |
 | III. Transmitter APIs only | PASS | Every call is declared in `types/jeti.lua` (R14); Jeti `io` function style for file checks; `math`/`string` only. The generator runs on the PC |
-| IV. State resets on model switch | PASS | All session state built in `init()`; 16 `pSave` keys (ints, int arrays, string arrays); voltages in centivolts, delays in tenths; load clamps and compacts |
+| IV. State resets on model switch | PASS | All session state built in `init()`; 18 `pSave` keys (ints, int arrays, string arrays); voltages in centivolts, delays in tenths; load clamps and compacts |
 | V. Stable names, UTF-8 | PASS | `AG-BatCp.lua` (8.3, permanent from 0.1.0), assets in `AG-BatCp/`, absolute `/Apps/AG-BatCp/...` paths; module `ag_peak` in `lib/`; labels use ASCII |
 | VI. Keep loop() light | PASS | 200 ms / 1 s ticks; `getSensorValueByID` only; units resolved in the form; strings rebuilt only on change at 1 s; phrase paths built only at dispatch; `getSensors` only when a subform opens |
 | VII. Shared code in lib, stateless | PASS | New `ag_peak` (pure functions over a caller-owned table, no `lcd`/`form`/`system`). No existing module changed; Speed Gauge not migrated in this feature, so no other app needs re-verification (follow-up listed below) |

@@ -148,6 +148,8 @@ filename becomes permanent at first release (constitution V).
   voltage, not the gauge's 100% point; a too-long custom name is shortened
   on confirm (the text editor can't refuse characters as typed); default
   labels that don't fit use short forms "FLT", "BRK", "LGT" (FR-003).
+- Emulator review (Aaron, 2026-11-01): the two windows' titles ("Battery",
+  "Batteries") must be editable in the settings (FR-009a).
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -465,6 +467,12 @@ batteries) is not committed; the sketches replace it.
 
 - **FR-009**: The app MUST provide a small telemetry window showing one
   battery the pilot picks, and a double-size window showing up to 4.
+- **FR-009a**: Each window's title MUST be editable in the settings,
+  defaulting to "Battery" (small) and "Batteries" (double), up to 20
+  characters; an empty title restores the default. Titles are saved per
+  model. A changed title takes effect the next time the app starts (model
+  load or transmitter restart), since windows are registered at start-up;
+  the settings say so.
 - **FR-010**: Small window (150 × 23 on the transmitter): the battery lies
   on its side, rotated 90° clockwise (cap on the right, filling from the
   left), about 85 px long, with % remaining drawn inside it (same contrast
@@ -633,7 +641,8 @@ batteries) is not committed; the sketches replace it.
 - **Pack session state** (not saved): % remaining, last values, which levels
   have fired, repeat counters, low-voltage state, session max and last
   announced max, new-pack check done.
-- **App settings**: voice choice, "speak number only", small-window battery.
+- **App settings**: voice choice, "speak number only", small-window battery,
+  the two window titles.
 
 ## Success Criteria *(mandatory)*
 
