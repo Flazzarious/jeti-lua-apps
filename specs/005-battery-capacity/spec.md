@@ -124,6 +124,24 @@ filename becomes permanent at first release (constitution V).
   reset.
 - Q: Are the FR-006 and FR-007 default tables right for v1? → A: Yes,
   accepted as drafted.
+- Q: What should the small window show, given it is only 23 px tall on the
+  transmitter? → A: A battery about 85 px long with % remaining inside it;
+  to its right, two lines in the small font: the label, then voltage and
+  current ("8.1V 0.4A"). Max current is not shown in the small window.
+- Q: In the double window, what appears below a battery with no current
+  sensor? → A: Its pack voltage ("8.1 V"); batteries with a current sensor
+  show current as before.
+- Q: Should the gauges follow the transmitter's display theme or always use
+  the sketch's dark panel? → A: Follow the theme (provisional): outline,
+  cap and text use the transmitter's text colour, the empty part shows the
+  window background, band colours are fixed. To be reviewed on the
+  transmitter; a forced dark panel stays an option if it looks poor.
+- Q: Should an unused double-window slot show the sketch's dashed "empty"
+  outline? → A: No, it stays blank for now (the sketch's dashed slot only
+  marks the position). A better use of the space may come later.
+- Q: Which colours do the yellow and orange bands use, given the sketch
+  draws a yellow-band battery in amber? → A: Green #639922, yellow #F2C230,
+  orange #EF9F27 (the sketch's amber), red #E24B4A.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -132,8 +150,8 @@ filename becomes permanent at first release (constitution V).
 The pilot adds a battery, picks its category, chemistry, cell count, rated
 capacity and capacity source sensor, and places the app's small telemetry
 window on the main screen. The window shows that battery lying on its side,
-filled to its % remaining in the band colour, with the label, % remaining,
-voltage and (if assigned) current beside it.
+filled to its % remaining in the band colour, with % remaining inside it and
+the label, voltage and (if assigned) current beside it.
 
 **Why this priority**: The gauge is the core of the app; every alarm builds
 on the same % remaining.
@@ -206,7 +224,7 @@ flashing outline.
 
 The pilot places the double-size window and sees up to four upright
 batteries side by side, left-justified, each with its label above, % inside
-at the bottom and current below.
+at the bottom and current (or, without a current sensor, voltage) below.
 
 **Why this priority**: Most turbine models carry two to four packs; one
 glance should cover all of them. The small window already covers one.
@@ -220,8 +238,8 @@ spacing, readability and that unused slots stay empty on the right.
    positions, starting at the left edge, with the fourth slot empty.
 2. **Given** a battery is removed, **Then** the others shift left in
    configured order.
-3. **Given** a battery with no current sensor, **Then** its current line is
-   blank.
+3. **Given** a battery with no current sensor, **Then** the line below it
+   shows pack voltage, or is blank when there is no voltage reading either.
 4. **Given** the fill reaches the % text, **Then** the text colour keeps it
    readable on the fill and on the background.
 
@@ -310,6 +328,8 @@ and repeat.
 Approved layout sketches (Aaron, 2026-10-25), original work committed with
 this spec. They show arrangement and colours, not final proportions: the
 transmitter's windows are 150 × 23 and 150 × 68, so spacing is tuned there.
+Where a sketch and an FR disagree, the FR wins (the small window's text
+arrangement is set by FR-010).
 
 - Small window: `assets/layout-small-window.svg` (`.png` preview)
 - Double window: `assets/layout-double-window.svg` (`.png` preview)
@@ -429,24 +449,41 @@ batteries) is not committed; the sketches replace it.
 
 - **FR-009**: The app MUST provide a small telemetry window showing one
   battery the pilot picks, and a double-size window showing up to 4.
-- **FR-010**: Small window: the battery lies on its side, rotated 90°
-  clockwise (cap on the right, filling from the left), as large as the
-  window allows, with label, % remaining, voltage and current (when
-  assigned) in the remaining space, plus the session max current when it
-  fits.
+- **FR-010**: Small window (150 × 23 on the transmitter): the battery lies
+  on its side, rotated 90° clockwise (cap on the right, filling from the
+  left), about 85 px long, with % remaining drawn inside it (same contrast
+  rule as FR-013). To its right, two lines in the small font: the label,
+  then voltage and current ("8.1V 0.4A"; each part only when that reading
+  is assigned). The session max current is not shown in the small window.
+  The sketch's three stacked text lines do not fit 23 px and are replaced
+  by this arrangement.
 - **FR-011**: Double window: batteries stand upright (cap on top, filling
   bottom-up), same size and spacing, left-justified in configured order.
   With fewer than 4, each keeps its four-battery size and position and the
-  unused space stays empty on the right. Above each battery: its label.
+  unused space stays blank on the right: nothing is drawn there (the
+  sketch's dashed "empty" slot only marks the position; a later version may
+  use the space). Above each battery: its label.
   Inside, bottom-justified: % remaining. Below: current draw when a current
-  sensor is assigned and reporting, otherwise blank; "--" when the current
-  sensor is lost.
+  sensor is assigned ("--" when it is lost); otherwise pack voltage
+  ("8.1 V") when a voltage reading exists; otherwise blank.
 - **FR-012**: The fill MUST be one solid block in the band colour, not
   segments, sized to % remaining in 1% steps (rounded to the nearest pixel).
   The empty part MUST be left undrawn so it shows the window background.
   The whole fill changes colour at a band boundary.
+- **FR-012a**: The gauges MUST follow the transmitter's display theme: the
+  battery outline, cap, label and value text use the theme's text colour;
+  only the band colours (and the red low-voltage flash) are fixed. The
+  sketches' dark panel shows a dark theme, not a forced background.
+  (Provisional: reviewed on the transmitter with light and dark themes; if
+  it reads poorly, a forced dark panel may replace this.)
+- **FR-012b**: Band colours MUST be green `#639922`, yellow `#F2C230`,
+  orange `#EF9F27` and red `#E24B4A`. The sketch's amber is the orange
+  band; its 52% Receiver battery would be drawn yellow. Exact shades may be
+  tuned on the transmitter as long as the four stay distinct at a glance.
 - **FR-013**: Text over the fill or background MUST stay readable (e.g. dark
-  text on yellow, white on green, orange and red).
+  text on yellow, white on green, orange and red). White on orange
+  `#EF9F27` is low-contrast and MUST be checked on the transmitter; dark
+  text on orange (as in the sketch) is the fallback.
 - **FR-014**: Data MUST update once per second to start (tunable); drawing
   reuses the last computed values. Flashing uses the system clock so it
   stays smooth.
@@ -597,7 +634,9 @@ batteries) is not committed; the sketches replace it.
   state of charge at rest across the chemistry's range (bench-checked).
 - **SC-005**: The double window shows 1–4 upright, left-justified batteries
   and the small window one battery on its side, with % and label readable
-  at arm's length outdoors (Aaron's sign-off on the transmitter).
+  at arm's length outdoors, in both the light and the dark theme (Aaron's
+  sign-off on the transmitter; this sign-off also confirms or replaces the
+  theme decision in FR-012a).
 - **SC-006**: The fill is solid and tracks % remaining in 1% steps within
   ±1 pixel of the exact proportion, in both windows.
 - **SC-007**: Each enabled capacity level first plays within 1 update
@@ -637,8 +676,9 @@ batteries) is not committed; the sketches replace it.
   each about 30 px wide with a label above and current below, so the inner
   fill height is roughly 35–40 px: 1% steps then share pixels (about 3% per
   pixel), while the % number stays exact. The sideways battery in the small
-  window has about 90–100 px of length, close to 1% per pixel. Layout and
-  fonts are iterated on the transmitter.
+  window is about 85 px long (fill about 80 px, roughly 1.25% per pixel).
+  Font heights on the transmitter: small 12, normal 17, big 20–21 px. Layout
+  and fonts are iterated on the transmitter.
 - **Two telemetry windows per app** (API: `registerTelemetry` window 1 or 2).
   Four separate small windows from one app are not possible; the small
   window shows one chosen battery.
