@@ -322,8 +322,11 @@ tools/probe/PROBE.lua             Dev tool: prints the screen/window sizes in th
    ```
    This writes `docs/vendor/jeti-api.md`. It's gitignored because the PDF is
    JETI's copyrighted document.
-4. **Lua 5.3 compiler (optional).** `tools/check.py` uses `luac5.3`/`luac` from
-   PATH for syntax checks and skips that step with a warning if absent.
+4. **Lua 5.3 compiler (recommended).** `tools/check.py` uses `luac5.3`,
+   `luac53` or `luac` from PATH for syntax checks, only if it reports Lua 5.3,
+   and skips that step with a warning otherwise. On Windows, from an admin
+   PowerShell: `choco install lua53`. Don't use Lua 5.4 (e.g. winget's
+   `DEVCOM.Lua`): it accepts syntax the transmitter's Lua 5.3 rejects.
 
 ## Workflow
 
