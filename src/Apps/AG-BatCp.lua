@@ -105,6 +105,7 @@ local MINI_W_DEFAULT = { upper = 7, digit = 6, other = 7, ["-"] = 4, [" "] = 3 }
 -- Layout (contracts/telemetry-window.md), transmitter coordinates.
 local L = {
   slotW = 37,               -- double window: one battery slot
+  minFill = 2, minFillPct = 2,   -- 0-2 %: fill at least 2 px so the colour shows (FR-012)
   -- small window: battery on its side
   sx = 1, sy = 1, sw = 82, sh = 21, capX = 83, capY = 7, capW = 3, capH = 9,
   sfx = 3, sfy = 3, sfw = 78, sfh = 17, sPctY = 2, stx = 90, sLabelY = -1, sValY = 10,
@@ -1442,6 +1443,16 @@ local function drawCentered(cx, y, text, font)
   lcd.drawText(cx - lcd.getTextWidth(font, text) // 2, y, text, font)
 end
 
+-- Fill size in px for `pct` over `full` px, rounded; never thinner than
+-- L.minFill at 0-2 % (FR-012).
+local function fillSize(full, pct)
+  local n = (full * pct + 50) // 100
+  if pct <= L.minFillPct and n < L.minFill then
+    return L.minFill
+  end
+  return n
+end
+
 -- Small window (150 x 23): one battery on its side (FR-010).
 local function drawSmall(ox, k)
   local s = ss[k]
@@ -1451,7 +1462,7 @@ local function drawSmall(ox, k)
   lcd.drawFilledRectangle(ox + L.capX, L.capY, L.capW, L.capH)
   local cx = ox + L.sx + L.sw // 2
   if live then
-    local fw = (L.sfw * s.pct + 50) // 100
+    local fw = fillSize(L.sfw, s.pct)
     if fw > 0 then
       setColor(BAND[s.band])
       lcd.drawFilledRectangle(ox + L.sfx, L.sfy, fw, L.sfh)
@@ -1507,7 +1518,7 @@ local function drawUpright(ox, k)
   lcd.drawFilledRectangle(cx - L.dCapW // 2, L.dCapY, L.dCapW, L.dCapH)
   lcd.drawRectangle(x0 + L.dx, L.dy, L.dw, L.dh, 2)
   if live then
-    local fh = (L.dfh * s.pct + 50) // 100
+    local fh = fillSize(L.dfh, s.pct)
     local fy = L.dfBottom - fh
     if fh > 0 then
       setColor(BAND[s.band])

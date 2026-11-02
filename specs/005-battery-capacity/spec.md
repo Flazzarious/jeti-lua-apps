@@ -493,7 +493,10 @@ batteries) is not committed; the sketches replace it.
 - **FR-012**: The fill MUST be one solid block in the band colour, not
   segments, sized to % remaining in 1% steps (rounded to the nearest pixel).
   The empty part MUST be left undrawn so it shows the window background.
-  The whole fill changes colour at a band boundary.
+  The whole fill changes colour at a band boundary. From 0 to 2% the fill
+  MUST be at least 2 px thick (a red sliver with every default band), so an
+  empty pack still shows its colour instead of an empty outline (Aaron,
+  emulator review 2026-11-01).
 - **FR-012a**: The gauges MUST follow the transmitter's display theme: the
   battery outline, cap, label and value text use the theme's text colour;
   only the band colours (and the red low-voltage flash) are fixed. The

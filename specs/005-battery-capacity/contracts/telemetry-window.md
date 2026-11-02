@@ -53,6 +53,8 @@ positions, unused slots draw nothing (FR-011, clarified 2026-11-01).
 | Below line | centred in slot, top y 56 | `FONT_MINI` | current "42.5 A"; "--" if current sensor lost; else pack voltage "8.1 V"; else blank (FR-011) |
 
 Fill resolution: 36 px for 100%, about 2.8% per pixel; the % text is exact.
+In both windows, at 0–2% the fill is drawn at least 2 px thick (`L.minFill`,
+FR-012), so an empty pack shows a red sliver.
 
 ## Small window (150 × 23): one battery on its side
 
