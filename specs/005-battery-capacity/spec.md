@@ -48,7 +48,9 @@ filename becomes permanent at first release (constitution V).
 - **Label**: the text drawn with the gauge. Defaults from the category
   ("FLIGHT", "RX", "ECU", "LIGHTS", "BRAKES", "GEAR", "AUX" or the custom
   name); numbered with a hyphen when a category is used more than once
-  ("RX-1", "RX-2").
+  ("RX-1", "RX-2"). If a numbered default is too wide for its slot on the
+  transmitter, the category uses its short form instead ("FLT", "BRK",
+  "LGT").
 - **Capacity source**: the telemetry value the gauge is driven by: mAh
   consumed, % remaining, or voltage (estimated through the chemistry's
   voltage curve).
@@ -142,6 +144,10 @@ filename becomes permanent at first release (constitution V).
 - Q: Which colours do the yellow and orange bands use, given the sketch
   draws a yellow-band battery in amber? → A: Green #639922, yellow #F2C230,
   orange #EF9F27 (the sketch's amber), red #E24B4A.
+- Plan findings accepted (Aaron, 2026-11-01): FR-006 "Full" is a charge
+  voltage, not the gauge's 100% point; a too-long custom name is shortened
+  on confirm (the text editor can't refuse characters as typed); default
+  labels that don't fit use short forms "FLT", "BRK", "LGT" (FR-003).
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -376,8 +382,8 @@ batteries) is not committed; the sketches replace it.
 - **Max current with steady current from power-up.** The 1 s hold rule still
   registers it.
 - **Model switch mid-session.** Session max resets; settings are per model.
-- **Custom name too long.** The editor stops accepting characters once the
-  label would be wider than the battery.
+- **Custom name too long.** On confirm the name is shortened from the end
+  until the label fits its slot, and the settings show "Shortened to fit".
 - **Third pack in a category.** It becomes "-3"; removing "-1" doesn't
   renumber the others.
 - **% text over a very low fill.** Contrast must hold where the text straddles
@@ -401,8 +407,11 @@ batteries) is not committed; the sketches replace it.
   can be added later without changing settings saved on existing models.
 - **FR-003**: Labels MUST default from the category; two or more batteries in
   one category MUST be numbered "-1", "-2", …. Every label, including a
-  custom name, MUST fit above its upright battery in the four-battery double
-  window; the label editor MUST refuse characters that would not fit.
+  custom name, MUST fit above its upright battery (within its slot) in the
+  four-battery double window. Default labels that would not fit use the
+  category's short form ("FLT", "BRK", "LGT"). The transmitter's text editor
+  only reports the finished text, so a custom name that would not fit MUST
+  be shortened from the end on confirm, with a "Shortened to fit" note.
 - **FR-004**: The app MUST interpret the capacity source by its unit: mAh
   consumed ((rated − consumed) / rated), % remaining (as is), or voltage
   (per-chemistry resting curve, scaled by cell count). Other units MUST be
@@ -423,6 +432,13 @@ batteries) is not committed; the sketches replace it.
   | Li-ion | 4.20 | 3.60 | 3.40 | 3.20 |
   | LiFe | 3.60 | 3.30 | 3.20 | 3.00 |
   | NiMH/NiCd | 1.40 | 1.20 | 1.15 | 1.10 |
+
+  "Full" is the charge voltage. It is used to check the cell count, never
+  as the gauge's 100% point: voltage-based % comes from each chemistry's
+  resting curve (plan research R3), because a charged LiFe pack rests near
+  3.40 V/cell, not 3.60, and would otherwise read about 70%. Warning is the
+  low-voltage default, Cutoff is the 0% floor, and Nominal is shown for
+  reference only.
 
 - **FR-007**: Choosing a category MUST fill the suggested chemistry, colour
   bands, capacity callout levels and current-alarm visibility from this
