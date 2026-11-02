@@ -444,8 +444,8 @@ local function newSession()
     pct = 0, pctLast = 0, vPct = nil, vPctLast = nil,
     vSum = 0, vN = 0, vNow = nil, vEst = nil,
     iNow = nil, band = 1,
-    fired = 0, rptN = 0, rptT = 0,
-    lvBelowT = nil, lvAboveT = nil, lvOn = false,
+    fired = 0, rptOn = false, rptN = 0, rptT = 0,
+    vLast = nil, lvBelowT = nil, lvAboveT = nil, lvOn = false, lvN = 0, lvT = 0,
     iAboveT = nil, iAlarm = false, iRptT = 0,
     peak = peak.new(), riseT = 0, lastAnn = 0,
     npDueT = nil, npDone = true,
@@ -537,12 +537,21 @@ end
 
 local sim = {
   idx = 1, t0 = 0,
-  names = { "Off", "1 Discharge", "2 Noisy voltage" },
-  noise = { false, false, true },
+  names = { "Off", "1 Discharge", "2 Noisy voltage", "3 Jittery discharge", "4 Voltage sags",
+    "5 Start at 35%" },
+  noise = { false, false, true, false, false, false },     -- volts +-3 %
+  jitter = { false, false, false, true, false, false },    -- % +-2 points
   prof = {
     {},
     { { 0, 100, 415, 5 }, { 300000, 0, 350, 5 } },
     { { 0, 90, 334, 0 }, { 120000, 50, 329, 0 }, { 240000, 10, 315, 0 } },
+    -- through 60/50/40/30 in 4 minutes, % jittering around each level
+    { { 0, 70, 390, 0 }, { 240000, 20, 373, 0 } },
+    -- 3.80 V/cell; sag to 3.55 for 1.5 s (no alarm), then for 3 s (alarm)
+    { { 0, 60, 380, 0 }, { 5000, 60, 380, 0 }, { 5001, 60, 355, 0 }, { 6500, 60, 355, 0 },
+      { 6501, 60, 380, 0 }, { 12000, 60, 380, 0 }, { 12001, 60, 355, 0 }, { 15000, 60, 355, 0 },
+      { 15001, 60, 380, 0 } },
+    { { 0, 35, 377, 0 } },
   },
 }
 
@@ -579,6 +588,9 @@ local function simRead(now)
   local volts = vCell * b.p[P.CELLS] / 100
   if sim.noise[sim.idx] then
     volts = volts * (0.97 + 0.06 * math.random())
+  end
+  if sim.jitter[sim.idx] then
+    pct = clamp(pct - 2 + 4 * math.random(), 0, 100)
   end
   local cap = pct
   if d.mode == M.MAH then
@@ -633,6 +645,21 @@ local function speak(k, kind, value)
   speakTransmitter(k, kind, value)
 end
 
+-- Repeat bookkeeping once a phrase has started (start to start, FR-018,
+-- FR-021): the lowest capacity level and the low-voltage alarm count their
+-- plays against the battery's max count.
+local function onSpoken(k, kind, value, now)
+  local s, a, d = ss[k], bat[k].a, dv[k]
+  if kind == K.LVL and d.lowest > 0 and value == a[d.lowest] then
+    s.rptT, s.rptN = now, s.rptN + 1
+    if a[A.MAXCNT] > 0 and s.rptN >= a[A.MAXCNT] then
+      s.rptOn = false
+    end
+  elseif kind == K.LV then
+    s.lvT, s.lvN = now, s.lvN + 1
+  end
+end
+
 local function dispatch(now)
   if system.isPlayback() then
     return
@@ -644,6 +671,7 @@ local function dispatch(now)
         s.pend[kind] = false
         speak(k, kind, s.pendV[kind])
         s.spokeT = now
+        onSpoken(k, kind, s.pendV[kind], now)
         return
       end
     end
@@ -659,8 +687,8 @@ end
 local function startPackSession(k, now, pct)
   local s = ss[k]
   s.pct, s.vEst = pct, nil
-  s.fired, s.rptN, s.rptT = 0, 0, 0
-  s.lvBelowT, s.lvAboveT, s.lvOn = nil, nil, false
+  s.fired, s.rptOn, s.rptN, s.rptT = 0, false, 0, 0
+  s.lvBelowT, s.lvAboveT, s.lvOn, s.lvN, s.lvT = nil, nil, false, 0, 0
   s.iAboveT, s.iAlarm = nil, false
   peak.reset(s.peak)
   s.riseT, s.lastAnn = 0, 0
@@ -716,6 +744,9 @@ local function readSensors(now)
     end
     if volts ~= nil then
       s.vSum, s.vN = s.vSum + volts * 100, s.vN + 1
+      s.vLast = volts * 100
+    else
+      s.vLast = nil
     end
     s.iNow = amps
   end
@@ -778,6 +809,121 @@ local function updateCapacity(k, now)
   end
   s.pct = roundPct(raw)
   s.band = bandOf(b, s.pct)
+end
+
+------------------------------------------------------------------------------
+-- Capacity callouts (FR-016 - FR-018, data-model "Capacity level k")
+------------------------------------------------------------------------------
+
+local function levelOn(a, i)
+  return (a[A.LVLON] & (1 << (i - 1))) ~= 0
+end
+
+-- Marks every enabled, armed level the current % has reached as fired and
+-- returns the lowest of them (slots are strictly descending, so the last
+-- one), or nil.
+local function markCrossed(k)
+  local a, s = bat[k].a, ss[k]
+  local hit = nil
+  for i = 1, 4 do
+    local bit = 1 << (i - 1)
+    if levelOn(a, i) and (s.fired & bit) == 0 and s.pct <= a[A.LVL1 + i - 1] then
+      s.fired = s.fired | bit
+      hit = i
+    end
+  end
+  return hit
+end
+
+-- After the levels are edited (or one is turned off): re-arm from the
+-- current %, silently (spec edge cases). The lowest keeps repeating only if
+-- it was repeating and the new lowest has already fired.
+local function rearmLevels(k)
+  local s, d = ss[k], dv[k]
+  s.fired = 0
+  markCrossed(k)
+  s.rptOn = s.rptOn and d.lowest > 0 and (s.fired & (1 << (d.lowest - 1))) ~= 0
+end
+
+-- Slow tick, LIVE batteries. A level fires at or below its value and
+-- re-arms HYST points above it; when several fire at once only the lowest
+-- speaks (also at the start of a pack session, US2 #4). The lowest enabled
+-- level then repeats every rptS, start to start, up to maxCnt plays.
+local function updateLevels(k, now)
+  local a, d, s = bat[k].a, dv[k], ss[k]
+  for i = 1, 4 do
+    local bit = 1 << (i - 1)
+    if (s.fired & bit) ~= 0 and s.pct >= a[A.LVL1 + i - 1] + T.HYST then
+      s.fired = s.fired & ~bit
+      if i == d.lowest then
+        s.rptOn = false
+      end
+    end
+  end
+  local hit = markCrossed(k)
+  if hit then
+    raise(k, K.LVL, a[A.LVL1 + hit - 1])
+    if hit == d.lowest then
+      s.rptOn, s.rptN, s.rptT = true, 0, 0
+    end
+  elseif s.rptOn and s.rptT > 0 and not s.pend[K.LVL]
+      and now - s.rptT >= a[A.RPT] * 1000 then
+    if a[A.MAXCNT] == 0 or s.rptN < a[A.MAXCNT] then
+      raise(k, K.LVL, a[A.LVL1 + d.lowest - 1])
+    else
+      s.rptOn = false
+    end
+  end
+end
+
+------------------------------------------------------------------------------
+-- Low-voltage alarm (FR-019 - FR-022, data-model "Low-voltage alarm").
+-- Fast tick, on the latest voltage reading, compared per cell.
+------------------------------------------------------------------------------
+
+local function updateLowVoltage(k, now)
+  local a, d, s, p = bat[k].a, dv[k], ss[k], bat[k].p
+  if not d.hasV or a[A.LVMODE] == 0 or s.tel ~= TEL.LIVE or s.vLast == nil then
+    s.lvBelowT, s.lvAboveT = nil, nil
+    return
+  end
+  local vCell = s.vLast / p[P.CELLS]
+  local thr = d.lvThrCell
+  local dly = a[A.LVDLY] * 100
+  -- Value to speak: volts per cell, or pack volts, in cV (FR-021).
+  local value = a[A.LVMODE] == 2 and s.vLast or vCell
+  if vCell < thr then
+    s.lvAboveT = nil
+    if s.lvBelowT == nil then
+      s.lvBelowT = now
+    end
+    if not s.lvOn and now - s.lvBelowT >= dly then
+      s.lvOn, s.lvN, s.lvT = true, 0, 0
+      raise(k, K.LV, value)
+    end
+  else
+    s.lvBelowT = nil
+    -- Clears only after recovering 0.05 V per cell for the delay (FR-020).
+    if s.lvOn and vCell >= thr + 5 then
+      if s.lvAboveT == nil then
+        s.lvAboveT = now
+      end
+      if now - s.lvAboveT >= dly then
+        s.lvOn, s.lvAboveT = false, nil
+        s.pend[K.LV] = false
+      end
+    else
+      s.lvAboveT = nil
+    end
+  end
+  if s.lvOn then
+    if s.pend[K.LV] then
+      s.pendV[K.LV] = value   -- speak the latest reading
+    elseif s.lvT > 0 and now - s.lvT >= a[A.RPT] * 1000
+        and (a[A.MAXCNT] == 0 or s.lvN < a[A.MAXCNT]) then
+      raise(k, K.LV, value)
+    end
+  end
 end
 
 -- Cached strings for the windows, rebuilt only when their value changed.
@@ -844,7 +990,7 @@ local cur = 0
 local formOpen = false      -- loop may touch form rows only while true
 local idx = {}              -- component indices of rows updated after creation
 local keepRow = nil         -- focused row to restore after a rebuild
-local note = { short = false, band = false, title = false }   -- one-off notes for this form session
+local note = { short = false, band = false, title = false, levels = false }   -- one-off notes for this form session
 local LABEL_W = 180
 
 -- Sensor lists for the open battery screen (R1): one getSensors() pass.
@@ -988,8 +1134,27 @@ local function setCategory(k, cat)
   if p[P.CAT] == cat then
     return
   end
+  local oldCat = p[P.CAT]
   p[P.CAT] = cat
   assignNumber(k)
+  -- Moving out of a category that then has one battery left drops that
+  -- one's number again ("RX-1" -> "RX"), e.g. after "Add battery" briefly
+  -- made a second Receiver. Deleting never renumbers (spec edge case).
+  local left = nil
+  for j = 1, #bat do
+    if bat[j].p[P.CAT] == oldCat then
+      if left then
+        left = 0
+        break
+      end
+      left = j
+    end
+  end
+  if left and left > 0 and bat[left].p[P.NUM] ~= 0 then
+    bat[left].p[P.NUM] = 0
+    recompute(left)
+    saveBattery(left)
+  end
   local c = catOf(cat)
   b.a[A.MAXON] = c.maxOn
   local groups = E.BAND | E.LVL
@@ -1000,6 +1165,7 @@ local function setCategory(k, cat)
   refill(k, groups)
   recompute(k)
   saveBattery(k)
+  rearmLevels(k)
 end
 
 local function newSessionFor(k)
@@ -1265,6 +1431,116 @@ local function initBattery(k)
   form.addLabel({ label = "Now", width = LABEL_W })
   idx.live = form.addLabel({ label = TXT.dash, alignRight = true })
 
+  -- 11-16 Capacity callouts (FR-016 - FR-018)
+  heading("Capacity callouts")
+  local function levelsOk()
+    local prev = 100
+    for i = 1, 4 do
+      if levelOn(a, i) then
+        if a[A.LVL1 + i - 1] >= prev then
+          return false
+        end
+        prev = a[A.LVL1 + i - 1]
+      end
+    end
+    return true
+  end
+  -- Applies a level change, or reverts it with a note (R11).
+  local function levelChanged(revert)
+    if not levelsOk() then
+      revert()
+      note.levels = true
+      refresh()
+      return
+    end
+    note.levels = false
+    p[P.EDITED] = p[P.EDITED] | E.LVL
+    recompute(k)
+    saveBattery(k)
+    rearmLevels(k)
+  end
+  for i = 1, 4 do
+    local field = A.LVL1 + i - 1
+    local bit = 1 << (i - 1)
+    form.addRow(3)
+    form.addLabel({ label = "Level " .. i .. " (%)", width = 150 })
+    local ci
+    ci = form.addCheckbox(levelOn(a, i), function(value)
+      local on = not value      -- the callback gets the old state
+      if ci then
+        form.setValue(ci, on)
+      end
+      a[A.LVLON] = on and (a[A.LVLON] | bit) or (a[A.LVLON] & ~bit)
+      levelChanged(function()
+        a[A.LVLON] = a[A.LVLON] ~ bit
+      end)
+    end, { width = 40 })
+    form.addIntbox(a[field], 1, 99, a[field], 0, 1, function(value)
+      local old = a[field]
+      a[field] = value
+      levelChanged(function()
+        a[field] = old
+      end)
+    end, { width = 110 })
+  end
+  hint("Levels must go down, e.g. 60 > 50 > 40 > 30.", note.levels)
+  if a[A.SHOWALL] == 1 then
+    addIntRow("Repeat lowest every (s)", a[A.RPT], 3, 60, 5, 0, 1, function(value)
+      a[A.RPT] = value
+      saveBattery(k)
+    end)
+    addIntRow("Max repeats", a[A.MAXCNT], 0, 20, 0, 0, 1, function(value)
+      a[A.MAXCNT] = value
+      saveBattery(k)
+    end)
+    hint("0 = no limit. Also limits the low-voltage alarm.")
+  end
+
+  -- 17-19 Low voltage (FR-019, FR-020), only with a voltage reading
+  if dv[k].hasV then
+    heading("Low voltage")
+    form.addRow(2)
+    form.addLabel({ label = "Low-voltage alarm", width = LABEL_W })
+    form.addSelectbox({ "Off", "Per cell", "Per pack" }, a[A.LVMODE] + 1, false, function(i)
+      local old, new = a[A.LVMODE], i - 1
+      -- Off and per cell keep the threshold per cell; per pack is the pack
+      -- voltage. Convert when crossing between them (FR-019).
+      if new == 2 and old ~= 2 then
+        a[A.LVTHR] = a[A.LVTHR] * p[P.CELLS]
+      elseif old == 2 and new ~= 2 then
+        a[A.LVTHR] = (a[A.LVTHR] + p[P.CELLS] // 2) // p[P.CELLS]
+      end
+      a[A.LVMODE] = new
+      ss[k].lvOn, ss[k].lvBelowT, ss[k].lvAboveT = false, nil, nil
+      recompute(k)
+      saveBattery(k)
+      refresh()
+    end)
+    if a[A.LVMODE] == 1 then
+      addIntRow("Threshold (V per cell)", a[A.LVTHR], 50, 500, a[A.LVTHR], 2, 1, function(value)
+        a[A.LVTHR] = value
+        p[P.EDITED] = p[P.EDITED] | E.LVTHR
+        recompute(k)
+        saveBattery(k)
+      end)
+    elseif a[A.LVMODE] == 2 then
+      -- Shown in tenths of a volt (FR-021: one decimal per pack), stored in cV.
+      addIntRow("Threshold (V pack)", (a[A.LVTHR] + 5) // 10, 5, 999, (a[A.LVTHR] + 5) // 10, 1, 1,
+        function(value)
+          a[A.LVTHR] = value * 10
+          p[P.EDITED] = p[P.EDITED] | E.LVTHR
+          recompute(k)
+          saveBattery(k)
+        end)
+    end
+    if a[A.LVMODE] > 0 and a[A.SHOWALL] == 1 then
+      addIntRow("Alarm delay (s)", a[A.LVDLY], 5, 100, 20, 1, 1, function(value)
+        a[A.LVDLY] = value
+        saveBattery(k)
+      end)
+    end
+  end
+
   -- 28 Name for the transmitter voice (FR-033)
   heading("Voice")
   form.addRow(2)
@@ -1359,7 +1635,7 @@ end
 local function closeForm()
   formOpen = false
   idx = {}
-  note.short, note.band, note.title = false, false, false
+  note.short, note.band, note.title, note.levels = false, false, false, false
   cur = 0
 end
 
@@ -1583,6 +1859,9 @@ local function loop()
   end
   app.fastT = now
   readSensors(now)
+  for k = 1, #bat do
+    updateLowVoltage(k, now)
+  end
   -- Dispatch as soon as playback ends, not only on the slow tick (R9).
   local playing = system.isPlayback()
   if app.playing and not playing then
@@ -1594,6 +1873,9 @@ local function loop()
     app.slowT = now
     for k = 1, #bat do
       updateCapacity(k, now)
+      if ss[k].tel == TEL.LIVE then
+        updateLevels(k, now)
+      end
       updateStrings(k)
       updateFormLive(k)
     end
