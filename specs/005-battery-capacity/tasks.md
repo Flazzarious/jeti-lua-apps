@@ -125,7 +125,7 @@ so US2, US4 and US5 are testable without the voice files.
 - [X] T027 [US2] Low-voltage alarm in `src/Apps/AG-BatCp.lua` (FR-020–FR-022, data-model "Low-voltage alarm"): fast tick: per-cell voltage below `lvThrCell` continuously for `lvDly` → `lvOn`, `raise(k, LV, v)`; clear after `>= thr + 5 cV` per cell continuously for `lvDly`, or on new pack; repeats every `rptS` up to `maxCnt`. Spoken value: per cell `playNumber(v, 2, "V")`, per pack `playNumber(v, 1, "V")` (transmitter path for now). Flash: in both print functions draw outline and cap red 226,75,74 when `lvOn` and `(system.getTimeCounter() // 500) % 2 == 0`
 - [X] T028 [US2] Add `SIM` profiles 3 (noisy discharge through 60/50/40/30), 4 (voltage sag below threshold for 1.5 s, then for 3 s) and 5 (start at 35%) in `src/Apps/AG-BatCp.lua`
 - [X] T029 [US2] Run `python tools/check.py`; deploy to the emulator
-- [ ] T030 [US2] MANUAL: Emulator, quickstart E6, E7, E10 and E14; `SIM` profiles 3–5 (one callout per level, lowest repeats every 5 s and stops at max count, no alarm for the 1.5 s sag, alarm and flash for the 3 s sag). Set `SIM = false` afterwards
+- [X] T030 [US2] MANUAL: Emulator, quickstart E6, E7, E10 and E14; `SIM` profiles 3–5 (one callout per level, lowest repeats every 5 s and stops at max count, no alarm for the 1.5 s sag, alarm and flash for the 3 s sag). Set `SIM = false` afterwards
 
 **Checkpoint**: A low pack is spoken (in the transmitter's voice) and flashes; US1 still works
 
@@ -153,11 +153,11 @@ so US2, US4 and US5 are testable without the voice files.
 
 **Independent Test**: Quickstart E11, E12: hold current above the alarm; spike profile for max
 
-- [ ] T035 [US4] Current rows in `src/Apps/AG-BatCp.lua` (FR-024, contract rows 20–25, shown only with a current sensor; hidden for ECU and Lights unless Show all, FR-007): "Current alarm above" 0–500 A (0 = off), "for" 0–10 s (1 decimal), "repeat every" 0–60 s, note listing which are still 0 ("Current alarm off: set delay"); "Max current callouts" checkbox (default from category); "Max sensitivity" 1–50 A with Show all; "Reset max current" link (`peak.reset`, `lastAnn = 0`, clear `pendMax`)
-- [ ] T036 [US4] Current alarm in `src/Apps/AG-BatCp.lua` (data-model "Current alarm"): fast tick, only when `iOn`: above `iThr` continuously for `iDly` → raise HICUR with the rounded current; repeats every `iRpt` while above; clears when `i <= iThr`
-- [ ] T037 [US4] Max current in `src/Apps/AG-BatCp.lua` (FR-025–FR-027, research R7): fast tick `local m, rose = peak.update(st.peak, i, now)`; `rose` → `riseT = now`; slow tick: when `maxOn`, `now − riseT >= 1000` and `m − lastAnn >= maxSens`, `raise(k, MAX, round(m))` (replaces a waiting value, FR-034a); set `lastAnn` when it is spoken; reset on new pack (T009), "Reset max current", and app start
-- [ ] T038 [US4] Add `SIM` profiles 6 (climb-outs with single-sample spikes and a held 92 A peak) and 7 (steady 40 A from power-up) in `src/Apps/AG-BatCp.lua`
-- [ ] T039 [US4] Run `python tools/check.py`; deploy to the emulator
+- [X] T035 [US4] Current rows in `src/Apps/AG-BatCp.lua` (FR-024, contract rows 20–25, shown only with a current sensor; hidden for ECU and Lights unless Show all, FR-007): "Current alarm above" 0–500 A (0 = off), "for" 0–10 s (1 decimal), "repeat every" 0–60 s, note listing which are still 0 ("Current alarm off: set delay"); "Max current callouts" checkbox (default from category); "Max sensitivity" 1–50 A with Show all; "Reset max current" link (`peak.reset`, `lastAnn = 0`, clear `pendMax`)
+- [X] T036 [US4] Current alarm in `src/Apps/AG-BatCp.lua` (data-model "Current alarm"): fast tick, only when `iOn`: above `iThr` continuously for `iDly` → raise HICUR with the rounded current; repeats every `iRpt` while above; clears when `i <= iThr`
+- [X] T037 [US4] Max current in `src/Apps/AG-BatCp.lua` (FR-025–FR-027, research R7): fast tick `local m, rose = peak.update(st.peak, i, now)`; `rose` → `riseT = now`; slow tick: when `maxOn`, `now − riseT >= 1000` and `m − lastAnn >= maxSens`, `raise(k, MAX, round(m))` (replaces a waiting value, FR-034a); set `lastAnn` when it is spoken; reset on new pack (T009), "Reset max current", and app start
+- [X] T038 [US4] Add `SIM` profiles 6 (climb-outs with single-sample spikes and a held 92 A peak) and 7 (steady 40 A from power-up) in `src/Apps/AG-BatCp.lua`
+- [X] T039 [US4] Run `python tools/check.py`; deploy to the emulator
 - [ ] T040 [US4] MANUAL: Emulator, quickstart E11 and E12; `SIM` 6 (spike never becomes the max; "92" spoken once 1 s after the peak) and 7 (steady current still registers). Set `SIM = false` afterwards
 
 **Checkpoint**: Electric flight packs are fully covered

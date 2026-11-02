@@ -538,9 +538,9 @@ end
 local sim = {
   idx = 1, t0 = 0,
   names = { "Off", "1 Discharge", "2 Noisy voltage", "3 Jittery discharge", "4 Voltage sags",
-    "5 Start at 35%" },
-  noise = { false, false, true, false, false, false },     -- volts +-3 %
-  jitter = { false, false, false, true, false, false },    -- % +-2 points
+    "5 Start at 35%", "6 Current spikes", "7 Steady 40 A" },
+  noise = { false, false, true, false, false, false, false, false },     -- volts +-3 %
+  jitter = { false, false, false, true, false, false, false, false },    -- % +-2 points
   prof = {
     {},
     { { 0, 100, 415, 5 }, { 300000, 0, 350, 5 } },
@@ -552,6 +552,12 @@ local sim = {
       { 6501, 60, 380, 0 }, { 12000, 60, 380, 0 }, { 12001, 60, 355, 0 }, { 15000, 60, 355, 0 },
       { 15001, 60, 380, 0 } },
     { { 0, 35, 377, 0 } },
+    -- climb to 40 A and hold; a one-sample 150 A spike at 10 s (shorter
+    -- than the 200 ms read tick); climb to 92 A, hold 3 s, cruise at 50 A
+    { { 0, 90, 385, 10 }, { 5000, 89, 384, 40 }, { 10000, 88, 383, 40 }, { 10001, 88, 383, 150 },
+      { 10199, 88, 383, 150 }, { 10200, 88, 383, 40 }, { 15000, 86, 382, 60 },
+      { 18000, 85, 381, 92 }, { 21000, 85, 381, 92 }, { 21001, 85, 381, 50 }, { 30000, 83, 380, 50 } },
+    { { 0, 80, 380, 40 } },
   },
 }
 
@@ -657,6 +663,10 @@ local function onSpoken(k, kind, value, now)
     end
   elseif kind == K.LV then
     s.lvT, s.lvN = now, s.lvN + 1
+  elseif kind == K.CUR then
+    s.iRptT = now
+  elseif kind == K.MAX then
+    s.lastAnn = value
   end
 end
 
@@ -924,6 +934,70 @@ local function updateLowVoltage(k, now)
       raise(k, K.LV, value)
     end
   end
+end
+
+------------------------------------------------------------------------------
+-- Current alarm and max current (FR-024 - FR-027, data-model "Current
+-- alarm", "Max current"). Fast tick, LIVE batteries with a current reading.
+------------------------------------------------------------------------------
+
+local function updateCurrent(k, now)
+  local a, d, s = bat[k].a, dv[k], ss[k]
+  local i = s.iNow
+  if not d.hasI or s.tel ~= TEL.LIVE or i == nil then
+    s.iAboveT = nil
+    return
+  end
+  -- Max: Speed Gauge's spike filter (R7). riseT = when it last rose.
+  local _, rose = peak.update(s.peak, i, now)
+  if rose then
+    s.riseT = now
+  end
+  -- Alarm: above the threshold for the delay, repeat while above.
+  if not d.iOn then
+    s.iAboveT, s.iAlarm = nil, false
+    return
+  end
+  local n = math.floor(i + 0.5)
+  if i > a[A.ITHR] then
+    if s.iAboveT == nil then
+      s.iAboveT = now
+    end
+    if not s.iAlarm and now - s.iAboveT >= a[A.IDLY] * 100 then
+      s.iAlarm, s.iRptT = true, 0
+      raise(k, K.CUR, n)
+    elseif s.iAlarm then
+      if s.pend[K.CUR] then
+        s.pendV[K.CUR] = n    -- speak the latest reading
+      elseif s.iRptT > 0 and now - s.iRptT >= a[A.IRPT] * 1000 then
+        raise(k, K.CUR, n)
+      end
+    end
+  else
+    s.iAboveT, s.iAlarm = nil, false
+    s.pend[K.CUR] = false
+  end
+end
+
+-- Slow tick: a new max is spoken once it hasn't risen for 1 s and beats the
+-- last announced max by the sensitivity (FR-026). A waiting callout is
+-- replaced by the newer value (FR-034a).
+local function updateMax(k, now)
+  local a, d, s = bat[k].a, dv[k], ss[k]
+  if not d.hasI or a[A.MAXON] ~= 1 or s.tel ~= TEL.LIVE then
+    return
+  end
+  local maxNow = s.peak.max
+  if maxNow > 0 and now - s.riseT >= 1000 and maxNow - s.lastAnn >= a[A.MAXSENS] then
+    raise(k, K.MAX, math.floor(maxNow + 0.5))
+  end
+end
+
+local function resetMax(k)
+  local s = ss[k]
+  peak.reset(s.peak)
+  s.riseT, s.lastAnn = 0, 0
+  s.pend[K.MAX] = false
 end
 
 -- Cached strings for the windows, rebuilt only when their value changed.
@@ -1541,6 +1615,63 @@ local function initBattery(k)
     end
   end
 
+  -- 20-25 Current (FR-024 - FR-027), only with a current sensor; hidden for
+  -- categories without current-alarm rows unless "Show all" (FR-007)
+  if dv[k].hasI and (dv[k].cat.cur or a[A.SHOWALL] == 1) then
+    heading("Current")
+    local function missing()
+      local parts = {}
+      if a[A.ITHR] == 0 then
+        parts[#parts + 1] = "threshold"
+      end
+      if a[A.IDLY] == 0 then
+        parts[#parts + 1] = "delay"
+      end
+      if a[A.IRPT] == 0 then
+        parts[#parts + 1] = "repeat"
+      end
+      if #parts == 0 or #parts == 3 then
+        return ""             -- complete, or simply not used
+      end
+      return "Current alarm off: set " .. table.concat(parts, ", ") .. "."
+    end
+    local function currentChanged()
+      recompute(k)
+      saveBattery(k)
+      local text = missing()
+      form.setProperties(idx.iMissing, { label = text, visible = text ~= "" })
+    end
+    addIntRow("Alarm above (A)", a[A.ITHR], 0, 500, 0, 0, 1, function(value)
+      a[A.ITHR] = value
+      currentChanged()
+    end)
+    addIntRow("for (s)", a[A.IDLY], 0, 100, 0, 1, 1, function(value)
+      a[A.IDLY] = value
+      currentChanged()
+    end)
+    addIntRow("repeat every (s)", a[A.IRPT], 0, 60, 0, 0, 1, function(value)
+      a[A.IRPT] = value
+      currentChanged()
+    end)
+    local text = missing()
+    idx.iMissing = hint(text, text ~= "")
+    hint("0 = off. The alarm needs all three set.", a[A.ITHR] + a[A.IDLY] + a[A.IRPT] == 0)
+    addCheck("Max current callouts", a[A.MAXON] == 1, function(on)
+      a[A.MAXON] = on and 1 or 0
+      saveBattery(k)
+    end)
+    if a[A.SHOWALL] == 1 then
+      addIntRow("Max sensitivity (A)", a[A.MAXSENS], 1, 50, 5, 0, 1, function(value)
+        a[A.MAXSENS] = value
+        saveBattery(k)
+      end)
+    end
+    form.addLink(function()
+      resetMax(k)
+      system.messageBox("Max current reset", 2)
+    end, { label = "Reset max current" })
+  end
+
   -- 28 Name for the transmitter voice (FR-033)
   heading("Voice")
   form.addRow(2)
@@ -1861,6 +1992,7 @@ local function loop()
   readSensors(now)
   for k = 1, #bat do
     updateLowVoltage(k, now)
+    updateCurrent(k, now)
   end
   -- Dispatch as soon as playback ends, not only on the slow tick (R9).
   local playing = system.isPlayback()
@@ -1875,6 +2007,7 @@ local function loop()
       updateCapacity(k, now)
       if ss[k].tel == TEL.LIVE then
         updateLevels(k, now)
+        updateMax(k, now)
       end
       updateStrings(k)
       updateFormLive(k)
