@@ -73,5 +73,92 @@
         "lowerBound": 0,
         "upperBound": 160000,
         "input": "P8"
+    },
+    {
+        "id": 4,
+        "param": 0,
+        "decimals": 0,
+        "type": 1,
+        "label": "MUI 75",
+        "unit": "",
+        "sensorName": "MUI 75"
+    },
+    {
+        "id": 4,
+        "param": 1,
+        "decimals": 2,
+        "type": 1,
+        "label": "Voltage",
+        "unit": "V",
+        "sensorName": "MUI 75",
+        "lowerBound": 6.0,
+        "upperBound": 8.6,
+        "input": "P1"
+    },
+    {
+        "id": 4,
+        "param": 2,
+        "decimals": 1,
+        "type": 1,
+        "label": "Current",
+        "unit": "A",
+        "sensorName": "MUI 75",
+        "lowerBound": 0,
+        "upperBound": 120,
+        "input": "P2"
+    },
+    {
+        "id": 4,
+        "param": 3,
+        "decimals": 0,
+        "type": 1,
+        "label": "Capacity",
+        "unit": "mAh",
+        "sensorName": "MUI 75",
+        "lowerBound": 0,
+        "upperBound": 5000,
+        "input": "P3"
+    },
+    {
+        "id": 5,
+        "param": 0,
+        "decimals": 0,
+        "type": 1,
+        "label": "Rx",
+        "unit": "",
+        "sensorName": "Rx"
+    },
+    {
+        "id": 5,
+        "param": 1,
+        "decimals": 2,
+        "type": 1,
+        "label": "U Rx",
+        "unit": "V",
+        "sensorName": "Rx",
+        "lowerBound": 5.6,
+        "upperBound": 7.0,
+        "input": "P4"
+    },
+    {
+        "id": 6,
+        "param": 0,
+        "decimals": 0,
+        "type": 1,
+        "label": "Central Box",
+        "unit": "",
+        "sensorName": "Central Box"
+    },
+    {
+        "id": 6,
+        "param": 1,
+        "decimals": 0,
+        "type": 1,
+        "label": "Battery %",
+        "unit": "%",
+        "sensorName": "Central Box",
+        "lowerBound": 0,
+        "upperBound": 100,
+        "input": "P9"
     }
 ]
