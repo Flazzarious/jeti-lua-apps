@@ -659,7 +659,105 @@ local function speakTransmitter(k, kind, value)
   end
 end
 
+-- App voice (FR-030 - FR-033, research R8/R9): Piper "Amy" files made by
+-- tools/voice/make_batcap.py. Checked once in init(); a phrase is never
+-- half app voice.
+local VOICE = {
+  dir = "/Apps/AG-BatCp/voice/",
+  words = { "pct", "amps", "volts", "vpc", "point", "max", "hicur", "lowv", "notfull",
+    "n_flt", "n_rx", "n_ecu", "n_gear", "n_brk", "n_lgt", "n_aux", "n_bat" },
+  maxNum = 500,
+}
+local KIND_WORD = { [K.LV] = "lowv", [K.CUR] = "hicur", [K.NP] = "notfull", [K.MAX] = "max" }
+local phrase = {}           -- file stems of the phrase being built, reused
+
+-- Jeti's io is function-style (constitution III). The transmitter opens
+-- "/Apps/..."; the JETI Studio emulator only opens it without the leading
+-- "/" (API notes, 2026-10-05). Playback keeps the absolute path.
+local function fileExists(path)
+  local f = io.open(path, "r") or io.open(string.sub(path, 2), "r")
+  if f then
+    io.close(f)
+    return true
+  end
+  return false
+end
+
+local function checkVoice()
+  local ok = fileExists(VOICE.dir .. "0.wav") and fileExists(VOICE.dir .. VOICE.maxNum .. ".wav")
+  for _, w in ipairs(VOICE.words) do
+    ok = ok and fileExists(VOICE.dir .. w .. ".wav")
+  end
+  app.voiceOk = ok
+  app.useAppVoice = ok and cfg.voice ~= 2
+end
+
+local function add(stem)
+  phrase[#phrase + 1] = stem
+end
+
+-- Adds number n as a file; false when it can't be spoken in the app voice
+-- (over 500, or its file is missing: FR-033).
+local function addNumber(n)
+  if n < 0 or n > VOICE.maxNum or not fileExists(VOICE.dir .. n .. ".wav") then
+    return false
+  end
+  add(tostring(n))
+  return true
+end
+
+-- "receiver 2, 30 percent", "flight, low voltage, 3 point 5 8 volts per
+-- cell" (contracts/audio-events.md). Returns false to fall back.
+local function buildPhrase(k, kind, value)
+  for i = #phrase, 1, -1 do
+    phrase[i] = nil
+  end
+  local b = bat[k]
+  add(dv[k].cat.voice)
+  if b.p[P.NUM] > 0 and not addNumber(b.p[P.NUM]) then
+    return false
+  end
+  if KIND_WORD[kind] then
+    add(KIND_WORD[kind])
+  end
+  local unit
+  if kind == K.LV then
+    local whole, digits
+    if b.a[A.LVMODE] == 2 then
+      local tenths = math.floor(value / 10 + 0.5)
+      whole, digits, unit = tenths // 10, { tenths % 10 }, "volts"
+    else
+      local cv = math.floor(value + 0.5)
+      whole, digits, unit = cv // 100, { (cv // 10) % 10, cv % 10 }, "vpc"
+    end
+    if not addNumber(whole) then
+      return false
+    end
+    add("point")
+    for _, dgt in ipairs(digits) do
+      if not addNumber(dgt) then
+        return false
+      end
+    end
+  else
+    if not addNumber(math.floor(value + 0.5)) then
+      return false
+    end
+    unit = (kind == K.CUR or kind == K.MAX) and "amps" or "pct"
+  end
+  if cfg.numOnly ~= 1 then
+    add(unit)
+  end
+  return true
+end
+
 local function speak(k, kind, value)
+  if app.useAppVoice and buildPhrase(k, kind, value) then
+    for _, stem in ipairs(phrase) do
+      system.playFile(VOICE.dir .. stem .. ".wav", AUDIO_QUEUE)
+    end
+    return
+  end
   speakTransmitter(k, kind, value)
 end
 
@@ -1382,6 +1480,20 @@ local function initMain()
       end
     end, { width = 200 })
   end
+  -- Voice (FR-031, FR-032): the app voice by default when its files are there.
+  heading("Voice")
+  form.addRow(2)
+  form.addLabel({ label = "Voice", width = LABEL_W })
+  local voices = { app.voiceOk and APP_NAME or (APP_NAME .. " (files missing)"), "Transmitter" }
+  form.addSelectbox(voices, app.useAppVoice and 1 or 2, false, function(i)
+    saveApp("voice", i)
+    app.useAppVoice = app.voiceOk and i ~= 2
+  end)
+  addCheck("Speak number only", cfg.numOnly == 1, function(on)
+    saveApp("numOnly", on and 1 or 0)
+  end)
+  hint("Voice files missing: the transmitter's voice is used.", not app.voiceOk)
+  hint("Voice: Piper, Amy (CC BY-SA 4.0).")
   hint(APP_NAME .. " " .. APP_VERSION)
 end
 
@@ -2030,6 +2142,7 @@ local function init()
   recomputeAll()
   resetSessions()
   app.gaugeOk = string.find(system.getDeviceType() or "", "24 II", 1, true) ~= nil
+  checkVoice()              -- once: 19 file opens (R9)
   local now = system.getTimeCounter()
   app.fastT, app.slowT = now, now
 
