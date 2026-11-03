@@ -538,9 +538,12 @@ end
 local sim = {
   idx = 1, t0 = 0,
   names = { "Off", "1 Discharge", "2 Noisy voltage", "3 Jittery discharge", "4 Voltage sags",
-    "5 Start at 35%", "6 Current spikes", "7 Steady 40 A" },
-  noise = { false, false, true, false, false, false, false, false },     -- volts +-3 %
-  jitter = { false, false, false, true, false, false, false, false },    -- % +-2 points
+    "5 Start at 35%", "6 Current spikes", "7 Steady 40 A", "8 Start at 82%", "9 Start at 95%",
+    "10 Swap to fuller pack", "11 Brown-out" },
+  -- volts +-3 %
+  noise = { false, false, true, false, false, false, false, false, false, false, false, false },
+  -- % +-2 points
+  jitter = { false, false, false, true, false, false, false, false, false, false, false, false },
   prof = {
     {},
     { { 0, 100, 415, 5 }, { 300000, 0, 350, 5 } },
@@ -558,6 +561,15 @@ local sim = {
       { 10199, 88, 383, 150 }, { 10200, 88, 383, 40 }, { 15000, 86, 382, 60 },
       { 18000, 85, 381, 92 }, { 21000, 85, 381, 92 }, { 21001, 85, 381, 50 }, { 30000, 83, 380, 50 } },
     { { 0, 80, 380, 40 } },
+    -- New-pack check (FR-029); voltages are LiPo resting values for that %.
+    { { 0, 82, 404, 0 } },
+    { { 0, 95, 416, 0 } },
+    -- 40 %, telemetry off for 3 s, back at 75 %: a new pack
+    { { 0, 40, 380, 0 }, { 10000, 40, 380, 0 }, { 10001, -1, 380, 0 }, { 13000, -1, 380, 0 },
+      { 13001, 75, 398, 0 } },
+    -- 50 %, telemetry off for 3 s, back at 50 %: a brown-out
+    { { 0, 50, 384, 0 }, { 10000, 50, 384, 0 }, { 10001, -1, 384, 0 }, { 13000, -1, 384, 0 },
+      { 13001, 50, 384, 0 } },
   },
 }
 
@@ -990,6 +1002,25 @@ local function updateMax(k, now)
   local maxNow = s.peak.max
   if maxNow > 0 and now - s.riseT >= 1000 and maxNow - s.lastAnn >= a[A.MAXSENS] then
     raise(k, K.MAX, math.floor(maxNow + 0.5))
+  end
+end
+
+-- New-pack check (FR-029): 3 s after a pack session starts, the resting
+-- voltage estimate (unsmoothed 1 s average, R3) below the threshold says
+-- "pack not full" once. Only a new pack schedules it again (a brown-out
+-- keeps npDone, R4). Waits while no voltage reading arrives.
+local function updatePackCheck(k, now)
+  local a, d, s = bat[k].a, dv[k], ss[k]
+  if s.npDone or a[A.NPON] ~= 1 or not d.hasV or s.npDueT == nil or now < s.npDueT then
+    return
+  end
+  if s.vPct == nil then
+    return
+  end
+  s.npDone = true
+  local pct = roundPct(s.vPct)
+  if pct < a[A.NPTHR] then
+    raise(k, K.NP, pct)
   end
 end
 
@@ -1672,6 +1703,22 @@ local function initBattery(k)
     end, { label = "Reset max current" })
   end
 
+  -- 26-27 New pack (FR-029), only with a voltage reading
+  if dv[k].hasV then
+    heading("New pack")
+    addCheck("Check pack is full", a[A.NPON] == 1, function(on)
+      a[A.NPON] = on and 1 or 0
+      saveBattery(k)
+    end)
+    hint("Says once if a newly connected pack isn't charged (3 s after it's seen).")
+    if a[A.SHOWALL] == 1 then
+      addIntRow("Full above (%)", a[A.NPTHR], 50, 99, 90, 0, 1, function(value)
+        a[A.NPTHR] = value
+        saveBattery(k)
+      end)
+    end
+  end
+
   -- 28 Name for the transmitter voice (FR-033)
   heading("Voice")
   form.addRow(2)
@@ -2008,6 +2055,7 @@ local function loop()
       if ss[k].tel == TEL.LIVE then
         updateLevels(k, now)
         updateMax(k, now)
+        updatePackCheck(k, now)
       end
       updateStrings(k)
       updateFormLive(k)
