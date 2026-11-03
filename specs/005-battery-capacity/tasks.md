@@ -158,7 +158,7 @@ so US2, US4 and US5 are testable without the voice files.
 - [X] T037 [US4] Max current in `src/Apps/AG-BatCp.lua` (FR-025–FR-027, research R7): fast tick `local m, rose = peak.update(st.peak, i, now)`; `rose` → `riseT = now`; slow tick: when `maxOn`, `now − riseT >= 1000` and `m − lastAnn >= maxSens`, `raise(k, MAX, round(m))` (replaces a waiting value, FR-034a); set `lastAnn` when it is spoken; reset on new pack (T009), "Reset max current", and app start
 - [X] T038 [US4] Add `SIM` profiles 6 (climb-outs with single-sample spikes and a held 92 A peak) and 7 (steady 40 A from power-up) in `src/Apps/AG-BatCp.lua`
 - [X] T039 [US4] Run `python tools/check.py`; deploy to the emulator
-- [ ] T040 [US4] MANUAL: Emulator, quickstart E11 and E12; `SIM` 6 (spike never becomes the max; "92" spoken once 1 s after the peak) and 7 (steady current still registers). Set `SIM = false` afterwards
+- [X] T040 [US4] MANUAL: Emulator, quickstart E11 and E12; `SIM` 6 (spike never becomes the max; "92" spoken once 1 s after the peak) and 7 (steady current still registers). Set `SIM = false` afterwards
 
 **Checkpoint**: Electric flight packs are fully covered
 
