@@ -19,6 +19,7 @@ other work. Remove an item once he says it's done.
 | Speed Gauge | `src/Apps/AG-SpdGa.lua` | `specs/001-speed-gauge/` | DFM Speed Announcer (Dave McQueeney, MIT) |
 | Throttle Setup Wizard | `src/Apps/AG-TrbSt.lua` | `specs/002-turbine-throttle-setup/` | original |
 | Flameout Alarm | `src/Apps/AG-FlmOt.lua` | `specs/003-flameout-alarm/` | original |
+| Battery Capacity | `src/Apps/AG-BatCp.lua` | `specs/005-battery-capacity/` | original |
 
 Keep this table current when an app is added.
 

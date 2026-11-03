@@ -203,12 +203,12 @@ so US2, US4 and US5 are testable without the voice files.
 
 **Purpose**: Docs, credits, release readiness and real-world checks
 
-- [ ] T054 [P] Add a Battery Capacity section to `README.md`: apps table row, what it does, install (app, `AG-BatCp/`, and `lib/ag_peak.lua`, FR-037), setup steps, voice credit (CC BY-SA 4.0), advice to assign a voltage sensor (brown-out vs swap, research R4) and that a voltage-only gauge is a resting estimate (R3)
-- [ ] T055 [P] Add a Battery Capacity section to `CREDITS.md` (Piper MIT, Amy CC BY-SA 4.0, number files shared with Speed Gauge's set)
-- [ ] T056 [P] Add the apps table row to `CLAUDE.md`: Battery Capacity | `src/Apps/AG-BatCp.lua` | `specs/005-battery-capacity/` | original
-- [ ] T057 [P] Add a Battery Capacity section to `tools/voice/README.md` (what `make_batcap.py` writes, how to run it, numbers copied from Speed Gauge)
+- [X] T054 [P] Add a Battery Capacity section to `README.md`: apps table row, what it does, install (app, `AG-BatCp/`, and `lib/ag_peak.lua`, FR-037), setup steps, voice credit (CC BY-SA 4.0), advice to assign a voltage sensor (brown-out vs swap, research R4) and that a voltage-only gauge is a resting estimate (R3)
+- [X] T055 [P] Add a Battery Capacity section to `CREDITS.md` (Piper MIT, Amy CC BY-SA 4.0, number files shared with Speed Gauge's set)
+- [X] T056 [P] Add the apps table row to `CLAUDE.md`: Battery Capacity | `src/Apps/AG-BatCp.lua` | `specs/005-battery-capacity/` | original
+- [X] T057 [P] Add a Battery Capacity section to `tools/voice/README.md` (what `make_batcap.py` writes, how to run it, numbers copied from Speed Gauge)
 - [ ] T058 [P] Record transmitter findings in `docs/jeti-api-notes.md`: sensor units (T060), `playNumber` after a queued `playFile` (T053), clipping-based text cost (T034)
-- [ ] T059 Quickstart section 1 static checks: `python tools/check.py` 0 errors; LuaLS clean on `AG-BatCp.lua` and `lib/ag_peak.lua`; search for forbidden APIs (none); `SIM` and `DEBUG_CPU` false
+- [X] T059 Quickstart section 1 static checks: `python tools/check.py` 0 errors; LuaLS clean on `AG-BatCp.lua` and `lib/ag_peak.lua`; search for forbidden APIs (none); `SIM` and `DEBUG_CPU` false
 - [ ] T060 MANUAL: Transmitter T1 (units of Aaron's sensors match research R1), T5 (pack swap and a short receiver dropout), T7 (30 minutes, four batteries, both windows, no CPU-limit error), T8 (install on a card with no other AG- apps)
 - [ ] T061 MANUAL: Bench B1 (LiPo and LiFe packs at rest vs the charger's state, SC-004) and B2 (fresh LiFe with the new-pack check on: no callout); adjust `CURVE` entries if needed
 - [ ] T062 MANUAL: SC-001 timing (one battery under 2 minutes, four under 6) and Aaron's sign-off on readability outdoors in both themes (SC-005), which also confirms or replaces FR-012a

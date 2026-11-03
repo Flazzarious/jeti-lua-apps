@@ -10,6 +10,7 @@ spec-driven workflow (GitHub Spec Kit + Claude Code) in VS Code.
 | Speed Gauge | [`AG-SpdGa.lua`](src/Apps/AG-SpdGa.lua) | Released (0.3.1) | [001](specs/001-speed-gauge/spec.md) | DFM Speed Announcer by Dave McQueeney (MIT) |
 | Flameout Alarm | [`AG-FlmOt.lua`](src/Apps/AG-FlmOt.lua) | Released (0.1.0) | [003](specs/003-flameout-alarm/spec.md) | Original |
 | Throttle Setup Wizard | [`AG-TrbSt.lua`](src/Apps/AG-TrbSt.lua) | Released (0.1.0) | [002](specs/002-turbine-throttle-setup/spec.md) | Original |
+| Battery Capacity | [`AG-BatCp.lua`](src/Apps/AG-BatCp.lua) | In development (0.1.0) | [005](specs/005-battery-capacity/spec.md) | Original |
 
 ### Screenshots
 
@@ -242,6 +243,50 @@ The voice files in `src/Apps/AG-TrbSt/` are generated with
 4.0, not MIT. Install = `AG-TrbSt.lua` plus the `AG-TrbSt/` folder. Tested on
 the DS-24 II; older DC/DS transmitters should work but are untested.
 
+### Battery Capacity
+
+Shows up to four battery packs per model (receiver, turbine ECU, landing
+gear, brakes, lights, aux or flight packs) as solid battery gauges and
+speaks when a pack needs attention, naming the pack every time:
+"receiver two, 30 percent", "flight, low voltage, 3 point 5 8 volts per
+cell".
+
+- **Two windows:** a small one with one battery on its side, and a
+  double-size one with up to four upright batteries. Each fills in green,
+  yellow, orange or red by % remaining; current (or voltage) is shown under
+  each. Both window titles can be renamed in the settings.
+- **Any capacity sensor:** mAh consumed (e.g. MUI, Central Box), % remaining,
+  or voltage alone (estimated from each chemistry's resting voltage curve).
+- **Callouts:** up to four capacity levels per pack (the lowest repeats), a
+  low-voltage alarm per cell or per pack with a flashing red outline, an
+  optional current alarm, session max current (as in Speed Gauge) and an
+  optional "pack not full" check when a pack is connected.
+- **Smart defaults** from the pack's category and chemistry (LiPo, LiHV,
+  Li-ion, LiFe, NiMH/NiCd); everything can be changed.
+
+**It only listens and informs.** It never controls the model, and it doesn't
+replace the transmitter's own receiver-voltage alarm.
+
+**Give each pack a voltage sensor if you can.** When telemetry drops out and
+comes back, the app has to tell a pack swap (reset the callouts) from a
+brown-out (keep them); an mAh sensor that restarts at 0 looks like a full
+pack either way, and the voltage settles it. A gauge driven by voltage alone
+is a resting estimate: it reads low under load and is coarse in the flat
+middle of LiFe and NiMH packs.
+
+**Setup** (Applications → Battery Capacity): Add battery, pick the category,
+chemistry, cell count, capacity (mAh) and the capacity sensor; the
+thresholds fill in. "Show all settings" on a battery shows the colour bands,
+voltages, delays and repeat limits. With the transmitter's voice (or without
+the voice files), each battery can play its own name file before the number.
+
+The voice files in `src/Apps/AG-BatCp/voice/` are generated with
+[`tools/voice/make_batcap.py`](tools/voice/README.md) (numbers shared with
+Speed Gauge's set) and licensed CC BY-SA 4.0, not MIT. Install =
+`AG-BatCp.lua`, the `AG-BatCp/` folder and `lib/ag_peak.lua`. Needs a
+DS-24 II for the gauges; the callouts work on any DC/DS transmitter. Details
+in [spec 005](specs/005-battery-capacity/spec.md).
+
 ## Install with JETI Studio
 
 1. In JETI Studio open **File → Configuration**, and add this line to the
@@ -286,6 +331,7 @@ src/Apps/                         Mirrors /Apps on the transmitter SD card
 tools/check.py                    Syntax, forbidden-API, naming, encoding checks
 tools/pdf2md.py                   Converts Jeti's API PDF for local reference
 tests/test_ag_dens.lua            Optional desktop test for the density module (any Lua 5.3)
+tests/test_ag_peak.lua            Optional desktop test for the spike-filtered max module
 tools/probe/PROBE.lua             Dev tool: prints the screen/window sizes in the emulator
 ```
 
