@@ -174,7 +174,7 @@ so US2, US4 and US5 are testable without the voice files.
 - [X] T042 [US5] New-pack check in `src/Apps/AG-BatCp.lua`: slow tick, when `npOn`, not `npDone` and `now >= npDueT`: estimate % from the resting curve of the current 1 s voltage (unsmoothed); below `npThr` → `raise(k, NP, pct)`; set `npDone` either way. Brown-outs don't reschedule it (T009)
 - [X] T043 [US5] Add `SIM` profiles 8 (start at 82%), 9 (start at 95%), 10 (dropout and return 30 points higher with voltage) and 11 (dropout, same value: brown-out) in `src/Apps/AG-BatCp.lua`
 - [X] T044 [US5] Run `python tools/check.py`; deploy to the emulator
-- [ ] T045 [US5] MANUAL: Emulator, quickstart E13; `SIM` 8–11 (one callout at 82, none at 95, new pack resets max and re-arms levels, brown-out keeps everything). Set `SIM = false` afterwards
+- [X] T045 [US5] MANUAL: Emulator, quickstart E13; `SIM` 8–11 (one callout at 82, none at 95, new pack resets max and re-arms levels, brown-out keeps everything). Set `SIM = false` afterwards
 
 **Checkpoint**: All alarm kinds work in the transmitter's voice
 
