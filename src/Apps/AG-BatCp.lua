@@ -1411,6 +1411,14 @@ local function onSensor(k, list, i, idField, parField, lblField)
   end
 end
 
+-- Row 32 / F1 on a battery screen: delete after confirming.
+local function confirmDelete(k)
+  if form.question("Delete " .. dv[k].label .. "?", "Its settings are removed.", "", 0, false, 0) == 1 then
+    deleteBattery(k)
+    goTo(0)
+  end
+end
+
 -- Battery screen, essentials first (contracts/settings-form.md rows 1-10,
 -- 28-32).
 local function initBattery(k)
@@ -1777,12 +1785,8 @@ local function initBattery(k)
     saveBattery(k)
     refresh()
   end)
-  form.addLink(function()
-    if form.question("Delete " .. dv[k].label .. "?", "Its settings are removed.", "", 0, false, 0) == 1 then
-      deleteBattery(k)
-      goTo(0)
-    end
-  end, { label = "Delete battery" })
+  form.addLink(function() confirmDelete(k) end, { label = "Delete battery" })
+  form.setButton(1, "Delete", ENABLED)   -- also on F1: the link is the last row
 end
 
 local function initForm()
@@ -1792,6 +1796,7 @@ local function initForm()
     cur = 0
   end
   if cur == 0 then
+    form.setButton(1, "", 3)  -- hide F1's "Delete" from a battery screen
     initMain()
   else
     initBattery(cur)
@@ -1802,11 +1807,17 @@ local function initForm()
   end
 end
 
--- F5 / ESC on a battery screen go back to the main page (R12).
+-- On a battery screen: F5 / ESC go back to the main page (R12), F1
+-- deletes the battery after confirming.
 local function keyForm(keyCode)
-  if cur ~= 0 and (keyCode == KEY_ESC or keyCode == KEY_5) then
+  if cur == 0 then
+    return
+  end
+  if keyCode == KEY_ESC or keyCode == KEY_5 then
     form.preventDefault()
     goTo(0)
+  elseif keyCode == KEY_1 then
+    confirmDelete(cur)
   end
 end
 

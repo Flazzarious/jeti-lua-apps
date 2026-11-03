@@ -62,7 +62,7 @@ current sensor; **C** only for Custom.
 | 29 | Bands yellow / orange / red | three intboxes | descending | FR-007 |
 | 30 | Full / Nominal / Warning / Cutoff | four intboxes, 2 decimals | cV per cell | FR-006; editing sets the edited bit |
 | 31 | Show all settings | checkbox | | per battery; `form.reinit` |
-| 32 | Delete battery | `addLink` → `form.question` | | compacts slots (research R5) |
+| 32 | Delete battery | `addLink` → `form.question`; also **F1 "Delete"** on every battery screen | | compacts slots (research R5); F1 added after the emulator review (the row is last on a long screen) |
 
 ## Rules
 
