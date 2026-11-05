@@ -336,7 +336,11 @@ bench test can settle; each has a quickstart check and a fallback.
   the cheap kind of drawing (Flameout's 12 polygons + 12 outlines measured
   5–6%). The same code draws both orientations with swapped axes.
 - **Colours (FR-012a, FR-012b):** the outline, cap, label and value text use
-  `lcd.getFgColor()`; the empty part is left undrawn so the theme's
+  a neutral grey chosen from `lcd.getBgColor()`'s brightness (30,30,30 on a
+  light background, 235,235,235 on a dark one). Changed 2026-11-04: on the
+  DS-24 II `lcd.getFgColor()` returns the theme's accent colour (green in
+  the dark theme, salmon red in the light one, `Screen035/036`), and red
+  outlines looked like the low-voltage flash. The empty part is left undrawn so the theme's
   background shows. Band fills are fixed RGB. Text on a fill uses white on
   green, orange and red, dark (`#412402`) on yellow (FR-013). Grey for lost
   telemetry is the foreground colour at alpha 100.

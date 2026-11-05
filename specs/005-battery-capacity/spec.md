@@ -497,12 +497,15 @@ batteries) is not committed; the sketches replace it.
   MUST be at least 2 px thick (a red sliver with every default band), so an
   empty pack still shows its colour instead of an empty outline (Aaron,
   emulator review 2026-11-01).
-- **FR-012a**: The gauges MUST follow the transmitter's display theme: the
-  battery outline, cap, label and value text use the theme's text colour;
-  only the band colours (and the red low-voltage flash) are fixed. The
-  sketches' dark panel shows a dark theme, not a forced background.
-  (Provisional: reviewed on the transmitter with light and dark themes; if
-  it reads poorly, a forced dark panel may replace this.)
+- **FR-012a**: The gauges MUST follow the transmitter's light or dark
+  theme: the battery outline, cap, label and value text use a neutral
+  colour chosen from the theme's background brightness (dark grey on a
+  light background, light grey on a dark one); only the band colours (and
+  the red low-voltage flash) are fixed. The sketches' dark panel shows a
+  dark theme, not a forced background. The theme's own foreground colour
+  is not used: on the DS-24 II it is the theme's accent colour (green or
+  red), and red outlines would look like the low-voltage flash (transmitter
+  screenshots, 2026-11-04).
 - **FR-012b**: Band colours MUST be green `#639922`, yellow `#F2C230`,
   orange `#EF9F27` and red `#E24B4A`. The sketch's amber is the orange
   band; its 52% Receiver battery would be drawn yellow. Exact shades may be

@@ -1966,14 +1966,23 @@ end
 -- used.
 ------------------------------------------------------------------------------
 
-local fg = { 0, 0, 0 }      -- theme foreground, read once per frame
+local fg = { 0, 0, 0 }      -- neutral outline/text colour, set once per frame
+local NEUTRAL = { light = 30, dark = 235 }   -- grey levels on light / dark backgrounds
 
 local function setColor(c, alpha)
   lcd.setColor(c[1], c[2], c[3], alpha)
 end
 
+-- FR-012a: dark grey on a light theme, light grey on a dark one.
+-- getFgColor() isn't used: on the DS-24 II it is the theme's accent colour
+-- (green or red), and red outlines would look like the low-voltage flash.
 local function readTheme()
-  fg[1], fg[2], fg[3] = lcd.getFgColor()
+  local r, g, b = lcd.getBgColor()
+  local v = NEUTRAL.dark
+  if 299 * r + 587 * g + 114 * b > 128000 then
+    v = NEUTRAL.light
+  end
+  fg[1], fg[2], fg[3] = v, v, v
 end
 
 -- Outline colour: red on the flash phase of a low-voltage alarm (FR-022),

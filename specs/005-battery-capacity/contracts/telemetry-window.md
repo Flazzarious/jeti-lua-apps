@@ -31,7 +31,7 @@ screenshots.
 
 | Element | Colour |
 | --- | --- |
-| Outline, cap, label, value text, % text on the empty part | `lcd.getFgColor()` (theme) |
+| Outline, cap, label, value text, % text on the empty part | neutral: 30, 30, 30 when `lcd.getBgColor()` is light (luma > 128), else 235, 235, 235 (FR-012a; `getFgColor()` is the theme's accent colour on the DS-24 II) |
 | Empty part of the battery | not drawn (theme background shows) |
 | Fill | band colour (data-model.md) |
 | % text on the fill | band's text colour (white; dark on yellow) |
@@ -101,7 +101,7 @@ the fill's colour when the fill covers at least half the text height.
 
 - No allocation per frame: all strings (`txtPct`, `txtLine`, `txtSmall`,
   labels) are rebuilt on the 1 s tick only when their value changed.
-- `getFgColor()` read once per frame.
+- `getBgColor()` read once per frame.
 - `lcd` calls only in the two print functions (constitution VI).
 - Measured with `DEBUG_CPU`: target under 10% per call with four
   batteries (Flameout's double window measured 5–6%).
