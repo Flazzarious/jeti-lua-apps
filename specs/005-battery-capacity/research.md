@@ -189,8 +189,12 @@ bench test can settle; each has a quickstart check and a fallback.
 - **Finding:** the four-battery slot is 150 / 4 = 37 px wide. In `FONT_MINI`
   (12 px high on the transmitter) capitals are roughly 6–7 Lua px wide, so
   "BRAKES-2" or "LIGHTS-2" (8 characters) need about 50 px and probably do
-  **not** fit, while "RX-2", "ECU", "GEAR-2", "AUX-3" do. **UNVERIFIED**
-  until measured.
+  **not** fit, while "RX-2", "ECU", "GEAR-2", "AUX-3" do. **Measured
+  2026-11-04** (transmitter, `Screen034.png`): capitals 2–7 px, digits 4;
+  "FLIGHT-2" 38, "BRAKES-2" 40, "LIGHTS-2" 38 do not fit 35 px, so they
+  use FLT-2, BRK-2, LGT-2; the unnumbered words (31–34 px) fit. Single
+  characters read rounded down, so the check adds 0.6 px per character
+  (`docs/jeti-api-notes.md`).
 - **Decision:**
   1. First implementation task: measure `lcd.getTextWidth(FONT_MINI, c)`
      for `A–Z`, `0–9`, `-` and space on the transmitter with a probe mode,

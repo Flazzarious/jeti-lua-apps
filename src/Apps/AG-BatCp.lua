@@ -97,10 +97,19 @@ local BAND_TXT = {
 }
 local RED = { 226, 75, 74 }  -- low-voltage flash (FR-022)
 
--- FONT_MINI advance widths in Lua px, for the label fit check (R6).
--- ESTIMATED until measured on the transmitter (tasks T002, PROBE MODE 6).
-local MINI_W = {}
-local MINI_W_DEFAULT = { upper = 7, digit = 6, other = 7, ["-"] = 4, [" "] = 3 }
+-- FONT_MINI widths in Lua px, for the label fit check (R6). Measured on
+-- the DS-24 II with PROBE MODE 6 (Screen034, 2026-11-04). Single characters
+-- read rounded down: whole words measure about 0.6 px per character more
+-- ("FLIGHT-2" 33 summed, 38 measured), so labelWidth adds MINI_W_EXTRA.
+-- Characters not measured (lower case, punctuation) count as 7.
+local MINI_W = {
+  A = 6, B = 5, C = 6, D = 6, E = 4, F = 4, G = 6, H = 6, I = 2, J = 4, K = 5, L = 4, M = 7,
+  N = 6, O = 6, P = 5, Q = 6, R = 5, S = 5, T = 5, U = 5, V = 5, W = 7, X = 5, Y = 5, Z = 5,
+  ["0"] = 4, ["1"] = 4, ["2"] = 4, ["3"] = 4, ["4"] = 4, ["5"] = 4, ["6"] = 4, ["7"] = 4,
+  ["8"] = 4, ["9"] = 4, ["-"] = 2, [" "] = 2, ["%"] = 6,
+}
+local MINI_W_OTHER = 7
+local MINI_W_EXTRA = 0.6
 
 -- Layout (contracts/telemetry-window.md), transmitter coordinates.
 local L = {
@@ -330,26 +339,14 @@ end
 
 local dv = {}               -- dv[k]: derived values of battery k
 
-local function charWidth(ch)
-  local w = MINI_W[ch] or MINI_W_DEFAULT[ch]
-  if w then
-    return w
-  elseif ch:match("%u") then
-    return MINI_W_DEFAULT.upper
-  elseif ch:match("%d") then
-    return MINI_W_DEFAULT.digit
-  end
-  return MINI_W_DEFAULT.other
-end
-
 -- Label width in FONT_MINI from MINI_W (R6); lcd isn't available in form
 -- callbacks, so the form measures with this table.
 local function labelWidth(text)
   local w = 0
   for i = 1, #text do
-    w = w + charWidth(string.sub(text, i, i))
+    w = w + (MINI_W[string.sub(text, i, i)] or MINI_W_OTHER)
   end
-  return w
+  return math.ceil(w + MINI_W_EXTRA * #text)
 end
 
 local function labelFits(text)

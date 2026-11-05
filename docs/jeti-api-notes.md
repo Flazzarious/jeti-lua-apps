@@ -90,6 +90,16 @@ the emulator's numbers above:
 - Font heights on the transmitter: `FONT_NORMAL` 17, `FONT_BIG` 20–21,
   `FONT_MINI` 12, `FONT_MAXI` 38–39 (the two probes read 20/38 in the
   small/large windows and 21/39 full screen).
+- **`FONT_MINI` character widths** (transmitter, PROBE MODE 6, `Screen034.png`,
+  2026-11-04), from `lcd.getTextWidth(FONT_MINI, c)`: A 6, B 5, C 6, D 6,
+  E 4, F 4, G 6, H 6, I 2, J 4, K 5, L 4, M 7, N 6, O 6, P 5, Q 6, R 5, S 5,
+  T 5, U 5, V 5, W 7, X 5, Y 5, Z 5; digits 0–9 all 4; "-" 2, space 2,
+  "%" 6. **Single characters read rounded down**: whole strings measure
+  about 0.6 px per character more than their characters' sum ("FLIGHT-2"
+  38 vs 33, "BRAKES-2" 40, "TELEM" 27, "100%" 21, "8.1V 0.4A" 38;
+  `FONT_NORMAL` and `FONT_BOLD` "100%" both 32). Measure whole strings with
+  `getTextWidth` where `lcd` is available; elsewhere add 0.6 px per
+  character (Battery Capacity's label fit check).
 - Lua coordinates are enlarged about 1.45× on the 480 × 480 panel (the
   316 × 159 window covers 454 × 228 screen pixels). Lines are drawn at Lua
   resolution and then enlarged, so curves built from 5° segments look
