@@ -486,23 +486,23 @@ local function curvePct(chem, vCell, cut)
   return 0
 end
 
--- Raw % from the capacity source's last reading; nil when it can't be
--- computed (no rated capacity for an mAh source).
-local function rawPct(k, value)
-  local b, d = bat[k], dv[k]
+-- Raw % from the capacity source's last reading in capacity mode `mode`;
+-- nil when it can't be computed (no rated capacity for an mAh source).
+local function rawPct(k, value, mode)
+  local b = bat[k]
   local mAh = b.p[P.MAH]
-  if d.mode == M.MAH or d.mode == M.AH then
+  if mode == M.MAH or mode == M.AH then
     if mAh <= 0 then
       return nil
     end
     local used = value
-    if d.mode == M.AH then
+    if mode == M.AH then
       used = value * 1000
     end
     return (mAh - used) * 100 / mAh
-  elseif d.mode == M.PCT then
+  elseif mode == M.PCT then
     return value
-  elseif d.mode == M.VOLT then
+  elseif mode == M.VOLT then
     return curvePct(b.p[P.CHEM], value * 100 / b.p[P.CELLS], b.p[P.VCUT])
   end
   return nil
@@ -616,6 +616,16 @@ local function simRead(now)
     cap = volts
   end
   return cap, volts, amps
+end
+
+-- Capacity mode in use. A SIM profile also drives battery 1 when it has no
+-- capacity sensor (e.g. on a transmitter without one), as a % source.
+local function modeOf(k)
+  local mode = dv[k].mode
+  if SIM and k == 1 and sim.idx > 1 and mode == M.NONE then
+    return M.PCT
+  end
+  return mode
 end
 
 ------------------------------------------------------------------------------
@@ -882,7 +892,8 @@ local function updateCapacity(k, now)
   end
   s.vSum, s.vN = 0, 0
 
-  if d.mode == M.NONE then
+  local mode = modeOf(k)
+  if mode == M.NONE then
     s.tel = TEL.NONE
     return
   end
@@ -895,7 +906,7 @@ local function updateCapacity(k, now)
   if not s.capOk then
     return                    -- short gap or still lost: hold the last value
   end
-  local raw = rawPct(k, s.capVal)
+  local raw = rawPct(k, s.capVal, mode)
   if raw == nil then
     return
   end
@@ -915,7 +926,7 @@ local function updateCapacity(k, now)
     end
   end
   -- Voltage source: smoothed (10 s time constant), held under load (R3).
-  if d.mode == M.VOLT then
+  if mode == M.VOLT then
     local loaded = s.iNow ~= nil and s.iNow > math.max(1, b.p[P.MAH] / 10000)
     if s.vEst == nil then
       s.vEst = raw
