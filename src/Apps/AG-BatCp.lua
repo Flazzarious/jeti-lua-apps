@@ -543,7 +543,7 @@ local sim = {
   jitter = { false, false, false, true, false, false, false, false, false, false, false, false },
   prof = {
     {},
-    { { 0, 100, 415, 5 }, { 300000, 0, 350, 5 } },
+    { { 0, 100, 415, 5 }, { 150000, 0, 350, 5 } },   -- 100 -> 0 % in 2.5 min
     { { 0, 90, 334, 0 }, { 120000, 50, 329, 0 }, { 240000, 10, 315, 0 } },
     -- through 60/50/40/30 in 4 minutes, % jittering around each level
     { { 0, 70, 390, 0 }, { 240000, 20, 373, 0 } },
