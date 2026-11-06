@@ -88,6 +88,11 @@ the emulator's numbers above:
   `FONT_BOLD` 22, `FONT_MINI` 12, `FONT_MAXI` 40. Its screen is 320 × 240,
   dark blue theme. A layout for 150 × 23 / 150 × 68 fits both models.
   Full-screen size on the first version: not measured yet.
+- **Battery Capacity on the first-version DS-24** (2026-11-05,
+  `D:\Screen004-014.png`): rounded rectangles, filled rectangles, alpha
+  (the faint "no data" grey), `setClipping` text and `getBgColor` all work
+  as on the II; Amy WAVs queued with `AUDIO_QUEUE` play. Its CPU figure
+  stayed at **9 %** while drawing both windows and running a SIM profile.
 - "Full screen" is not the whole panel on the transmitter: sizes 3 and 4
   both get a titled 316 × 159 area across the top two thirds. With size 3
   the desktop's model tile still covers its lower-left corner; size 4 has
