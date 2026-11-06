@@ -68,6 +68,8 @@ current sensor; **C** only for Custom.
 
 - The sensor lists come from one `system.getSensors()` pass when the
   subform opens, filtered by unit (research R1). Never called from `loop()`.
+  The capacity and voltage lists also start with the three receiver
+  voltages, read from `getTxTelemetry()` (research R1).
 - Only form callbacks and `initForm` build components; `loop()` touches
   the form only through `form.setProperties` on the live-value label and
   setup notes, and only while `formOpen` (Speed Gauge R17).

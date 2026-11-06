@@ -417,7 +417,9 @@ batteries) is not committed; the sketches replace it.
 - **FR-004**: The app MUST interpret the capacity source by its unit: mAh
   consumed ((rated − consumed) / rated), % remaining (as is), or voltage
   (per-chemistry resting curve, scaled by cell count). Other units MUST be
-  refused with an explanation.
+  refused with an explanation. The receivers' own voltages (receiver 1, 2
+  and backup) MUST be offered as voltage sources too, although the
+  transmitter doesn't list them as sensors (research R1).
 - **FR-005**: All settings MUST be saved per model and survive a transmitter
   restart without leaking to other models.
 

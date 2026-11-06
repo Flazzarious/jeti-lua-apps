@@ -34,8 +34,16 @@ bench test can settle; each has a quickstart check and a fallback.
     remember it.
   - JETI Central Box 200/400: per-battery `V` and `A`, and `mAh` consumed
     per battery.
-  - Receiver `U Rx` / `Rx voltage`: `V` only (the transmitter's own receiver
-    telemetry, always present).
+  - Receiver `U Rx` / `Rx voltage`: **not a sensor on the transmitter**.
+    Auto-detect in Sensors/Logging Setup lists nothing for a bare receiver,
+    and `getSensors()` has no entry for it (DS-24, 2026-11-05; the emulator's
+    `sensors.json` fakes it as a sensor). The app adds three fixed entries,
+    "Receiver 1 voltage", "Receiver 2 voltage" and "Backup Rx voltage", at
+    the top of the capacity and voltage lists. They are saved as sensor id
+    −1 with param 1–3 and read from `system.getTxTelemetry()`
+    (`rx1Voltage`, `rx2Voltage`, `rxBVoltage`), at most once per 200 ms
+    tick; 0 V counts as no telemetry. The receiver's Q (%) isn't a sensor
+    either, so it can't be picked as a capacity % by mistake.
   - ESC telemetry (YGE, Castle via adaptor, Hobbywing via VSpeak): `V`, `A`,
     `mAh`; some also expose `%` (fuel-gauge style).
   - Powerbox Mercury/Royal/Competition (via the EX bus adaptor): battery

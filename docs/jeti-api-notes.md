@@ -256,6 +256,12 @@ The app file returns a table: `init`, `loop`, `destroy` (5.00+), `author`,
 
 - `system.getSensors()` returns every sensor entry; `param == 0` is the sensor's
   name row. Useful in a setup form, too heavy for `loop()`.
+- The receivers' own values (U Rx, Q, A1/A2) are **not** sensors on the
+  transmitter: Auto-detect lists nothing for a bare receiver and
+  `getSensors()` has no entry. Read them with `system.getTxTelemetry()`
+  (`rx1Voltage`, `rx1Percent`, ...; 0 when no telemetry). The emulator's
+  `sensors.json` can fake them as sensors, so test this on the transmitter
+  (DS-24, 2026-11-05, Battery Capacity).
 - `system.getSensorByID(id, param)` returns a full entry;
   `system.getSensorValueByID(id, param)` returns a lighter one (no label/unit).
   Both return `nil` if the sensor doesn't exist. Always check `.valid`.

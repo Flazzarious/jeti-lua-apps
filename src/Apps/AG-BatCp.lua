@@ -148,6 +148,12 @@ local E = { VOLT = 1, BAND = 2, LVL = 4, LVTHR = 8, MA = 0x8000 }
 local M = { NONE = 0, MAH = 1, AH = 2, PCT = 3, VOLT = 4 }
 local CAP_UNITS = { mAh = M.MAH, Ah = M.AH, ["%"] = M.PCT, V = M.VOLT }
 
+-- Receiver voltages aren't in getSensors() on the transmitter; they come
+-- from getTxTelemetry(). Saved as sensor id RXV, param 1-3 (R1).
+local RXV = -1
+local RXV_LABEL = { "Receiver 1 voltage", "Receiver 2 voltage", "Backup Rx voltage" }
+local RXV_FIELD = { "rx1Voltage", "rx2Voltage", "rxBVoltage" }
+
 -- Clamp ranges on load; nil = not clamped (sensor ids).
 local P_RANGE = {
   [1] = { 1, 99 }, [2] = { 0, 9 }, [3] = { 1, 5 }, [4] = { 1, 14 }, [5] = { 0, 30000 },
@@ -825,7 +831,30 @@ end
 
 -- Fast tick: read each assigned sensor once (always through system, R3 of
 -- Speed Gauge: the emulator's telemetry app replaces these functions).
+local txTel = nil            -- getTxTelemetry() for this tick, read on first use
+
+-- One reading, or nil when invalid. A receiver voltage of 0 means no
+-- telemetry from that receiver.
+local function readValue(id, par)
+  if id == RXV then
+    if txTel == nil then
+      txTel = system.getTxTelemetry()
+    end
+    local v = txTel[RXV_FIELD[par]]
+    if v ~= nil and v > 0 then
+      return v
+    end
+    return nil
+  end
+  local v = system.getSensorValueByID(id, par)
+  if v ~= nil and v.valid then
+    return v.value
+  end
+  return nil
+end
+
 local function readSensors(now)
+  txTel = nil
   for k = 1, #bat do
     local b, d, s = bat[k], dv[k], ss[k]
     local p = b.p
@@ -841,23 +870,17 @@ local function readSensors(now)
       end
     else
       if p[P.CAPID] ~= 0 then
-        local v = system.getSensorValueByID(p[P.CAPID], p[P.CAPPAR])
-        if v ~= nil and v.valid then
-          cap = v.value
-        end
+        cap = readValue(p[P.CAPID], p[P.CAPPAR])
       end
       if d.voltSrc == 1 then
-        local v = system.getSensorValueByID(p[P.VID], p[P.VPAR])
-        if v ~= nil and v.valid then
-          volts = v.value
-        end
+        volts = readValue(p[P.VID], p[P.VPAR])
       elseif d.voltSrc == 2 then
         volts = cap
       end
       if d.hasI then
-        local v = system.getSensorValueByID(p[P.IID], p[P.IPAR])
-        if v ~= nil and v.valid then
-          amps = v.value * d.iScale
+        amps = readValue(p[P.IID], p[P.IPAR])
+        if amps ~= nil then
+          amps = amps * d.iScale
         end
       end
     end
@@ -1255,6 +1278,11 @@ end
 local function buildLists(k)
   local p, s = bat[k].p, bat[k].s
   lists = { cap = newList(), volt = newList(), cur = newList() }
+  for i = 1, 3 do
+    local e = { id = RXV, param = i, unit = "V" }
+    addEntry(lists.cap, RXV_LABEL[i], e)
+    addEntry(lists.volt, RXV_LABEL[i], e)
+  end
   local parent = ""
   for _, e in ipairs(system.getSensors()) do
     if e.param == 0 then
@@ -1632,7 +1660,7 @@ local function initBattery(k)
   idx.capHint = hint("", false)
   updateCapHint(k)
   hint("Lists sensors in mAh, Ah, % or V. No sensors? Turn the receiver on.",
-    #lists.cap.labels == 1)
+    #lists.cap.labels == 1 + #RXV_LABEL)
 
   form.addRow(2)
   form.addLabel({ label = "Voltage sensor", width = 130 })
