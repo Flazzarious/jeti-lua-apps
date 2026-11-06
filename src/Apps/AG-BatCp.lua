@@ -35,7 +35,7 @@ local TITLE_H = 26
 
 local TXT = {
   noTel = "NO TELEM", no = "NO", telem = "TELEM", dash = "--",
-  noBat = "Add a battery in settings", needs = "Battery Capacity needs DS-24 II",
+  noBat = "Add a battery in settings", needs = "Gauges need a DS/DC-24",
 }
 
 ------------------------------------------------------------------------------
@@ -2158,7 +2158,10 @@ local function init()
   dv = {}
   recomputeAll()
   resetSessions()
-  app.gaugeOk = string.find(system.getDeviceType() or "", "24 II", 1, true) ~= nil
+  -- Gauges on the DS/DC-24 family, II and first version: both report
+  -- about 150 x 23 / 150 x 68 windows (API notes, 2026-11-05). Callouts work
+  -- on any transmitter.
+  app.gaugeOk = string.find(system.getDeviceType() or "", "24", 1, true) ~= nil
   checkVoice()              -- once: 19 file opens (R9)
   local now = system.getTimeCounter()
   app.fastT, app.slowT = now, now

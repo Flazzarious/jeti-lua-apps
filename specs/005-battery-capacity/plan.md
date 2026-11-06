@@ -50,7 +50,7 @@ Approach:
 
 **Testing**: `python tools/check.py`; LuaLS diagnostics; generator self-check; emulator scenarios with Emulated Telemetry and `SIM` profiles; transmitter checks for sound, layout, themes and sensor units; bench check of the voltage curves ([quickstart.md](quickstart.md))
 
-**Target Platform**: JETI DS-24 II / DC-24 II, firmware 6.03+ (emulator 6.04). Transmitter windows 150 × 23 (small) and 150 × 68 (double); emulator 157 × 60 / 157 × 127 with the title inside. Callouts work on any DC/DS transmitter; the gauges need a DS-24 II
+**Target Platform**: JETI DS/DC-24 family, II (firmware 6.03+) and first version (added 2026-11-05). Transmitter windows 150 × 23 / 150 × 68 on the II, 151 × 24 / 151 × 69 on the first version; emulator 157 × 60 / 157 × 127 with the title inside. Callouts work on any DC/DS transmitter; the gauges need a DS/DC-24
 
 **Project Type**: Embedded transmitter app (Lua script, asset folder, one lib module) and a developer-side voice generator
 

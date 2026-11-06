@@ -115,12 +115,18 @@ src/Apps/lib/ag_xxxxx.lua  shared module, loaded with require("ag_xxxxx")
 
 ## Environment
 
-- **Target:** DS-24 II / DC-24 II only for anything drawn on screen. Design
-  for the Lua window sizes measured **on the transmitter**, not the panel's
-  480 × 480 or the emulator's: small 150 × 23, large 150 × 68, full screen
-  316 × 159, all visible, with the title drawn above the window. The JETI
-  Studio emulator (firmware 6.04) reports 157 × 60 / 157 × 127 / 320 × 260
-  with a title bar inside. Details, scaling and drawing limits are in
+- **Target:** the DS/DC-24 family, **both the II and the first version**
+  (Aaron's goal from 2026-11-05: support both unless a problem shows up).
+  Design for the Lua window sizes measured **on the transmitters**, not the
+  II panel's 480 × 480 or the emulator's: small 150 × 23, large 150 × 68,
+  full screen 316 × 159 on the II; small 151 × 24, large 151 × 69 on the
+  first version; all visible, with the title drawn above the window. A
+  layout for 150 × 23 / 150 × 68 fits both. Check new drawing on both (the
+  first version runs older firmware). The JETI Studio emulator (firmware
+  6.04) reports 157 × 60 / 157 × 127 / 320 × 260 with a title bar inside.
+  Speed Gauge, Flameout Alarm and Throttle Setup Wizard still check for
+  "24 II" and show only text on the first version; widening them is a
+  separate change per app. Details, scaling and drawing limits are in
   `docs/jeti-api-notes.md`; measure more with `tools/probe/PROBE.lua`. The
   emulator plays no Lua audio, so voice can only be tested on the
   transmitter.

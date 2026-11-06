@@ -17,7 +17,8 @@ where they differ, this contract and the FRs win). Decisions: research R10.
 
 ```text
 if w == 157 then h = h - 26 end   -- emulator draws its title inside (Speed Gauge)
-if not gaugeOk -> text notice "Battery Capacity needs DS-24 II" (theme colour, FONT_MINI)
+if not gaugeOk -> text notice "Gauges need a DS/DC-24" (neutral colour, FONT_MINI)
+   gaugeOk = device type contains "24": DS/DC-24 II and first version (151 x 24 / 151 x 69)
 elseif no batteries configured -> "Add a battery in settings" (FONT_MINI)
 else -> layout below
 ```

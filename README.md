@@ -1,6 +1,7 @@
 # Jeti Lua Apps
 
-A collection of Lua apps for the JETI DS-24 II transmitter, built with a
+A collection of Lua apps for the JETI DS-24 transmitters (II and first
+version; see each app for what it draws on which), built with a
 spec-driven workflow (GitHub Spec Kit + Claude Code) in VS Code.
 
 ## Apps
@@ -283,8 +284,9 @@ the voice files), each battery can play its own name file before the number.
 The voice files in `src/Apps/AG-BatCp/voice/` are generated with
 [`tools/voice/make_batcap.py`](tools/voice/README.md) (numbers shared with
 Speed Gauge's set) and licensed CC BY-SA 4.0, not MIT. Install =
-`AG-BatCp.lua`, the `AG-BatCp/` folder and `lib/ag_peak.lua`. Needs a
-DS-24 II for the gauges; the callouts work on any DC/DS transmitter. Details
+`AG-BatCp.lua`, the `AG-BatCp/` folder and `lib/ag_peak.lua`. The gauges
+work on the DS/DC-24 II and the first-version DS/DC-24; the callouts work on
+any DC/DS transmitter. Details
 in [spec 005](specs/005-battery-capacity/spec.md).
 
 ## Install with JETI Studio

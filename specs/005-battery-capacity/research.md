@@ -359,9 +359,12 @@ bench test can settle; each has a quickstart check and a fallback.
 - **Layout numbers** (Lua px, transmitter) are in
   [contracts/telemetry-window.md](contracts/telemetry-window.md); all are
   constants, tuned on the transmitter with screenshots.
-- **Unsupported transmitters:** like Speed Gauge (R12), `gaugeOk` from
-  `system.getDeviceType()` containing "24 II". Elsewhere the window shows
-  "Battery Capacity needs DS-24 II"; callouts still work.
+- **Supported transmitters:** `gaugeOk` from `system.getDeviceType()`
+  containing "24": the DS/DC-24 II and the first version. Changed
+  2026-11-05 from Speed Gauge's "24 II" (R12) after the first-version DS-24
+  measured 151 × 24 / 151 × 69, the same layout space. Elsewhere the window
+  shows "Gauges need a DS/DC-24" (the old "Battery Capacity needs DS-24 II"
+  was cut off at "needs DS-24" on the first version); callouts still work.
 - **Alternatives considered:** PNG battery shells (would need four images
   per size and orientation, and couldn't follow the theme colour);
   `lcd.renderer` polygons (unnecessary for rectangles).

@@ -660,7 +660,8 @@ batteries) is not committed; the sketches replace it.
   threshold with the documented defaults in 100% of combinations; only the
   lowest callout is on.
 - **SC-003**: Displayed % remaining matches the value computed from the
-  sensor (mAh or %) within ±1%, in the emulator and on the DS-24 II.
+  sensor (mAh or %) within ±1%, in the emulator and on the DS-24 II and the
+  first-version DS-24.
 - **SC-004**: For voltage-only packs, the estimate stays within ±10% of true
   state of charge at rest across the chemistry's range (bench-checked).
 - **SC-005**: The double window shows 1–4 upright, left-justified batteries
@@ -702,8 +703,11 @@ batteries) is not committed; the sketches replace it.
 
 ## Assumptions
 
-- **Window sizes** (measured on the transmitter, `docs/jeti-api-notes.md`):
-  small 150 × 23, double 150 × 68. Four upright batteries in 150 px leave
+- **Window sizes** (measured on the transmitters, `docs/jeti-api-notes.md`):
+  small 150 × 23, double 150 × 68 on the DS-24 II; 151 × 24 and 151 × 69 on
+  the first-version DS-24, so one layout serves both. Since 2026-11-05 both
+  are targets (Aaron): the gauges draw on the whole DS/DC-24 family, and
+  callouts work on any transmitter. Four upright batteries in 150 px leave
   each about 30 px wide with a label above and current below, so the inner
   fill height is roughly 35–40 px: 1% steps then share pixels (about 3% per
   pixel), while the % number stays exact. The sideways battery in the small

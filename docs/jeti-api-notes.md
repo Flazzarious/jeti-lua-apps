@@ -81,6 +81,13 @@ the emulator's numbers above:
 
 - The window title is drawn **above** the reported area, not inside it, so
   nothing is hidden: don't subtract a title height on the transmitter.
+- **The first-version DS-24 reports almost the same sizes** (PROBE MODE 1,
+  `D:\Screen001-003.png`, 2026-11-05, Aaron's DS-24 with 2017 firmware
+  files): small **151 × 24**, large **151 × 69**, title drawn above, the
+  whole canvas visible (ruler to 60+). Font heights there: `FONT_NORMAL` 18,
+  `FONT_BOLD` 22, `FONT_MINI` 12, `FONT_MAXI` 40. Its screen is 320 × 240,
+  dark blue theme. A layout for 150 × 23 / 150 × 68 fits both models.
+  Full-screen size on the first version: not measured yet.
 - "Full screen" is not the whole panel on the transmitter: sizes 3 and 4
   both get a titled 316 × 159 area across the top two thirds. With size 3
   the desktop's model tile still covers its lower-left corner; size 4 has
