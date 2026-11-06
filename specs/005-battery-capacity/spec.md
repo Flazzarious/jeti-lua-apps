@@ -419,7 +419,9 @@ batteries) is not committed; the sketches replace it.
   (per-chemistry resting curve, scaled by cell count). Other units MUST be
   refused with an explanation. The receivers' own voltages (receiver 1, 2
   and backup) MUST be offered as voltage sources too, although the
-  transmitter doesn't list them as sensors (research R1).
+  transmitter doesn't list them as sensors (research R1). With no capacity
+  source but a voltage sensor set, the voltage sensor MUST be used as the
+  capacity source (transmitter review 2026-11-05).
 - **FR-005**: All settings MUST be saved per model and survive a transmitter
   restart without leaking to other models.
 

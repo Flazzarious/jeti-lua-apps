@@ -392,7 +392,11 @@ local function recompute(k)
   d.label = makeLabel(b)
   d.cat = catOf(p[P.CAT])
   d.mode = p[P.CAPMODE]
-  if p[P.CAPID] == 0 then
+  -- No capacity sensor: the voltage sensor gives the % (FR-004).
+  d.capFromV = p[P.CAPID] == 0 and p[P.VID] ~= 0
+  if d.capFromV then
+    d.mode = M.VOLT
+  elseif p[P.CAPID] == 0 then
     d.mode = M.NONE
   end
   -- Which reading is the battery's voltage: its own sensor, else the
@@ -874,6 +878,9 @@ local function readSensors(now)
       end
       if d.voltSrc == 1 then
         volts = readValue(p[P.VID], p[P.VPAR])
+        if d.capFromV then
+          cap = volts
+        end
       elseif d.voltSrc == 2 then
         volts = cap
       end
@@ -1539,6 +1546,9 @@ local function capHintText(k)
   if (d.mode == M.MAH or d.mode == M.AH) and bat[k].p[P.MAH] <= 0 then
     return "Set the pack's capacity (mAh)."
   end
+  if d.capFromV then
+    return "No capacity sensor: % comes from the voltage sensor."
+  end
   return ""
 end
 
@@ -1668,6 +1678,9 @@ local function initBattery(k)
     onSensor(k, lists.volt, i, P.VID, P.VPAR, S.VLBL)
     recompute(k)
     saveBattery(k)
+    if p[P.CAPID] == 0 then
+      ss[k].tel = TEL.NONE      -- the % source changed too
+    end
     refresh()
   end, { width = 180 })
 
