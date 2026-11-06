@@ -42,7 +42,10 @@ bench test can settle; each has a quickstart check and a fallback.
     the top of the capacity and voltage lists. They are saved as sensor id
     −1 with param 1–3 and read from `system.getTxTelemetry()`
     (`rx1Voltage`, `rx2Voltage`, `rxBVoltage`), at most once per 200 ms
-    tick; 0 V counts as no telemetry. The receiver's Q (%) isn't a sensor
+    tick. A reading counts only while that receiver's Q (`rx1Percent`,
+    `rx2Percent`, `rxBPercent`) is above 0: after a link loss the voltage
+    keeps its last value but Q drops to 0 (DS-24 II, PROBE MODE 7,
+    2026-11-05). The receiver's Q (%) isn't a sensor
     either, so it can't be picked as a capacity % by mistake.
   - ESC telemetry (YGE, Castle via adaptor, Hobbywing via VSpeak): `V`, `A`,
     `mAh`; some also expose `%` (fuel-gauge style).

@@ -22,6 +22,10 @@
 --             a few label widths for Battery Capacity (spec 005, research
 --             R6), on screen (take a screenshot) and once to the console;
 --             "Probe large" (size 2) for comparison.
+--   MODE = 7: "Probe Rx" (size 2) shows system.getTxTelemetry()'s receiver
+--             fields every 200 ms and prints them whenever they change, to
+--             see what they do when the receiver is switched off (Battery
+--             Capacity, research R1); "Probe small" (size 1) for comparison.
 -- A ruler down the right edge (tick every 10 px, number every 20 px) shows
 -- how much of the reported height is actually visible: the DS-24 II desktop
 -- draws a title bar inside each window and clips the bottom of the canvas.
@@ -125,6 +129,29 @@ local function printWidths(w, h)
   end
 end
 
+-- MODE 7: receiver telemetry, read in loop(), drawn as two lines.
+local rxLines = { "waiting", "" }
+local nextRxAt = 0
+local RX_MS = 200
+
+local function readRx(now)
+  local t = system.getTxTelemetry()
+  local r = t.RSSI or {}
+  local a = string.format("U1 %.2f Q1 %s  U2 %.2f UB %.2f",
+    t.rx1Voltage or -1, tostring(t.rx1Percent), t.rx2Voltage or -1, t.rxBVoltage or -1)
+  local b = string.format("RSSI %s %s  Tx %.2fV", tostring(r[1]), tostring(r[2]), t.txVoltage or -1)
+  if a ~= rxLines[1] or b ~= rxLines[2] then
+    print("PROBE rx " .. now .. " ms: " .. a .. " | " .. b)
+  end
+  rxLines[1], rxLines[2] = a, b
+end
+
+local function printRx(w, h)
+  report("rx", w, h)
+  lcd.drawText(2, 0, rxLines[1], FONT_MINI)
+  lcd.drawText(2, 14, rxLines[2], FONT_MINI)
+end
+
 local lastPlayback = "unset"
 local nextMemAt = nil
 local MEM_MS = 5000
@@ -136,6 +163,10 @@ local function loop()
     print("PROBE isPlayback: " .. p .. " at " .. system.getTimeCounter() .. " ms")
   end
   local now = system.getTimeCounter()
+  if MODE == 7 and now - nextRxAt >= 0 then
+    nextRxAt = now + RX_MS
+    readRx(now)
+  end
   if nextMemAt == nil or now - nextMemAt >= 0 then
     nextMemAt = now + MEM_MS
     print(string.format("PROBE memory: %.1f KB", collectgarbage("count")))
@@ -168,6 +199,9 @@ local function init()
   elseif MODE == 6 then
     system.registerTelemetry(1, "Probe widths", 4, printWidths)
     system.registerTelemetry(2, "Probe large", 2, printLarge)
+  elseif MODE == 7 then
+    system.registerTelemetry(1, "Probe small", 1, printSmall)
+    system.registerTelemetry(2, "Probe Rx", 2, printRx)
   else
     system.registerTelemetry(1, "Probe full+bar", 3, printFullBar)
     system.registerTelemetry(2, "Probe full", 4, printFull)

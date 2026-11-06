@@ -149,10 +149,12 @@ local M = { NONE = 0, MAH = 1, AH = 2, PCT = 3, VOLT = 4 }
 local CAP_UNITS = { mAh = M.MAH, Ah = M.AH, ["%"] = M.PCT, V = M.VOLT }
 
 -- Receiver voltages aren't in getSensors() on the transmitter; they come
--- from getTxTelemetry(). Saved as sensor id RXV, param 1-3 (R1).
+-- from getTxTelemetry(). Saved as sensor id RXV, param 1-3 (R1). The
+-- voltage keeps its last value after a link loss; Q drops to 0.
 local RXV = -1
 local RXV_LABEL = { "Receiver 1 voltage", "Receiver 2 voltage", "Backup Rx voltage" }
 local RXV_FIELD = { "rx1Voltage", "rx2Voltage", "rxBVoltage" }
+local RXV_Q = { "rx1Percent", "rx2Percent", "rxBPercent" }
 
 -- Clamp ranges on load; nil = not clamped (sensor ids).
 local P_RANGE = {
@@ -837,15 +839,15 @@ end
 -- Speed Gauge: the emulator's telemetry app replaces these functions).
 local txTel = nil            -- getTxTelemetry() for this tick, read on first use
 
--- One reading, or nil when invalid. A receiver voltage of 0 means no
--- telemetry from that receiver.
+-- One reading, or nil when invalid. A receiver's voltage is valid only
+-- while its signal quality is above 0 (transmitter, 2026-11-05).
 local function readValue(id, par)
   if id == RXV then
     if txTel == nil then
       txTel = system.getTxTelemetry()
     end
-    local v = txTel[RXV_FIELD[par]]
-    if v ~= nil and v > 0 then
+    local v, q = txTel[RXV_FIELD[par]], txTel[RXV_Q[par]]
+    if v ~= nil and v > 0 and q ~= nil and q > 0 then
       return v
     end
     return nil

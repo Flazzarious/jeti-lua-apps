@@ -259,7 +259,9 @@ The app file returns a table: `init`, `loop`, `destroy` (5.00+), `author`,
 - The receivers' own values (U Rx, Q, A1/A2) are **not** sensors on the
   transmitter: Auto-detect lists nothing for a bare receiver and
   `getSensors()` has no entry. Read them with `system.getTxTelemetry()`
-  (`rx1Voltage`, `rx1Percent`, ...; 0 when no telemetry). The emulator's
+  (`rx1Voltage`, `rx1Percent`, `RSSI`, ...). After a link loss the voltages
+  keep their last value, while `rx1Percent` (Q) and `RSSI` drop to 0, so
+  check Q before trusting a voltage (DS-24 II, PROBE MODE 7). The emulator's
   `sensors.json` can fake them as sensors, so test this on the transmitter
   (DS-24, 2026-11-05, Battery Capacity).
 - `system.getSensorByID(id, param)` returns a full entry;
