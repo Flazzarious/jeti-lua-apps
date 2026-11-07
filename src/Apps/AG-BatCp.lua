@@ -394,12 +394,15 @@ local function recompute(k)
   d.label = makeLabel(b)
   d.cat = catOf(p[P.CAT])
   d.mode = p[P.CAPMODE]
-  -- No capacity sensor: the voltage sensor gives the % (FR-004).
-  d.capFromV = p[P.CAPID] == 0 and p[P.VID] ~= 0
+  if p[P.CAPID] == 0 then
+    d.mode = M.NONE
+  end
+  -- No capacity sensor, or an mAh source without the pack's capacity: the
+  -- voltage sensor gives the % (FR-004).
+  d.noMah = (d.mode == M.MAH or d.mode == M.AH) and p[P.MAH] <= 0
+  d.capFromV = p[P.VID] ~= 0 and (d.mode == M.NONE or d.noMah)
   if d.capFromV then
     d.mode = M.VOLT
-  elseif p[P.CAPID] == 0 then
-    d.mode = M.NONE
   end
   -- Which reading is the battery's voltage: its own sensor, else the
   -- capacity source when that is a voltage (data-model "voltOf").
@@ -444,6 +447,7 @@ local ss = {}               -- ss[k]: session state of battery k (data-model.md)
 local app = {
   fastT = 0, slowT = 0, playing = false, cpuWorst = 0,
   voiceOk = false, useAppVoice = false, gaugeOk = false,
+  hintBlank = false,          -- flash phase of the missing-capacity hint
 }
 
 local function newSession()
@@ -875,7 +879,7 @@ local function readSensors(now)
         amps = nil
       end
     else
-      if p[P.CAPID] ~= 0 then
+      if p[P.CAPID] ~= 0 and not d.capFromV then
         cap = readValue(p[P.CAPID], p[P.CAPPAR])
       end
       if d.voltSrc == 1 then
@@ -1542,22 +1546,31 @@ local function initMain()
   hint(APP_NAME .. " " .. APP_VERSION)
 end
 
--- Capacity hint (FR-004): an mAh source needs the rated capacity.
+-- Capacity hint (FR-004): an mAh source needs the rated capacity. While
+-- it's missing, updateFormLive flashes the hint.
+local HINT_NOMAH_V = "Capacity (mAh) not set: % from voltage for now."
+local HINT_NOMAH = "Set the pack's capacity (mAh)."
+local HINT_FROMV = "No capacity sensor: % comes from the voltage sensor."
+
 local function capHintText(k)
   local d = dv[k]
-  if (d.mode == M.MAH or d.mode == M.AH) and bat[k].p[P.MAH] <= 0 then
-    return "Set the pack's capacity (mAh)."
+  if d.noMah then
+    return d.capFromV and HINT_NOMAH_V or HINT_NOMAH
   end
   if d.capFromV then
-    return "No capacity sensor: % comes from the voltage sensor."
+    return HINT_FROMV
   end
   return ""
 end
 
-local function updateCapHint(k)
+local function updateCapHint(k, blank)
   if idx.capHint then
     local text = capHintText(k)
-    form.setProperties(idx.capHint, { label = text, visible = text ~= "" })
+    local shown = text
+    if blank then
+      shown = " "
+    end
+    form.setProperties(idx.capHint, { label = shown, visible = text ~= "" })
   end
 end
 
@@ -1650,9 +1663,13 @@ local function initBattery(k)
 
   -- 6 Capacity (mAh)
   addIntRow("Capacity (mAh)", p[P.MAH], 0, 30000, 0, 0, 50, function(value)
+    local was = dv[k].mode
     p[P.MAH] = value
     recompute(k)
     saveBattery(k)
+    if dv[k].mode ~= was then
+      ss[k].tel = TEL.NONE      -- switched between the mAh and voltage sources
+    end
     updateCapHint(k)
   end)
 
@@ -2012,6 +2029,10 @@ local function updateFormLive(k)
       end
     end
     form.setProperties(idx.cells, { label = warn, visible = warn ~= "" })
+  end
+  if d.noMah then
+    app.hintBlank = not app.hintBlank
+    updateCapHint(k, app.hintBlank)
   end
 end
 

@@ -421,7 +421,10 @@ batteries) is not committed; the sketches replace it.
   and backup) MUST be offered as voltage sources too, although the
   transmitter doesn't list them as sensors (research R1). With no capacity
   source but a voltage sensor set, the voltage sensor MUST be used as the
-  capacity source (transmitter review 2026-11-05).
+  capacity source (transmitter review 2026-11-05). The same applies to an
+  mAh or Ah source while the pack's capacity is 0; the battery screen MUST
+  then flash a "Capacity (mAh) not set" reminder until it is entered (field
+  test 2026-11-07: a CB 210 setup without capacities showed only "--").
 - **FR-005**: All settings MUST be saved per model and survive a transmitter
   restart without leaking to other models.
 
