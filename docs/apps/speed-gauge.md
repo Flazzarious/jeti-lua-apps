@@ -52,8 +52,10 @@ transmitter is slow. Let JETI Studio finish before disconnecting.
 1. Add **Speed Gauge** in *Applications → User Applications*.
 2. Open its settings (*Applications → Speed Gauge*):
    - choose your **speed sensor** and the **units**;
-   - assign a **callouts on/off switch** (and, if you like, a continuous
-     callouts switch);
+   - assign a **callouts on/off switch** for normal callouts, and if you
+     like a **continuous callouts switch** (spring-loaded is handy): while
+     it's held you hear just the number every few seconds. Warnings sound
+     when either switch is on;
    - set your model's **landing**, **stall** and **overspeed** speeds;
    - set **Gauge max limit** to your sensor's top speed to use its whole
      range (MSpeed: 350 km/h / 215 mph; MSpeed 450 EX: 450 km/h / 280 mph).
