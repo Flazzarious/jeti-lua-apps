@@ -1702,6 +1702,7 @@ local function initBattery(k)
     end
     refresh()
   end, { width = 180 })
+  hint("Also gives the % when there's no capacity sensor or mAh.")
 
   form.addRow(2)
   form.addLabel({ label = "Current sensor", width = 130 })
@@ -1718,6 +1719,7 @@ local function initBattery(k)
     saveBattery(k)
     refresh()
   end, { width = 180 })
+  hint("When set, the 4-battery window shows current, not voltage.")
 
   -- 10 Live value, updated from loop() while the form is open
   form.addRow(2)

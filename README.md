@@ -277,8 +277,27 @@ middle of LiFe and NiMH packs.
 
 **Setup** (Applications → Battery Capacity): Add battery, pick the category,
 chemistry, cell count, capacity (mAh) and the capacity sensor; the
-thresholds fill in. "Show all settings" on a battery shows the colour bands,
-voltages, delays and repeat limits. With the transmitter's voice (or without
+thresholds fill in.
+
+**Sensor behaviour worth knowing:**
+
+- **Receiver voltages.** The transmitter doesn't list a receiver's own
+  voltage as a sensor, so the capacity and voltage lists start with
+  "Receiver 1 voltage", "Receiver 2 voltage" and "Backup Rx voltage" (read
+  from the transmitter's receiver telemetry). They count as lost as soon as
+  that receiver's signal quality drops to 0, because the transmitter keeps
+  showing the last voltage after a link loss.
+- **The voltage sensor fills in for the %.** With no capacity sensor, or an
+  mAh sensor while the pack's capacity (mAh) is still 0, the % comes from
+  the voltage sensor. A missing capacity flashes a "Capacity (mAh) not set"
+  reminder on the battery's screen until you enter it.
+- **Current or voltage under each battery.** The four-battery window shows
+  the current when a current sensor is set, otherwise the pack voltage.
+  Leave the current sensor at (none) to see the voltage, e.g. for receiver
+  packs on a Central Box.
+
+"Show all settings" on a battery shows the colour bands, voltages, delays
+and repeat limits. With the transmitter's voice (or without
 the voice files), each battery can play its own name file before the number.
 
 The voice files in `src/Apps/AG-BatCp/voice/` are generated with
