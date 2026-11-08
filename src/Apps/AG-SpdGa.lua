@@ -831,14 +831,17 @@ local function initForm()
   form.addRow(2)
   form.addLabel({ label = "Callouts on/off switch", width = LABEL_W })
   form.addInputbox(cfg.swOn, true, function(v) save("swOn", v) end)
-  hint("Speaks speed: more often as it changes, every")
-  hint("shortest time below landing speed")
+  -- Hints rewritten for clarity (user, 2026-11-07): what each switch does,
+  -- then how they combine. Behavior unchanged.
+  hint("On: normal callouts, slower when speed is")
+  hint("steady, faster when it changes or landing")
   form.addRow(2)
   form.addLabel({ label = "Continuous callouts switch", width = LABEL_W })
   form.addInputbox(cfg.swCont, true, function(v) save("swCont", v) end)
-  hint("Number only, every shortest time, while above")
-  hint("'Callouts start above'; works without on/off")
-  hint("Either switch also turns on the warnings")
+  hint("On: just the number, every 'Shortest time',")
+  hint("while above 'Callouts start above'. Takes")
+  hint("over from on/off, and works without it")
+  hint("Warnings sound if either switch is on")
 
   -- Callouts
   heading("Callouts")

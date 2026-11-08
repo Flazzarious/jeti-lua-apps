@@ -12,8 +12,8 @@ px as in v2.1; hints are `FONT_MINI` rows.
 | 3 | Sensor type | selectbox | Airspeed (pitot) / GPS; with GPS a hint row reads "GPS: warnings use ground speed, wind shifts them" (spec Assumptions) |
 | 4 | Units | selectbox | mph, km/h, kt, m/s, ft/s; converts settings (R10) |
 | 5 | Sensor calibration (%) | intbox 1–200 | hint "100 = unchanged" |
-| 6 | Callouts on/off switch | inputbox | proportional allowed. Hints (2026-10-03): "Speaks speed: more often as it changes, every" / "shortest time below landing speed" |
-| 7 | Continuous callouts switch | inputbox | Hints: "Number only, every shortest time, while above" / "'Callouts start above'; works without on/off" / "Either switch also turns on the warnings" (FR-009a, 2026-10-03) |
+| 6 | Callouts on/off switch | inputbox | proportional allowed. Hints (rewritten 2026-11-07): "On: normal callouts, slower when speed is" / "steady, faster when it changes or landing" |
+| 7 | Continuous callouts switch | inputbox | Hints (rewritten 2026-11-07): "On: just the number, every 'Shortest time'," / "while above 'Callouts start above'. Takes" / "over from on/off, and works without it" / "Warnings sound if either switch is on" (FR-009a) |
 | | **Callouts** | | |
 | 8 | Callout sensitivity (*unit*) | intbox 1–100 | |
 | 9 | *hint* | label | "Speak sooner when speed changes by this much" |

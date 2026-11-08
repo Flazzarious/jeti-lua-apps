@@ -53,15 +53,41 @@ correction.
 - **Speed sensor**, **sensor type** (airspeed or GPS) and **units** (mph,
   km/h, knots, m/s or ft/s). Every speed setting follows the units, and
   changing them converts the values.
-- A **callouts on/off switch**, and optionally a **continuous callouts
-  switch**. Either switch also turns on the warnings; with both off the app
-  is silent, but the gauge and max speed keep working.
+- A **callouts on/off switch** for normal callouts, and optionally a
+  **continuous callouts switch** for quick number-only updates (see "The
+  two switches" below).
 - Your model's **landing**, **stall** and **overspeed** speeds, entered as
   the model's sea-level values. The settings flag an illogical order (stall
   must be below landing, landing below overspeed).
 - **Gauge max limit**: the top of the dial. Set it to your sensor's top
   speed to use its whole range (MSpeed: 350 km/h / 215 mph; MSpeed 450 EX:
   450 km/h / 280 mph). 0 = auto: overspeed + 15%.
+
+The two switches:
+
+- **Callouts on/off switch:** the normal callouts. While it's on, Speed
+  Gauge speaks your speed with its unit ("eighty five miles per hour"),
+  slowly when the speed is steady and more often when it changes or you
+  slow down to land (details below).
+- **Continuous callouts switch:** for moments when you want constant
+  updates, such as a speed pass. While it's on, you hear just the number
+  ("eighty five") every "Shortest time between callouts", as long as you're
+  above "Callouts start above". It takes over from the on/off switch and
+  works without it. Below that speed it does nothing.
+- **Warnings** (stall, overspeed, "airspeed alive") sound when either switch
+  is on. With both off the app is silent, but the gauge keeps working.
+
+| On/off switch | Continuous switch | What you hear |
+| --- | --- | --- |
+| off | off | Nothing; the gauge still works |
+| on | off | Normal callouts and warnings |
+| on or off | on, above "Callouts start above" | The number every shortest time, and warnings |
+| on | on, below "Callouts start above" | Normal callouts and warnings |
+| off | on, below "Callouts start above" | Warnings only |
+
+A typical setup: the on/off switch on a two-position switch for the whole
+flight, and the continuous switch on a spring-loaded switch held for a
+burst of updates.
 
 Callouts:
 
@@ -76,8 +102,6 @@ Callouts:
 - **Landing speed callouts** (on by default): once the model has been above
   landing speed, slowing below it gives short number-only callouts every
   shortest time.
-- The **continuous switch** gives number-only callouts every shortest time
-  while above "Callouts start above", with or without the on/off switch.
 - **Max speed** ("max 201 miles per hour") is called about 1 s after each
   new peak, if it beats the last announced max by at least the callout
   sensitivity. The max resets at every start-up and with **Reset max
