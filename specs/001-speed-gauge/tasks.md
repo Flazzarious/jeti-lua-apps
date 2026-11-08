@@ -296,6 +296,8 @@ remain open.
 - [X] T092 [US1] In `checkCallout` in `src/Apps/AG-SpdGa.lua`, leave the unit out of the max-speed callout when `numOnly == 1`: app voice "max" + number; transmitter voice `system.playNumber(n, 0)`. The startup announcement keeps its unit. `contracts/audio-events.md`, `data-model.md`, quickstart 13d2, README and `docs/apps/speed-gauge.md` updated
 - [X] T093 Bump `APP_VERSION` to 0.3.1 in `src/Apps/AG-SpdGa.lua` and the version on `docs/apps/speed-gauge.html`
 - [X] T095 Note the DFM Speed Announcer conflict (both apps announce; DFM speaks units regardless of "Speak number only") in the README, `docs/apps/speed-gauge.md`, `docs/apps/speed-gauge.html` and spec Edge Cases. The reporter confirmed callouts were correct once DFM was removed (2026-10-23)
+- [X] T096 [US5] Clearer descriptions of the two callout switches (user, 2026-11-07): settings hints in `src/Apps/AG-SpdGa.lua`, a "The two switches" table in the README, the description pages and the settings contract rows 6/7. Behavior unchanged (PRs #26, #27)
+- [X] T097 Bump `APP_VERSION` to 0.3.2 in `src/Apps/AG-SpdGa.lua` and the version on `docs/apps/speed-gauge.html`, to publish T096's wording
 - [ ] T094 MANUAL: on the transmitter, with "Speak number only" on, confirm routine callouts are the number only and the max callout is "max N" with no unit (quickstart 13d2; the emulator plays no Lua audio)
 
 ---
