@@ -125,9 +125,9 @@ thresholds, `kDens`) changes.
     chosen), the label is "SENSOR OUT" in the overspeed color and the value
     is the standard temperature being used.
 
-## Notice (not DS-24 II)
+## Notice (not a DC/DS-24)
 
-`FONT_MINI` text "Speed Gauge needs DS-24 II" in the theme's foreground
+`FONT_MINI` text "Speed Gauge needs a DC/DS-24" in the theme's foreground
 color, centered, no face. Nothing else is drawn (FR-013a).
 
 ## States (all layouts)

@@ -353,6 +353,13 @@ Everything else matches v2.1.
 - **Alternatives considered:** Detect by window size (the original DS-24
   reports the same window sizes, so the two can't be told apart); detect by
   `lcd.renderer` being present (also true on the original DS-24).
+- **Changed 2026-11-08 (original DS-24):** the original DS-24 reports
+  "JETI DS-24" (firmware 5.08) and windows within 1-3 px of the II's
+  (151 × 24, 151 × 69, 319 × 159; drawn 1:1, no enlargement). `gaugeOk` is
+  now true for any name containing "DS-24" or "DC-24", and the notice reads
+  "Speed Gauge needs a DC/DS-24". The layouts already size themselves from
+  `(w, h)`; `tools/dial/make_dial.py` adds dial and ring images for 319 × 159
+  and 151 × 69, since the images are matched to the exact window size.
 
 ## R13. Generating the voice set (FR-030, FR-034–FR-036)
 

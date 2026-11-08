@@ -47,16 +47,18 @@ RAW = "https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps"
 # Transmitter type IDs ("hw") in JETI's catalog: every "(DC/DS-24II)" app
 # there uses exactly 3866 and 3867 (the DS-24 II and DC-24 II).
 HW_DCDS24_II = [3866, 3867]
+# The original DC-24 and DS-24, as JETI's catalog lists them (678, 679).
+HW_DCDS24 = [678, 679]
 
 # One entry per published app. "tag" is its release tag; "paths" are the
 # repo paths (files or folders) that make up the app on the transmitter.
 APPS = [
     {
-        "name": "Speed Gauge (DC/DS-24II)",
+        "name": "Speed Gauge (DC/DS-24)",
         "script": "AG-SpdGa",
-        "tag": "AG-SpdGa-v0.3.1",
+        "tag": "AG-SpdGa-v0.4.0",
         "author": "Aaron George (based on DFM Speed Announcer by Dave McQueeney)",
-        "hw": HW_DCDS24_II,
+        "hw": HW_DCDS24 + HW_DCDS24_II,   # both models since 0.4.0 (spec FR-013a)
         "description": "docs/apps/speed-gauge.html",
         "previewIcon": "docs/apps/img/speed-gauge-icon.png",
         "paths": [

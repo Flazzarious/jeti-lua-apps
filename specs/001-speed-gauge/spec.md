@@ -112,6 +112,16 @@ principle I).
   startup announcement ("stall speed warning at 45 miles per hour") keeps
   its unit: it plays once and confirms the units setting (FR-008, FR-019a).
 
+### Session 2026-11-08 (original DS-24)
+
+- Q: Should the gauge also run on the original (first-version) DS-24? →
+  A: Yes. Aaron owns one and measured it: "JETI DS-24", firmware 5.08;
+  windows 151 × 24, 151 × 69 and 319 × 159, all visible with the title
+  above, drawn 1:1 on its 320 × 240 screen. That is within 1-3 px of the
+  II, so the same layouts fit both. FR-013a now covers the whole DC/DS-24
+  family. In JETI Studio it becomes one entry, "Speed Gauge (DC/DS-24)",
+  for both models.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Hear speed during flight (Priority: P1)
@@ -274,11 +284,12 @@ the gauge. The elements to carry over:
   short label with a value. They go beside or below the dial wherever room
   allows, like the reference's side panel.
 
-**Target screen: DS-24 II only.** The gauge is designed for the DS-24 II
+**Target screens: DC/DS-24.** The gauge was designed for the DS-24 II
 (and the DC-24 II, which shares its display): a 4" color screen that JETI
-lists as 480 × 480 px, running the JUi2 interface. Earlier transmitters (the
-original DC/DS-24, DC/DS-16/14, DS-12) have smaller screens and are **not
-supported for the gauge** (see FR-013a).
+lists as 480 × 480 px, running the JUi2 interface. Since 2026-11-08 it also
+runs on the original DC/DS-24 (320 × 240 screen), whose Lua windows measure
+within 1-3 px of the II's. The DC/DS-16/14 and DS-12 are **not supported
+for the gauge** (see FR-013a).
 
 **Measured window sizes** (`tools/probe/PROBE.lua`; the transmitter's own
 screenshots, 2026-10-03):
@@ -599,9 +610,11 @@ settings screen must say the voice files are missing.
     telemetry, so the user asked for names that tell them apart. The
     full-screen window has no title bar, so the name appears only in that
     list.
-- **FR-013a**: The gauge is not supported on other transmitters. If the app
-  runs on one, the telemetry window MUST show a short notice (e.g. "Speed
-  Gauge needs DS-24 II") instead of a mis-drawn gauge. Callouts and warnings
+- **FR-013a**: The gauge runs on the DC/DS-24 family: the II and, since
+  2026-11-08, the original DC/DS-24. It is not supported on other
+  transmitters. If the app runs on one, the telemetry window MUST show a
+  short notice ("Speed Gauge needs a DC/DS-24") instead of a mis-drawn
+  gauge. Callouts and warnings
   MUST still work, because they don't depend on the screen.
 - **FR-014**: The window MUST show a round, speedometer-style gauge following
   the visual design reference in User Story 3:
@@ -853,10 +866,11 @@ settings screen must say the voice files are missing.
 
 ## Assumptions
 
-- **Target and baseline.** The gauge targets the DS-24 II / DC-24 II
-  (firmware 6.x) only, using the Lua window sizes measured on the
-  transmitter (150 × 23, 150 × 68 and 316 × 159), not the panel's
-  480 × 480 or the emulator's larger windows. The original app was tested
+- **Target and baseline.** The gauge targets the DC/DS-24 family, using
+  the Lua window sizes measured on the transmitters (DS-24 II, firmware
+  6.x: 150 × 23, 150 × 68 and 316 × 159; original DS-24, firmware 5.08:
+  151 × 24, 151 × 69 and 319 × 159), not the panel's 480 × 480 or the
+  emulator's larger windows. The original app was tested
   only on the original DS-24. The original's
   behavior (v2.1) is the baseline; where this spec is silent, match it.
 - **Audio.** Speed Gauge's own voice set (Amy) is the primary audio when

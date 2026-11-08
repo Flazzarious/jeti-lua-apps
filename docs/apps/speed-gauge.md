@@ -1,7 +1,7 @@
 # Speed Gauge
 
 Spoken airspeed callouts, stall and overspeed warnings, and a speedometer
-gauge for the JETI **DS-24 II / DC-24 II**.
+gauge for the JETI **DC/DS-24**, both the II and the original.
 
 ![Speed Gauge full screen](https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/main/docs/apps/img/speed-gauge.png)
 
@@ -30,9 +30,8 @@ gauge for the JETI **DS-24 II / DC-24 II**.
 
 ## Requirements
 
-- JETI **DS-24 II or DC-24 II**, firmware 6.0 or newer. On other DC/DS-24
-  transmitters the callouts and warnings work, and the gauge window shows
-  a notice instead.
+- JETI **DS-24 II / DC-24 II** (firmware 6.x) or the original **DS-24 /
+  DC-24** (tested with firmware 5.08).
 - A telemetry sensor that reports speed.
 - **Only one speed announcer.** If you used **DFM Speed Announcer**
   before, remove it in *Applications → User Applications*. With both
@@ -52,8 +51,10 @@ transmitter is slow. Let JETI Studio finish before disconnecting.
 1. Add **Speed Gauge** in *Applications → User Applications*.
 2. Open its settings (*Applications → Speed Gauge*):
    - choose your **speed sensor** and the **units**;
-   - assign a **callouts on/off switch** (and, if you like, a continuous
-     callouts switch);
+   - assign a **callouts on/off switch** for normal callouts, and if you
+     like a **continuous callouts switch** (spring-loaded is handy): while
+     it's held you hear just the number every few seconds. Warnings sound
+     when either switch is on;
    - set your model's **landing**, **stall** and **overspeed** speeds;
    - set **Gauge max limit** to your sensor's top speed to use its whole
      range (MSpeed: 350 km/h / 215 mph; MSpeed 450 EX: 450 km/h / 280 mph).

@@ -60,15 +60,21 @@ local function drawRuler(w, h)
   end
 end
 
+-- Device name and firmware, built once in init(); shown on screen so they can
+-- be read on a transmitter, which has no Lua console (added for the DS-24 v1).
+local deviceText = ""
+
 local function drawInfo(tag, w, h)
   report(tag, w, h)
   drawRuler(w, h)
   lcd.drawRectangle(0, 0, w, h)
   lcd.drawLine(0, 0, w - 1, h - 1)
   lcd.drawText(4, 2, tag .. " " .. w .. "x" .. h, FONT_BOLD)
-  lcd.drawText(4, 2 + lcd.getTextHeight(FONT_BOLD), "fonts N/B/M/Mx: "
+  local y = 2 + lcd.getTextHeight(FONT_BOLD)
+  lcd.drawText(4, y, "fonts N/B/M/Mx: "
     .. lcd.getTextHeight(FONT_NORMAL) .. "/" .. lcd.getTextHeight(FONT_BIG)
     .. "/" .. lcd.getTextHeight(FONT_MINI) .. "/" .. lcd.getTextHeight(FONT_MAXI), FONT_MINI)
+  lcd.drawText(4, y + lcd.getTextHeight(FONT_MINI), deviceText, FONT_MINI)
 end
 
 local function printSmall(w, h) drawInfo("small", w, h) end
@@ -174,8 +180,8 @@ local function loop()
 end
 
 local function init()
-  print("PROBE device: " .. tostring(system.getDeviceType())
-    .. ", firmware " .. tostring(system.getVersion()))
+  deviceText = tostring(system.getDeviceType()) .. " fw " .. tostring(system.getVersion())
+  print("PROBE device: " .. deviceText)
   for _, s in ipairs(system.getSensors()) do
     if s.param ~= 0 then
       local unit = s.unit or ""
