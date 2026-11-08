@@ -84,7 +84,7 @@ local GLOW = { 0.36, 0.02 }
 -- transmitter, 2026-10-03; worst 14% at speed).
 local DEBUG_CPU = false     -- off after transmitter testing (T080, 2026-10-04)
 
-local TXT_NOTICE = "Speed Gauge needs DS-24 II"
+local TXT_NOTICE = "Speed Gauge needs a DC/DS-24"
 local TXT_MAX = "MAX"
 -- Full-screen panel labels: short, because label and value share one line
 -- in a ~124 px panel (transmitter 316 x 159, 2026-10-03).
@@ -403,7 +403,7 @@ local lastSpokenAt = nil    -- nil = nothing spoken yet this session
 local lastTick = 0
 local curRounded, maxRounded, sensRounded = nil, 0, nil
 local curText, maxText, sensText = TXT_NO_DATA, "0", TXT_NO_DATA
-local gaugeOk = false       -- device is a DS-24 II (R12)
+local gaugeOk = false       -- device is a DC/DS-24, original or II (R12)
 
 local function resetSession()
   sensorSpd, shownSpd = nil, nil
@@ -1557,7 +1557,12 @@ local function init()
   roundDial = gauge.newDial(90, 225, 270)
   faceCircle = gauge.newCircle(90)
   glowDial = gauge.newDial(54, 225, 270)   -- 5-degree steps (10 looked polygonal)
-  gaugeOk = string.find(system.getDeviceType() or "", "24 II", 1, true) ~= nil
+  -- The gauge needs a DC/DS-24: the II ("JETI DS-24 II") or, since
+  -- 2026-11-08, the original ("JETI DS-24", firmware 5.08), whose windows
+  -- measure within 1-3 px of the II's (151 x 24, 151 x 69, 319 x 159).
+  local device = system.getDeviceType() or ""
+  gaugeOk = string.find(device, "DS-24", 1, true) ~= nil
+    or string.find(device, "DC-24", 1, true) ~= nil
 
   system.registerForm(1, MENU_APPS, APP_NAME, initForm, keyForm, nil, closeForm)
   system.registerTelemetry(1, APP_NAME, 0, printGauge)

@@ -200,7 +200,10 @@ def ring_image(cov, color):
 
 
 def main():
-    for w, h, geometry in ((316, 159, full_geometry), (150, 68, round_geometry)):
+    # DS-24 II (316 x 159, 150 x 68) and the original DS-24 (319 x 159,
+    # 151 x 69; measured 2026-11-08).
+    for w, h, geometry in ((316, 159, full_geometry), (150, 68, round_geometry),
+                           (319, 159, full_geometry), (151, 69, round_geometry)):
         g = geometry(w, h)
         img_w = min(w, g["cx"] + g["r"] + 2)   # just the dial; the app fills the rest
         tag = f"{w}x{h}"
