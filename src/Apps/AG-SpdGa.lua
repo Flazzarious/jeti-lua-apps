@@ -83,6 +83,10 @@ local GLOW = { 0.36, 0.02 }
 -- system.getCPU() on the full-screen gauge (used to measure the glow on the
 -- transmitter, 2026-10-03; worst 14% at speed).
 local DEBUG_CPU = false     -- off after transmitter testing (T080, 2026-10-04)
+-- Diagnostic, off for release: true replaces the speed sensor with a 30 s
+-- sweep from 0 to 10% past the overspeed warning and back, so drawing, CPU,
+-- warnings and callouts can be tested without a pitot (DS-24 v1, 2026-11-08).
+local SIM = false
 
 local TXT_NOTICE = "Speed Gauge needs a DC/DS-24"
 local TXT_MAX = "MAX"
@@ -1607,21 +1611,25 @@ local function loop()
   lastTick = now
   readTemp(now)             -- before the early return: tracked even with no speed
 
-  -- Always call through system: Emulator Telemetry replaces it (R3).
-  local s = nil
-  if cfg.sId ~= 0 then
-    s = system.getSensorValueByID(cfg.sId, cfg.sPar)
-  end
-  if s == nil or not s.valid then
-    if sensorSpd ~= nil then
-      sensorSpd, shownSpd = nil, nil
-      curRounded, curText = nil, TXT_NO_DATA
-      sensRounded, sensText = nil, TXT_NO_DATA
+  if SIM then
+    local t = now % 30000
+    sensorSpd = cfg.vOver * 1.1 * (t < 15000 and t or 30000 - t) / 15000
+  else
+    -- Always call through system: Emulator Telemetry replaces it (R3).
+    local s = nil
+    if cfg.sId ~= 0 then
+      s = system.getSensorValueByID(cfg.sId, cfg.sPar)
     end
-    return                  -- no data: no flags, max, warnings or callouts
+    if s == nil or not s.valid then
+      if sensorSpd ~= nil then
+        sensorSpd, shownSpd = nil, nil
+        curRounded, curText = nil, TXT_NO_DATA
+        sensRounded, sensText = nil, TXT_NO_DATA
+      end
+      return                -- no data: no flags, max, warnings or callouts
+    end
+    sensorSpd = s.value * kSensor
   end
-
-  sensorSpd = s.value * kSensor
   shownSpd = sensorSpd * kDens
 
   -- Flight flags use sensor speed (FR-011).
