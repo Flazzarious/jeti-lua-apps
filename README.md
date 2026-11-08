@@ -315,6 +315,19 @@ thresholds fill in.
   mAh sensor while the pack's capacity (mAh) is still 0, the % comes from
   the voltage sensor. A missing capacity flashes a "Capacity (mAh) not set"
   reminder on the battery's screen until you enter it.
+- **Every battery needs a voltage sensor.** Without one (or a capacity
+  sensor in V), the battery's screen flashes "Voltage sensor not set" and
+  the main screen marks it "SETUP!". The same mark shows for a missing
+  capacity (mAh).
+- **mAh counters start from the voltage.** A Central Box keeps its mAh
+  count across power-ups, so the app doesn't read the count as "used from
+  full". At power-on it takes the pack's % from its resting voltage (100 %
+  without a voltage sensor), then subtracts what the counter adds. A
+  partly charged pack starts where it really is, and a counter reset
+  doesn't make the % jump.
+- **Central Box packs: use U Accu.** Behind a Central Box the receiver
+  measures the box's regulated output, not the pack. Pick "U Accu 1" and
+  "U Accu 2" as the voltage sensors, not the receiver voltages.
 - **Current or voltage under each battery.** The four-battery window shows
   the current when a current sensor is set, otherwise the pack voltage.
   Leave the current sensor at (none) to see the voltage, e.g. for receiver

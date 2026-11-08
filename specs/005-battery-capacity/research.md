@@ -15,8 +15,8 @@ bench test can settle; each has a quickstart check and a fallback.
 
   | Unit (trimmed, case-sensitive) | Mode | % remaining |
   | --- | --- | --- |
-  | `mAh` | 1 mAh consumed | `(rated − value) / rated` |
-  | `Ah` | 2 Ah consumed | `(rated − value × 1000) / rated` |
+  | `mAh` | 1 mAh consumed | `start − (value − value₀) / rated` |
+  | `Ah` | 2 Ah consumed | the same, with `value × 1000` |
   | `%` | 3 % remaining | `value` |
   | `V` | 4 voltage | resting curve (R3) |
   | anything else | refused | setup note (FR-004) |
@@ -34,6 +34,15 @@ bench test can settle; each has a quickstart check and a fallback.
     remember it.
   - JETI Central Box 200/400: per-battery `V` and `A`, and `mAh` consumed
     per battery.
+  - **Counters don't start at 0** (field test 2026-11-08: a CB 210 with
+    2100 mAh entered showed 0 % right after power-on, its count carried over
+    from earlier flights). So `start` and `value₀` are taken when a pack
+    session starts: `start` is the resting-voltage % (the first 1 s average,
+    waiting up to 3 s for it), or 100 % without a voltage sensor, and
+    `value₀` the counter then. A reading below the previous one is a reset
+    by the sensor: `start` becomes the current %, `value₀` the new reading.
+    A CB 210's receiver voltages are its regulated output, not the packs':
+    use `U Accu 1/2` as the voltage sensors.
   - Receiver `U Rx` / `Rx voltage`: **not a sensor on the transmitter**.
     Auto-detect in Sensors/Logging Setup lists nothing for a bare receiver,
     and `getSensors()` has no entry for it (DS-24, 2026-11-05; the emulator's
@@ -154,10 +163,11 @@ bench test can settle; each has a quickstart check and a fallback.
   re-armed from the current %, US2 #4 rule), repeat counters, low-voltage
   state, the max-current filter and last announced max (FR-027), and
   schedules the new-pack check (FR-029) 3 s later.
-- **mAh-consumed sensors that reset to 0 at power-on** look like a full
-  pack after every brown-out. That is exactly the case where the voltage
-  cross-check matters; without a voltage reading the app can't tell, as the
-  spec's edge case says, and the README recommends assigning one.
+- **mAh-consumed sources** (counted from the session start, R1) decide
+  "new pack" by the voltage alone (+20 points), since the counter says
+  nothing about a fresh pack. Without a voltage reading, a counter that went
+  back counts as a new pack (a sensor that resets at power-on); otherwise
+  the counter's reset is absorbed and the % carries on.
 - **UNVERIFIED:** the 1 s dropout and 20-point thresholds on real packs.
   Both are constants (`LOST_MS`, `NEWPACK_PTS`). Quickstart T5 swaps a pack
   and pulls the receiver plug briefly.

@@ -35,7 +35,7 @@ current sensor; **C** only for Custom.
 | 5 | Cells | intbox | 1–14 | cell-count check note under it (research R11) |
 | 6 | Capacity (mAh) | intbox | 100–30 000, step 50 | needed for mAh/Ah sources; while 0 the note under row 7 flashes ("Capacity (mAh) not set: % from voltage for now." or "Set the pack's capacity (mAh).") |
 | 7 | Capacity sensor | selectbox | receiver voltages, then sensors with unit mAh, Ah, %, V | refuses other units: they aren't listed; "(not found)" entry kept (FR-004, edge case) |
-| 8 | Voltage sensor | selectbox | receiver voltages, sensors with unit V, "(none)" | gives the % when row 7 is "(none)" or an mAh source has capacity 0 (FR-004); note "Also gives the % when there's no capacity sensor or mAh." |
+| 8 | Voltage sensor | selectbox | receiver voltages, sensors with unit V, "(none)" | gives the % when row 7 is "(none)" or an mAh source has capacity 0 (FR-004); note "Also gives the % when there's no capacity sensor or mAh."; with no voltage reading at all it flashes "Voltage sensor not set: battery not fully set up." instead, and the battery's main-screen link ends in "SETUP!" (also for row 6 at 0 with an mAh source) |
 | 9 | Current sensor | selectbox | sensors with unit A or mA, "(none)" | note "When set, the 4-battery window shows current, not voltage." (FR-011) |
 | 10 | Live value | label, updated each second while open | "Now: 72%  8.1 V  0.4 A" | helps confirm the sensors |
 | | **Callouts** | | | |

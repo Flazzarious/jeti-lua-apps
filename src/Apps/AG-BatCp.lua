@@ -26,6 +26,7 @@ local T = {
   NEWPACK = 20,             -- % points higher after a loss = new pack
   HYST = 5,                 -- callout re-arm margin, % points (FR-017)
   NP_DELAY = 3000,          -- new-pack check after the pack is first seen (FR-029)
+  VWAIT = 3000,             -- an mAh pack waits this long for its starting voltage
 }
 
 -- The JETI Studio emulator draws each window's title inside the reported
@@ -455,6 +456,8 @@ local function newSession()
     tel = TEL.NONE, badSince = nil,
     capVal = nil, capOk = false,
     pct = 0, pctLast = 0, vPct = nil, vPctLast = nil,
+    -- mAh counting: % at the session start, the counter then, its last reading
+    start = 100, used0 = 0, usedPrev = 0, raw = 100, waitT = nil,
     vSum = 0, vN = 0, vNow = nil, vEst = nil,
     iNow = nil, band = 1,
     fired = 0, rptOn = false, rptN = 0, rptT = 0,
@@ -502,21 +505,11 @@ local function curvePct(chem, vCell, cut)
   return 0
 end
 
--- Raw % from the capacity source's last reading in capacity mode `mode`;
--- nil when it can't be computed (no rated capacity for an mAh source).
+-- Raw % from a % or voltage source's last reading in capacity mode `mode`
+-- (mAh sources are counted in updateCapacity); nil for other modes.
 local function rawPct(k, value, mode)
   local b = bat[k]
-  local mAh = b.p[P.MAH]
-  if mode == M.MAH or mode == M.AH then
-    if mAh <= 0 then
-      return nil
-    end
-    local used = value
-    if mode == M.AH then
-      used = value * 1000
-    end
-    return (mAh - used) * 100 / mAh
-  elseif mode == M.PCT then
+  if mode == M.PCT then
     return value
   elseif mode == M.VOLT then
     return curvePct(b.p[P.CHEM], value * 100 / b.p[P.CELLS], b.p[P.VCUT])
@@ -942,24 +935,70 @@ local function updateCapacity(k, now)
   if not s.capOk then
     return                    -- short gap or still lost: hold the last value
   end
-  local raw = rawPct(k, s.capVal, mode)
-  if raw == nil then
-    return
+  -- An mAh counter needn't start at 0 (a CB 210 keeps its count across
+  -- power-ups, field test 2026-11-08): the pack starts at its resting-voltage
+  -- %, or 100 without a voltage sensor, and loses what is counted from then.
+  local counted = mode == M.MAH or mode == M.AH
+  local used, raw = 0, nil
+  if counted then
+    if b.p[P.MAH] <= 0 then
+      return
+    end
+    used = s.capVal
+    if mode == M.AH then
+      used = used * 1000
+    end
+  else
+    raw = rawPct(k, s.capVal, mode)
+    if raw == nil then
+      return
+    end
   end
   if s.tel == TEL.NONE then
+    if counted then
+      if d.hasV and s.vPct == nil then
+        s.waitT = s.waitT or now
+        if now - s.waitT < T.VWAIT then
+          return
+        end
+      end
+      s.start, s.used0, s.usedPrev = s.vPct or 100, used, used
+    end
     s.tel = TEL.LIVE
-    startPackSession(k, now, roundPct(raw))
+    startPackSession(k, now, roundPct(counted and s.start or raw))
   elseif s.tel == TEL.LOST then
     s.tel = TEL.LIVE
     -- New pack: 20 points higher, and with a separate voltage sensor the
     -- voltage estimate agrees (R4). Otherwise a brown-out: keep everything.
-    local isNew = raw >= s.pctLast + T.NEWPACK
-    if isNew and d.voltSrc == 1 and s.vPct ~= nil and s.vPctLast ~= nil then
-      isNew = s.vPct >= s.vPctLast + T.NEWPACK
+    -- A counted pack goes by its voltage, else by its counter going back.
+    local isNew
+    if counted then
+      if s.vPct ~= nil and s.vPctLast ~= nil then
+        isNew = s.vPct >= s.vPctLast + T.NEWPACK
+      else
+        isNew = used < s.usedPrev
+      end
+    else
+      isNew = raw >= s.pctLast + T.NEWPACK
+      if isNew and d.voltSrc == 1 and s.vPct ~= nil and s.vPctLast ~= nil then
+        isNew = s.vPct >= s.vPctLast + T.NEWPACK
+      end
     end
     if isNew then
-      startPackSession(k, now, roundPct(raw))
+      if counted then
+        s.start, s.used0, s.usedPrev = s.vPct or 100, used, used
+      end
+      startPackSession(k, now, roundPct(counted and s.start or raw))
     end
+  end
+  if counted then
+    -- A counter that goes back (reset by its sensor) counts on from here.
+    if used < s.usedPrev then
+      s.start, s.used0 = s.raw, used
+    end
+    s.usedPrev = used
+    raw = s.start - (used - s.used0) * 100 / b.p[P.MAH]
+    s.raw = raw
   end
   -- Voltage source: smoothed (10 s time constant), held under load (R3).
   if mode == M.VOLT then
@@ -1456,10 +1495,21 @@ local function deleteBattery(k)
   end
 end
 
+-- Not fully set up: no voltage reading, or an mAh source without the pack's
+-- capacity (field test 2026-11-08). Shown on the main screen and flashed on
+-- the battery's screen.
+local function needsSetup(k)
+  return not dv[k].hasV or dv[k].noMah
+end
+
 local function batterySummary(k)
   local p = bat[k].p
-  return dv[k].label .. "   " .. catName(p[P.CAT]) .. "   " .. CHEM[p[P.CHEM]].name .. " "
+  local text = dv[k].label .. "   " .. catName(p[P.CAT]) .. "   " .. CHEM[p[P.CHEM]].name .. " "
     .. p[P.CELLS] .. "S"
+  if needsSetup(k) then
+    text = text .. "   SETUP!"
+  end
+  return text
 end
 
 -- A checkbox; the callback gets the old state (Speed Gauge, Flameout).
@@ -1567,10 +1617,25 @@ local function updateCapHint(k, blank)
   if idx.capHint then
     local text = capHintText(k)
     local shown = text
-    if blank then
+    if blank and dv[k].noMah then
       shown = " "
     end
     form.setProperties(idx.capHint, { label = shown, visible = text ~= "" })
+  end
+end
+
+-- Voltage hint: every battery needs a voltage reading (a starting % for
+-- mAh counters, low-voltage alarm, new-pack check); flashed while missing.
+local HINT_V = "Also gives the % when there's no capacity sensor or mAh."
+local HINT_NOV = "Voltage sensor not set: battery not fully set up."
+
+local function updateVHint(k, blank)
+  if idx.vHint then
+    local text = HINT_V
+    if not dv[k].hasV then
+      text = blank and " " or HINT_NOV
+    end
+    form.setProperties(idx.vHint, { label = text })
   end
 end
 
@@ -1702,7 +1767,8 @@ local function initBattery(k)
     end
     refresh()
   end, { width = 180 })
-  hint("Also gives the % when there's no capacity sensor or mAh.")
+  idx.vHint = hint(HINT_V)
+  updateVHint(k)
 
   form.addRow(2)
   form.addLabel({ label = "Current sensor", width = 130 })
@@ -2032,9 +2098,10 @@ local function updateFormLive(k)
     end
     form.setProperties(idx.cells, { label = warn, visible = warn ~= "" })
   end
-  if d.noMah then
+  if needsSetup(k) then
     app.hintBlank = not app.hintBlank
     updateCapHint(k, app.hintBlank)
+    updateVHint(k, app.hintBlank)
   end
 end
 

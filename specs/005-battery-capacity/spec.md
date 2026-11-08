@@ -171,7 +171,8 @@ values and check the fill, colour and number in the small window.
 **Acceptance Scenarios**:
 
 1. **Given** a Receiver battery, LiFe 2S, 2500 mAh, on an mAh-consumed
-   sensor reading 1000, **Then** the small window shows 60% with the fill
+   sensor with no voltage sensor, reading 0 at power-on and 1000 later,
+   **Then** the small window shows 60% with the fill
    at 60% of the battery's length, in the Receiver band colour for 60%.
 2. **Given** a battery on a % remaining sensor, **Then** the gauge shows the
    sensor value as is.
@@ -415,8 +416,13 @@ batteries) is not committed; the sketches replace it.
   only reports the finished text, so a custom name that would not fit MUST
   be shortened from the end on confirm, with a "Shortened to fit" note.
 - **FR-004**: The app MUST interpret the capacity source by its unit: mAh
-  consumed ((rated − consumed) / rated), % remaining (as is), or voltage
-  (per-chemistry resting curve, scaled by cell count). Other units MUST be
+  consumed, % remaining (as is), or voltage (per-chemistry resting curve,
+  scaled by cell count). An mAh counter MUST NOT be assumed to start at 0
+  (a Central Box keeps its count across power-ups, field test 2026-11-08):
+  a pack session starts at the resting-voltage % (100 % without a voltage
+  sensor) and then loses what the counter adds, (count − count at start) /
+  rated. A counter that goes back (reset by its sensor) MUST be counted on
+  from its new value, without a jump. Other units MUST be
   refused with an explanation. The receivers' own voltages (receiver 1, 2
   and backup) MUST be offered as voltage sources too, although the
   transmitter doesn't list them as sensors (research R1). With no capacity
@@ -425,6 +431,11 @@ batteries) is not committed; the sketches replace it.
   mAh or Ah source while the pack's capacity is 0; the battery screen MUST
   then flash a "Capacity (mAh) not set" reminder until it is entered (field
   test 2026-11-07: a CB 210 setup without capacities showed only "--").
+  Every battery needs a voltage reading (a voltage sensor, or a capacity
+  source in V): without one the battery screen MUST flash "Voltage sensor
+  not set: battery not fully set up." and the main screen MUST mark the
+  battery "SETUP!", as it does for a missing capacity (field test
+  2026-11-08). It still runs as far as its sensors allow.
 - **FR-005**: All settings MUST be saved per model and survive a transmitter
   restart without leaking to other models.
 
