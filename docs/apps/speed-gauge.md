@@ -30,9 +30,8 @@ gauge for the JETI **DS-24 II / DC-24 II**.
 
 ## Requirements
 
-- JETI **DS-24 II or DC-24 II**, firmware 6.0 or newer. On other DC/DS-24
-  transmitters the callouts and warnings work, and the gauge window shows
-  a notice instead.
+- JETI **DS-24 II / DC-24 II** (firmware 6.x) or the original **DS-24 /
+  DC-24** (tested with firmware 5.08).
 - A telemetry sensor that reports speed.
 - **Only one speed announcer.** If you used **DFM Speed Announcer**
   before, remove it in *Applications → User Applications*. With both

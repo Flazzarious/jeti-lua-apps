@@ -129,9 +129,9 @@ The gauge:
   elevation, temperature and the uncorrected sensor speed.
 - The dial's arc shows the current speed (overspeed color past the limit);
   a yellow marker stays at the session max. The colors can be changed.
-- The gauge is drawn for the DS-24 II / DC-24 II. On other DC/DS-24
-  transmitters the callouts and warnings work, and the window shows a
-  notice instead.
+- The gauge runs on the DS-24 II / DC-24 II and the original DS-24 /
+  DC-24. On other transmitters the callouts and warnings work, and the
+  window shows a notice instead.
 
 **Air density correction** (optional, airspeed sensors only). A pitot
 reads low where the air is thin: about 8% at 5,000 ft on a standard day,
