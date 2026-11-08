@@ -18,7 +18,7 @@ local gauge = require("ag_gauge")
 local dens = require("ag_dens")
 
 local APP_NAME = "Speed Gauge"
-local APP_VERSION = "0.3.1"
+local APP_VERSION = "0.3.2"
 local AUDIO_DIR = "/Apps/AG-SpdGa/"
 local TICK_MS = 100         -- loop logic runs at most 10x per second (R9)
 -- The JETI Studio emulator draws each window's title bar inside the reported
