@@ -1,7 +1,7 @@
 # Speed Gauge
 
 Spoken airspeed callouts, stall and overspeed warnings, and a speedometer
-gauge for the JETI **DS-24 II / DC-24 II**.
+gauge for the JETI **DC/DS-24**, both the II and the original.
 
 ![Speed Gauge full screen](https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/main/docs/apps/img/speed-gauge.png)
 
