@@ -18,7 +18,7 @@ local gauge = require("ag_gauge")
 local dens = require("ag_dens")
 
 local APP_NAME = "Speed Gauge"
-local APP_VERSION = "0.3.2"
+local APP_VERSION = "0.4.0"
 local AUDIO_DIR = "/Apps/AG-SpdGa/"
 local TICK_MS = 100         -- loop logic runs at most 10x per second (R9)
 -- The JETI Studio emulator draws each window's title bar inside the reported
@@ -83,8 +83,12 @@ local GLOW = { 0.36, 0.02 }
 -- system.getCPU() on the full-screen gauge (used to measure the glow on the
 -- transmitter, 2026-10-03; worst 14% at speed).
 local DEBUG_CPU = false     -- off after transmitter testing (T080, 2026-10-04)
+-- Diagnostic, off for release: true replaces the speed sensor with a 30 s
+-- sweep from 0 to 10% past the overspeed warning and back, so drawing, CPU,
+-- warnings and callouts can be tested without a pitot (DS-24 v1, 2026-11-08).
+local SIM = false
 
-local TXT_NOTICE = "Speed Gauge needs DS-24 II"
+local TXT_NOTICE = "Speed Gauge needs a DC/DS-24"
 local TXT_MAX = "MAX"
 -- Full-screen panel labels: short, because label and value share one line
 -- in a ~124 px panel (transmitter 316 x 159, 2026-10-03).
@@ -403,7 +407,7 @@ local lastSpokenAt = nil    -- nil = nothing spoken yet this session
 local lastTick = 0
 local curRounded, maxRounded, sensRounded = nil, 0, nil
 local curText, maxText, sensText = TXT_NO_DATA, "0", TXT_NO_DATA
-local gaugeOk = false       -- device is a DS-24 II (R12)
+local gaugeOk = false       -- device is a DC/DS-24, original or II (R12)
 
 local function resetSession()
   sensorSpd, shownSpd = nil, nil
@@ -1557,7 +1561,12 @@ local function init()
   roundDial = gauge.newDial(90, 225, 270)
   faceCircle = gauge.newCircle(90)
   glowDial = gauge.newDial(54, 225, 270)   -- 5-degree steps (10 looked polygonal)
-  gaugeOk = string.find(system.getDeviceType() or "", "24 II", 1, true) ~= nil
+  -- The gauge needs a DC/DS-24: the II ("JETI DS-24 II") or, since
+  -- 2026-11-08, the original ("JETI DS-24", firmware 5.08), whose windows
+  -- measure within 1-3 px of the II's (151 x 24, 151 x 69, 319 x 159).
+  local device = system.getDeviceType() or ""
+  gaugeOk = string.find(device, "DS-24", 1, true) ~= nil
+    or string.find(device, "DC-24", 1, true) ~= nil
 
   system.registerForm(1, MENU_APPS, APP_NAME, initForm, keyForm, nil, closeForm)
   system.registerTelemetry(1, APP_NAME, 0, printGauge)
@@ -1602,21 +1611,25 @@ local function loop()
   lastTick = now
   readTemp(now)             -- before the early return: tracked even with no speed
 
-  -- Always call through system: Emulator Telemetry replaces it (R3).
-  local s = nil
-  if cfg.sId ~= 0 then
-    s = system.getSensorValueByID(cfg.sId, cfg.sPar)
-  end
-  if s == nil or not s.valid then
-    if sensorSpd ~= nil then
-      sensorSpd, shownSpd = nil, nil
-      curRounded, curText = nil, TXT_NO_DATA
-      sensRounded, sensText = nil, TXT_NO_DATA
+  if SIM then
+    local t = now % 30000
+    sensorSpd = cfg.vOver * 1.1 * (t < 15000 and t or 30000 - t) / 15000
+  else
+    -- Always call through system: Emulator Telemetry replaces it (R3).
+    local s = nil
+    if cfg.sId ~= 0 then
+      s = system.getSensorValueByID(cfg.sId, cfg.sPar)
     end
-    return                  -- no data: no flags, max, warnings or callouts
+    if s == nil or not s.valid then
+      if sensorSpd ~= nil then
+        sensorSpd, shownSpd = nil, nil
+        curRounded, curText = nil, TXT_NO_DATA
+        sensRounded, sensText = nil, TXT_NO_DATA
+      end
+      return                -- no data: no flags, max, warnings or callouts
+    end
+    sensorSpd = s.value * kSensor
   end
-
-  sensorSpd = s.value * kSensor
   shownSpd = sensorSpd * kDens
 
   -- Flight flags use sensor speed (FR-011).
