@@ -93,6 +93,13 @@ the emulator's numbers above:
   (the faint "no data" grey), `setClipping` text and `getBgColor` all work
   as on the II; Amy WAVs queued with `AUDIO_QUEUE` play. Its CPU figure
   stayed at **9 %** while drawing both windows and running a SIM profile.
+- **Battery Capacity on the DS-24 II** (2026-11-05 to 11-08): queued
+  `playFile` and `playNumber` calls play in order as one phrase, so a
+  `playNumber` waits behind a name file queued before it (T053). Drawing
+  the % twice with `setClipping` (split across the fill edge) costs no
+  visible CPU: four batteries in both windows stayed within the CPU limit
+  over a 30-minute run, and a Battery Capacity callout waits while Flameout
+  Alarm's test alarm plays (T034, T060).
 - "Full screen" is not the whole panel on the transmitter: sizes 3 and 4
   both get a titled 316 × 159 area across the top two thirds. With size 3
   the desktop's model tile still covers its lower-left corner; size 4 has
@@ -264,6 +271,15 @@ The app file returns a table: `init`, `loop`, `destroy` (5.00+), `author`,
   check Q before trusting a voltage (DS-24 II, PROBE MODE 7). The emulator's
   `sensors.json` can fake them as sensors, so test this on the transmitter
   (DS-24, 2026-11-05, Battery Capacity).
+- **Units seen on Aaron's sensors** (DS-24 II flight log and Battery
+  Capacity's lists, 2026-11-07): CBOX210 "U Accu 1/2" `V`, "I Accu 1/2" `A`,
+  "Capacity 1/2" `mAh` (used); VOLTARIO "Voltage" `V`; turbine ECU "Bat."
+  `V`; SW "PwrVol" `V`; MSPEED "Velocity" `m/s`. The log writes the receivers
+  as "Rx1"/"Rx2" with "U Rx1" `V` and "Q" `%`, but Lua still can't list them.
+- **Sensor ids fit in 32 bits and may be negative** (e.g. -1598118838):
+  saving them in a `pSave` integer array round-trips fine. Don't treat a
+  negative id as "unset"; Battery Capacity reserves only -1 for receiver
+  voltages, and the log's 10-digit device numbers are not the Lua ids.
 - `system.getSensorByID(id, param)` returns a full entry;
   `system.getSensorValueByID(id, param)` returns a lighter one (no label/unit).
   Both return `nil` if the sensor doesn't exist. Always check `.valid`.

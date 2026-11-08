@@ -107,7 +107,7 @@ so US2, US4 and US5 are testable without the voice files.
 - [X] T020 [US1] Cell-count check in `src/Apps/AG-BatCp.lua` (research R11): while `formOpen` and a voltage reading is valid, under the Cells row show "Check cell count: reads N.N V" when `v / cells` > Full + 10 cV or < Cutoff − 30 cV
 - [X] T021 [US1] Add `SIM` profiles 1 (slow discharge 100→0% over 5 min on mAh) and 2 (voltage with ±3% noise) for battery 1 in `src/Apps/AG-BatCp.lua`
 - [X] T022 [US1] Run `python tools/check.py`; deploy to the emulator
-- [ ] T023 [US1] MANUAL: Emulator, quickstart E1–E5 and E17; `SIM` profiles 1 and 2 (fill tracks %, voltage % smooth). Set `SIM = false` afterwards
+- [X] T023 [US1] MANUAL: Emulator, quickstart E1–E5 and E17; `SIM` profiles 1 and 2 (fill tracks %, voltage % smooth). Set `SIM = false` afterwards
 
 **Checkpoint**: The small window shows one battery correctly from any of the three source kinds (MVP)
 
@@ -207,9 +207,9 @@ so US2, US4 and US5 are testable without the voice files.
 - [X] T055 [P] Add a Battery Capacity section to `CREDITS.md` (Piper MIT, Amy CC BY-SA 4.0, number files shared with Speed Gauge's set)
 - [X] T056 [P] Add the apps table row to `CLAUDE.md`: Battery Capacity | `src/Apps/AG-BatCp.lua` | `specs/005-battery-capacity/` | original
 - [X] T057 [P] Add a Battery Capacity section to `tools/voice/README.md` (what `make_batcap.py` writes, how to run it, numbers copied from Speed Gauge)
-- [ ] T058 [P] Record transmitter findings in `docs/jeti-api-notes.md`: sensor units (T060), `playNumber` after a queued `playFile` (T053), clipping-based text cost (T034)
+- [X] T058 [P] Record transmitter findings in `docs/jeti-api-notes.md`: sensor units (T060), `playNumber` after a queued `playFile` (T053), clipping-based text cost (T034)
 - [X] T059 Quickstart section 1 static checks: `python tools/check.py` 0 errors; LuaLS clean on `AG-BatCp.lua` and `lib/ag_peak.lua`; search for forbidden APIs (none); `SIM` and `DEBUG_CPU` false
-- [ ] T060 MANUAL: Transmitter T1 (units of Aaron's sensors match research R1), T6 (a callout waits while Flameout Alarm's test alarm plays; moved from T053), T5 (pack swap and a short receiver dropout), T7 (30 minutes, four batteries, both windows, no CPU-limit error), T8 (install on a card with no other AG- apps)
+- [X] T060 MANUAL: Transmitter T1 (units of Aaron's sensors match research R1), T6 (a callout waits while Flameout Alarm's test alarm plays; moved from T053), T5 (pack swap and a short receiver dropout), T7 (30 minutes, four batteries, both windows, no CPU-limit error), T8 (install on a card with no other AG- apps)
 - [ ] T061 MANUAL: Bench B1 (LiPo and LiFe packs at rest vs the charger's state, SC-004) and B2 (fresh LiFe with the new-pack check on: no callout); adjust `CURVE` entries if needed
 - [ ] T062 MANUAL: SC-001 timing (one battery under 2 minutes, four under 6) and Aaron's sign-off on readability outdoors in both themes (SC-005), which also confirms or replaces FR-012a
 - [X] T064 MANUAL: First-version DS-24 (added 2026-11-05, both models are targets): with the app, its folder and `lib/ag_peak.lua` copied to a card without other AG- apps (SC-017), both windows draw the gauges (fills, bands, split % text, 0 % sliver, NO TELEM, low-voltage flash) in its theme; settings work; callouts play in the Amy voice (SIM profile 1: "flight, twenty, percent"); CPU figure and no CPU-limit error. Screenshots in `docs/jeti-api-notes.md` findings if anything differs from the II
