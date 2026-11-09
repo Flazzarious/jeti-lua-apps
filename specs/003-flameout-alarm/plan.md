@@ -46,7 +46,7 @@ Approach:
 
 **Testing**: `python tools/check.py`; LuaLS diagnostics; the generator's self-check; emulator scenarios with Emulated Telemetry and `SIM` profiles ([quickstart.md](quickstart.md)); transmitter checks for sound and layout; bench test with a real ECU
 
-**Target Platform**: JETI DS-24 II / DC-24 II, firmware 6.03+ (emulator 6.04). Transmitter window sizes 150 × 68 (double) and 150 × 23 (single); emulator 157 × 127 / 157 × 60 with the title inside. The alarm works on any DC/DS transmitter; the sweep needs a DS-24 II
+**Target Platform**: JETI DS-24 II / DC-24 II, firmware 6.03+ (emulator 6.04). Transmitter window sizes 150 × 68 (double) and 150 × 23 (single); emulator 157 × 127 / 157 × 60 with the title inside. The alarm works on any DC/DS transmitter; the sweep needs a DC/DS-24 (the II, and since 0.2.0 the first version, 151 × 24 / 151 × 69, FR-031d)
 
 **Project Type**: Embedded transmitter app (single Lua script plus asset folder) and a developer-side sound generator
 

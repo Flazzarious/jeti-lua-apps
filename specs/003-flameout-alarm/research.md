@@ -346,10 +346,12 @@ straight bar (spec FR-031).
 changes, so at most once per tick; `FONT_BIG`, right-aligned under the high
 end, "RPM" in `FONT_MINI` below it.
 
-**Other transmitters:** the sweep needs `lcd.renderer` (DC/DS-24 only). On
-anything that isn't a DS-24 II (`getDeviceType()` lacks "24 II", Speed
-Gauge R12), the window shows the state and number as text. The alarm works
-everywhere.
+**Other transmitters:** the sweep needs `lcd.renderer` (DC/DS-24 only,
+firmware 4.27+). Until 0.2.0 only the DS-24 II drew it; since then any
+device type containing "DS-24" or "DC-24" does, the first version included
+(its 151 × 24 / 151 × 69 windows fit the layout; Speed Gauge 0.4.0 does the
+same, FR-031d). Anything else shows the state and number as text. The alarm
+works everywhere.
 
 **Lit segments:** `ceil(12 · rpm / fullScale)`, capped at 12, none without
 data. At idle RPM the lit run ends at the marker. Layout constants are named
