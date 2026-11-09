@@ -94,6 +94,20 @@ APPS = [
             "src/Apps/AG-TrbSt",
         ],
     },
+    {
+        "name": "Battery Capacity (DC/DS-24)",
+        "script": "AG-BatCp",
+        "tag": "AG-BatCp-v0.1.0",
+        "author": "Aaron George",
+        "hw": HW_DCDS24 + HW_DCDS24_II,   # tested on both (spec 005, T064)
+        "description": "docs/apps/battery-capacity.html",
+        "previewIcon": "docs/apps/img/battery-capacity-icon.png",
+        "paths": [
+            "src/Apps/AG-BatCp.lua",
+            "src/Apps/AG-BatCp",
+            "src/Apps/lib/ag_peak.lua",   # used by no other app
+        ],
+    },
 ]
 
 

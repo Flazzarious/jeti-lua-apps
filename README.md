@@ -11,7 +11,7 @@ spec-driven workflow (GitHub Spec Kit + Claude Code) in VS Code.
 | Speed Gauge | [`AG-SpdGa.lua`](src/Apps/AG-SpdGa.lua) | Released (0.4.0) | [001](specs/001-speed-gauge/spec.md) | DFM Speed Announcer by Dave McQueeney (MIT) |
 | Flameout Alarm | [`AG-FlmOt.lua`](src/Apps/AG-FlmOt.lua) | Released (0.1.0) | [003](specs/003-flameout-alarm/spec.md) | Original |
 | Throttle Setup Wizard | [`AG-TrbSt.lua`](src/Apps/AG-TrbSt.lua) | Released (0.1.0) | [002](specs/002-turbine-throttle-setup/spec.md) | Original |
-| Battery Capacity | [`AG-BatCp.lua`](src/Apps/AG-BatCp.lua) | In development (0.1.0) | [005](specs/005-battery-capacity/spec.md) | Original |
+| Battery Capacity | [`AG-BatCp.lua`](src/Apps/AG-BatCp.lua) | Released (0.1.0) | [005](specs/005-battery-capacity/spec.md) | Original |
 
 ### Screenshots
 
@@ -36,6 +36,14 @@ the summary. Full guide:
 <img src="docs/apps/img/throttle-setup-wizard-guide-2.png" width="200" alt="Throttle Setup Wizard guided step 2: Throttle-Cut output value -100%">
 <img src="docs/apps/img/throttle-setup-wizard-verify-passed.png" width="200" alt="Throttle Setup Wizard Verify: all four passed">
 <img src="docs/apps/img/throttle-setup-wizard-summary.png" width="200" alt="Throttle Setup Wizard Summary: setup complete with measured values">
+
+**Battery Capacity:** two receiver packs and the ECU on a Central Box 210,
+two packs unplugged (low-voltage alarm), both window sizes. More:
+[Battery Capacity](docs/apps/battery-capacity.md).
+
+<img src="docs/apps/img/battery-capacity-main.png" width="200" alt="Battery Capacity: RX-1, RX-2 and ECU packs with current and voltage under each">
+<img src="docs/apps/img/battery-capacity-alarm.png" width="200" alt="Battery Capacity: RX-2 and ECU unplugged, outlined in red">
+<img src="docs/apps/img/battery-capacity-windows.png" width="200" alt="Battery Capacity single-size and double-size windows, flight pack at 93%">
 
 ### Speed Gauge
 
@@ -360,7 +368,8 @@ in [spec 005](specs/005-battery-capacity/spec.md).
 Each app installs exactly its released version (its files come from the
 release tag). Descriptions: [Speed Gauge](docs/apps/speed-gauge.md),
 [Flameout Alarm](docs/apps/flameout-alarm.md),
-[Throttle Setup Wizard](docs/apps/throttle-setup-wizard.md).
+[Throttle Setup Wizard](docs/apps/throttle-setup-wizard.md),
+[Battery Capacity](docs/apps/battery-capacity.md).
 
 For maintainers: after tagging a release, run
 `python tools/publish/make_apps_json.py`, commit `Apps.json` and merge it to
