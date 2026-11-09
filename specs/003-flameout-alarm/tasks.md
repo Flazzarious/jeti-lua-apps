@@ -208,7 +208,7 @@ built and checked on its own.
 ### First-version DC/DS-24 (0.2.0, Session 2026-11-08)
 
 - [X] T059 Draw the sweep and bar on any DC/DS-24 (`getDeviceType()` contains "DS-24" or "DC-24", as Speed Gauge 0.4.0) in `src/Apps/AG-FlmOt.lua`, `APP_VERSION` 0.2.0; FR-031d, research R11, plan, description pages and README say both models
-- [ ] T060 After the tag `AG-FlmOt-v0.2.0`, point Flameout Alarm's `APPS` entry in `tools/publish/make_apps_json.py` at it with `hw` 678, 679, 3866, 3867 and name "(DC/DS-24)", regenerate `Apps.json`
+- [X] T060 After the tag `AG-FlmOt-v0.2.0`, point Flameout Alarm's `APPS` entry in `tools/publish/make_apps_json.py` at it with `hw` 678, 679, 3866, 3867 and name "(DC/DS-24)", regenerate `Apps.json`
 - [ ] T061 MANUAL: On the first-version DS-24, both window sizes (sweep, idle marker, FLAMEOUT banner via the test alarm switch) and the settings form (the 320 px RPM sensor row fits or clips cleanly); screenshots for the description page
 
 - [X] T058 After the release tag `AG-FlmOt-v0.1.0` exists (CLAUDE.md branch rules), add a Flameout Alarm entry to `APPS` in `tools/publish/make_apps_json.py` (script `AG-FlmOt`, files `src/Apps/AG-FlmOt.lua` and `src/Apps/AG-FlmOt`, description and icon from T056/T057), run it, and commit `Apps.json` for the merge to `main`. Try it first with `--local` in JETI Studio

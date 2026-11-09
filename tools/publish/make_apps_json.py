@@ -69,11 +69,11 @@ APPS = [
         ],
     },
     {
-        "name": "Flameout Alarm (DC/DS-24II)",
+        "name": "Flameout Alarm (DC/DS-24)",
         "script": "AG-FlmOt",
-        "tag": "AG-FlmOt-v0.1.0",
+        "tag": "AG-FlmOt-v0.2.0",
         "author": "Aaron George",
-        "hw": HW_DCDS24_II,
+        "hw": HW_DCDS24 + HW_DCDS24_II,   # both models since 0.2.0 (spec FR-031d)
         "description": "docs/apps/flameout-alarm.html",
         "previewIcon": "docs/apps/img/flameout-alarm-icon.png",
         "paths": [
@@ -82,11 +82,11 @@ APPS = [
         ],
     },
     {
-        "name": "Throttle Setup Wizard (DC/DS-24II)",
+        "name": "Throttle Setup Wizard (DC/DS-24)",
         "script": "AG-TrbSt",
         "tag": "AG-TrbSt-v0.1.0",
         "author": "Aaron George",
-        "hw": HW_DCDS24_II,   # older DC/DS should work but are untested (spec FR-025)
+        "hw": HW_DCDS24 + HW_DCDS24_II,   # form-only; older DC/DS untested (spec FR-025)
         "description": "docs/apps/throttle-setup-wizard.html",
         "previewIcon": "docs/apps/img/throttle-setup-wizard-icon.png",
         "paths": [
