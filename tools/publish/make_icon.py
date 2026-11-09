@@ -12,10 +12,13 @@ pixel 8 x 8, with "AG" (Aaron George) drawn as strokes:
   lit cyan up to past a yellow idle marker, "AG" at the upper left.
 - Throttle Setup Wizard (--app throttle): the silver safety switch lever and
   a throttle bar with cut, idle and full marks, "AG" at the upper left.
+- Battery Capacity (--app battery): three upright batteries filled green,
+  yellow and red, "AG" at the upper left.
 
     python tools/publish/make_icon.py                  # docs/apps/img/speed-gauge-icon.png
     python tools/publish/make_icon.py --app flameout   # docs/apps/img/flameout-alarm-icon.png
     python tools/publish/make_icon.py --app throttle   # docs/apps/img/throttle-setup-wizard-icon.png
+    python tools/publish/make_icon.py --app battery    # docs/apps/img/battery-capacity-icon.png
     python tools/publish/make_icon.py --preview DIR    # also Speed Gauge's variants
 
 Standard library only.
@@ -234,6 +237,47 @@ def shade_throttle(x, y):
     return col
 
 
+GREEN = (40, 200, 80)
+RED = (230, 40, 40)
+
+# Battery Capacity: three upright batteries as in the four-battery window,
+# filled green, yellow and red from the bottom, "AG" at the upper left.
+BAT = {"x0": 8.0, "w": 12.0, "gap": 6.0, "top": 27.0, "bot": 57.0,
+       "cap": (5.0, 3.0),                             # terminal width, height
+       "fills": ((0.85, GREEN), (0.5, YELLOW), (0.15, RED)),
+       "ag": (-10.0, -17.0)}
+
+
+def shade_battery(x, y):
+    """Color of one sample point in Battery Capacity's icon."""
+    c = SIZE / 2
+    dx, dy = x - c, y - c
+    r_corner = 12
+    qx, qy = max(abs(dx) - (c - r_corner), 0), max(abs(dy) - (c - r_corner), 0)
+    if math.hypot(qx, qy) > r_corner:
+        return None
+    col = BG
+    w, top, bot = BAT["w"], BAT["top"], BAT["bot"]
+    cw, ch = BAT["cap"]
+    for i, (fill, fc) in enumerate(BAT["fills"]):
+        x0 = BAT["x0"] + i * (w + BAT["gap"])
+        x1 = x0 + w
+        mid = (x0 + x1) / 2
+        if abs(x - mid) <= cw / 2 and top - ch <= y < top:
+            col = EDGE
+        if x0 <= x <= x1 and top <= y <= bot:
+            if min(x - x0, x1 - x, y - top, bot - y) < 1.4:
+                col = EDGE
+            elif y >= bot - 1.4 - fill * (bot - top - 2.8):
+                col = fc
+            else:
+                col = UNLIT
+    ox, oy = BAT["ag"]
+    if monogram(x - ox, y - oy, c):
+        col = WHITE
+    return col
+
+
 def render(variant, size=SIZE):
     rows = []
     step = 1 / SS
@@ -250,6 +294,8 @@ def render(variant, size=SIZE):
                         col = shade_flameout(sxp, syp)
                     elif variant == "throttle":
                         col = shade_throttle(sxp, syp)
+                    elif variant == "battery":
+                        col = shade_battery(sxp, syp)
                     else:
                         col = shade(sxp, syp, variant)
                     if col is not None:
@@ -283,8 +329,9 @@ def write_png(path, size, rows):
 
 def main():
     app = sys.argv[sys.argv.index("--app") + 1] if "--app" in sys.argv else None
-    if app in ("flameout", "throttle"):
-        name = {"flameout": "flameout-alarm-icon.png", "throttle": "throttle-setup-wizard-icon.png"}[app]
+    if app in ("flameout", "throttle", "battery"):
+        name = {"flameout": "flameout-alarm-icon.png", "throttle": "throttle-setup-wizard-icon.png",
+                "battery": "battery-capacity-icon.png"}[app]
         out = REPO / "docs" / "apps" / "img" / name
         write_png(out, SIZE, render(app))
         print(f"wrote {out.relative_to(REPO)}")

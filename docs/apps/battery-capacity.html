@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title>Battery Capacity</title>
+    </head>
+    <body style="padding:10px;float:left;max-width:500px;">
+        <h1>Battery Capacity</h1>
+        <p>Up to four battery packs per model (receiver, turbine ECU, gear,
+        brakes, lights, aux or flight packs) as battery gauges on the main
+        screen, with spoken callouts that name the pack: "receiver two, 30
+        percent". For the DC/DS-24 II and the first-version DC/DS-24.</p>
+        <img src="img/battery-capacity-main.png" alt="Battery Capacity: two receiver packs and the ECU pack on a Central Box 210" width="480">
+        <ul>
+            <li><b>Two windows:</b> one battery on its side (single size) or
+            up to four upright batteries (double size), filled green,
+            yellow, orange or red by % remaining, with the current or
+            voltage under each.</li>
+            <li><b>Any capacity sensor:</b> mAh used (MUI, Central Box), %
+            remaining, or the voltage alone, including the receivers' own
+            voltages. An mAh pack starts at the % its resting voltage
+            shows, so a part-charged pack is right from the start.</li>
+            <li><b>Callouts:</b> up to four capacity levels per pack, a
+            low-voltage alarm (per cell or per pack) with a flashing red
+            outline, an optional current alarm and max current, and a
+            "pack not full" check when you plug in.</li>
+            <li><b>Knows a pack swap from a brown-out:</b> callouts reset
+            for a fresh pack and carry on after a brief dropout.</li>
+            <li><b>Smart defaults</b> from the pack's category and chemistry
+            (LiPo, LiHV, Li-ion, LiFe, NiMH/NiCd); everything can be
+            changed.</li>
+        </ul>
+        <img src="img/battery-capacity-alarm.png" alt="Two packs disconnected: red low-voltage outlines" width="480">
+        <p>Above: one receiver pack and the ECU pack unplugged. Their
+        outlines turn red and the low-voltage alarm speaks.</p>
+        <img src="img/battery-capacity-windows.png" alt="The single-size and double-size windows" width="480">
+        <p><b>Advisory only.</b> It never controls the model, and doesn't
+        replace the transmitter's own receiver-voltage alarm.</p>
+        <h3>Setting up</h3>
+        <img src="img/battery-capacity-setup.png" alt="A battery's settings" width="480">
+        <ol>
+            <li>Add <b>Battery Capacity</b> in <i>Applications - User
+            Applications</i>.</li>
+            <li>In its settings choose <b>Add battery</b>, then the category,
+            chemistry, cells, capacity (mAh) and the <b>capacity</b>,
+            <b>voltage</b> and (optional) <b>current</b> sensors. Every
+            pack needs a voltage sensor; the screen flashes a reminder and
+            the list shows "SETUP!" until it's set.</li>
+            <li>Put <b>Batteries</b> (double size) or <b>Battery</b> (single
+            size) on a page in <i>Timers/Sensors - Displayed
+            telemetry</i>.</li>
+        </ol>
+        <p>Central Box: pick <i>U Accu 1/2</i> as the voltage sensors (the
+        receiver measures the box's regulated output, not the pack).</p>
+        <img src="img/battery-capacity-ds24.png" alt="The single-size window on a first-version DS-24" width="320">
+        <p>Above: the single-size window on a first-version DS-24.</p>
+        <p>Version: <b>0.1.0</b></p>
+        <p>Compatibility: <b>DC/DS-24 and DC/DS-24II</b></p>
+        <p>Voice: Piper text-to-speech with the "Amy" voice by Mycroft /
+        Rhasspy; the sound files are licensed CC BY-SA 4.0. Battery
+        Capacity: MIT license, Copyright (c) 2026 Aaron George.</p>
+        <p>Source and full credits:
+        <a href="https://github.com/Flazzarious/jeti-lua-apps">github.com/Flazzarious/jeti-lua-apps</a></p>
+    </body>
+</html>
