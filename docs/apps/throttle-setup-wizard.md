@@ -1,7 +1,9 @@
 # Throttle Setup Wizard
 
 Set up a turbine's throttle on one **safety switch**, and **prove it works**
-before the engine ever starts. For the JETI **DS-24 II / DC-24 II**.
+before the engine ever starts. For the JETI **DC/DS-24 II** and the
+**first-version DC/DS-24** (it uses only settings screens, so it runs on both;
+still being tested on the first version).
 
 ![Other Model Options with Throttle Cut and Throttle Idle on the same switch](img/throttle-setup-wizard-cut-idle.png)
 
