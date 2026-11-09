@@ -239,7 +239,9 @@ How it decides:
 A **Test alarm** switch plays the real alarm on the ground (not while armed).
 The sounds in `src/Apps/AG-FlmOt/` are generated with
 [`tools/voice/make_flameout.py`](tools/voice/README.md) and licensed CC BY-SA
-4.0, not MIT. Install = `AG-FlmOt.lua` plus the `AG-FlmOt/` folder.
+4.0, not MIT. Install = `AG-FlmOt.lua` plus the `AG-FlmOt/` folder. Runs on the
+DS/DC-24 II and, since 0.2.0, the first-version DS/DC-24 (still being tested
+there).
 
 ### Throttle Setup Wizard
 

@@ -125,6 +125,16 @@ threshold < idle RPM < start overshoot.
   setting (×1, ×10, ×100, ×1000, default ×1). No automatic unit conversion
   (FR-006a, FR-010).
 
+### Session 2026-11-08
+
+- Q: Should the sweep window also run on the original (first-version)
+  DC/DS-24? → A: Yes. Every app should run on both models (Aaron), and the
+  app is released for others to try before it's fully tested there. The
+  first version's windows (151 × 24 / 151 × 69, title above) fit the same
+  150 × 23 / 150 × 68 layout, and `lcd.renderer` exists there (firmware
+  4.27+, used by Speed Gauge 0.4.0 and Battery Capacity on a DS-24 with
+  5.08). FR-031d covers it; released as 0.2.0.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Hear a flameout the moment it happens (Priority: P1)
@@ -690,6 +700,10 @@ once.
 - **FR-031c**: If the window is placed at single size (150 × 23), it MUST
   show a straight horizontal bar filling left to right with the idle marker,
   the RPM number beside it, and the state. Full screen is out of scope.
+- **FR-031d**: The sweep and bar windows MUST draw on the whole DC/DS-24
+  family, the II and the first version (device type contains "DS-24" or
+  "DC-24"; Session 2026-11-08). Other transmitters show the state and RPM as
+  text, and the alarm works on all of them.
 
 **Safety and footprint**
 
@@ -819,7 +833,8 @@ once.
   signal loss itself.
 - **One engine per model** in v1. Two-engine models are out of scope; a later
   version could monitor one RPM sensor per engine.
-- **Target hardware** is the DS-24 II / DC-24 II on firmware 6.x. The
+- **Target hardware** is the DS-24 II / DC-24 II on firmware 6.x and, since
+  0.2.0, the first-version DC/DS-24 (FR-031d). The
   emulator plays no Lua audio, so the alarm sound and its timing can only be
   verified on the transmitter.
 - **Turbine Throttle Setup** (spec 002, separate app) uses the same physical

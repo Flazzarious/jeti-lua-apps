@@ -125,9 +125,9 @@ src/Apps/lib/ag_xxxxx.lua  shared module, loaded with require("ag_xxxxx")
   Check new drawing on both (the first version runs older firmware, 5.08
   on Aaron's). The JETI Studio emulator (firmware 6.04) reports 157 × 60 /
   157 × 127 / 320 × 260 with a title bar inside. Speed Gauge runs on both
-  since 0.4.0 (2026-11-08), with dial images per window size. Flameout
-  Alarm and Throttle Setup Wizard still check for "24 II" and show only
-  text on the first version; widening them is a separate change per app.
+  since 0.4.0 (2026-11-08), with dial images per window size, Battery
+  Capacity since 0.1.0 and Flameout Alarm since 0.2.0 (2026-11-08,
+  untested there). Throttle Setup Wizard is form-only and listed for both.
   A first-version transmitter's card says `"hw":679` in
   `Config/Config.jsn` (the II's says 3867); JETI Studio's catalog uses
   678/679 and 3866/3867. Details, scaling and drawing limits are in
