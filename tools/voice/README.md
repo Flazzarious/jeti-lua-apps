@@ -122,6 +122,34 @@ Options: `--out`, `--rate` (default 22050) and `--speed` (default 1.15).
 The self-check fails if a file is missing or longer than 1.5 s (committed
 files, speed 1.15: 0.92 s and 0.87 s).
 
+## Battery Capacity voice
+
+`make_batcap.py` writes Battery Capacity's app voice to
+`src/Apps/AG-BatCp/voice/` (spec 005, FR-030 and FR-035; research R8):
+
+| Files | Says |
+| --- | --- |
+| `0.wav` … `500.wav` | numbers: **copied byte for byte** from Speed Gauge's `src/Apps/AG-SpdGa/voice/`, so both apps say numbers identically |
+| `pct`, `amps`, `volts`, `vpc`, `point` | "percent", "amps", "volts", "volts per cell", "point" |
+| `max`, `hicur`, `lowv`, `notfull` | "max", "high current", "low voltage", "pack not full" |
+| `n_flt`, `n_rx`, `n_ecu`, `n_gear`, `n_brk`, `n_lgt`, `n_aux`, `n_bat` | pack names: "flight", "receiver", "E C U", "landing gear", "brakes", "lights", "aux", "battery" (Custom) |
+
+The words use Speed Gauge's settings (speed 1.5, no effects), plus
+`CREDITS.txt` and `index.txt` (written last). The app queues the parts as
+one phrase: name, word, number, unit ("receiver, 2, low voltage, 3, point, 1,
+5, volts per cell"). Aaron approved the set by ear on 2026-11-02; the files
+are committed.
+
+```powershell
+python tools/voice/make_batcap.py --model C:\path\to\en_US-amy-medium.onnx
+```
+
+Options: `--out`, `--rate` (default 22050) and `--speed` (default 1.5). The
+self-check fails if a file is missing, a number file differs from Speed
+Gauge's, the count isn't 518, or a word is longer than 1.3 s (committed set:
+longest 0.83 s, "low voltage" and "pack not full"). Regenerate Speed Gauge's
+set first if its numbers ever change.
+
 For a new app's voice, follow the `jeti-voice` skill
 (`.claude/skills/jeti-voice/`).
 
@@ -129,9 +157,9 @@ For a new app's voice, follow the `jeti-voice` skill
 
 - **Voice model:** "Amy" (`en_US-amy-medium`) by Mycroft / Rhasspy is
   licensed CC BY-SA 4.0, and the license of the recordings it was trained on
-  is undocumented. The committed sets in `src/Apps/AG-SpdGa/voice/` and
-  `src/Apps/AG-FlmOt/` are therefore CC BY-SA 4.0, not MIT; keep their
-  `CREDITS.txt` with them.
+  is undocumented. The committed sets in `src/Apps/AG-SpdGa/voice/`,
+  `src/Apps/AG-FlmOt/`, `src/Apps/AG-TrbSt/` and `src/Apps/AG-BatCp/voice/`
+  are therefore CC BY-SA 4.0, not MIT; keep their `CREDITS.txt` with them.
 - **Piper:** the `piper-tts` package is GPL-3.0-or-later
   ([OHF-Voice/piper1-gpl](https://github.com/OHF-Voice/piper1-gpl)),
   continuing the original MIT-licensed

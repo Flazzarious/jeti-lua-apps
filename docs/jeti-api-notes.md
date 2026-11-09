@@ -81,6 +81,25 @@ the emulator's numbers above:
 
 - The window title is drawn **above** the reported area, not inside it, so
   nothing is hidden: don't subtract a title height on the transmitter.
+- **The first-version DS-24 reports almost the same sizes** (PROBE MODE 1,
+  `D:\Screen001-003.png`, 2026-11-05, Aaron's DS-24 with 2017 firmware
+  files): small **151 × 24**, large **151 × 69**, title drawn above, the
+  whole canvas visible (ruler to 60+). Font heights there: `FONT_NORMAL` 18,
+  `FONT_BOLD` 22, `FONT_MINI` 12, `FONT_MAXI` 40. Its screen is 320 × 240,
+  dark blue theme. A layout for 150 × 23 / 150 × 68 fits both models.
+  Full-screen size on the first version: not measured yet.
+- **Battery Capacity on the first-version DS-24** (2026-11-05,
+  `D:\Screen004-014.png`): rounded rectangles, filled rectangles, alpha
+  (the faint "no data" grey), `setClipping` text and `getBgColor` all work
+  as on the II; Amy WAVs queued with `AUDIO_QUEUE` play. Its CPU figure
+  stayed at **9 %** while drawing both windows and running a SIM profile.
+- **Battery Capacity on the DS-24 II** (2026-11-05 to 11-08): queued
+  `playFile` and `playNumber` calls play in order as one phrase, so a
+  `playNumber` waits behind a name file queued before it (T053). Drawing
+  the % twice with `setClipping` (split across the fill edge) costs no
+  visible CPU: four batteries in both windows stayed within the CPU limit
+  over a 30-minute run, and a Battery Capacity callout waits while Flameout
+  Alarm's test alarm plays (T034, T060).
 - "Full screen" is not the whole panel on the transmitter: sizes 3 and 4
   both get a titled 316 × 159 area across the top two thirds. With size 3
   the desktop's model tile still covers its lower-left corner; size 4 has
@@ -90,6 +109,16 @@ the emulator's numbers above:
 - Font heights on the transmitter: `FONT_NORMAL` 17, `FONT_BIG` 20–21,
   `FONT_MINI` 12, `FONT_MAXI` 38–39 (the two probes read 20/38 in the
   small/large windows and 21/39 full screen).
+- **`FONT_MINI` character widths** (transmitter, PROBE MODE 6, `Screen034.png`,
+  2026-11-04), from `lcd.getTextWidth(FONT_MINI, c)`: A 6, B 5, C 6, D 6,
+  E 4, F 4, G 6, H 6, I 2, J 4, K 5, L 4, M 7, N 6, O 6, P 5, Q 6, R 5, S 5,
+  T 5, U 5, V 5, W 7, X 5, Y 5, Z 5; digits 0–9 all 4; "-" 2, space 2,
+  "%" 6. **Single characters read rounded down**: whole strings measure
+  about 0.6 px per character more than their characters' sum ("FLIGHT-2"
+  38 vs 33, "BRAKES-2" 40, "TELEM" 27, "100%" 21, "8.1V 0.4A" 38;
+  `FONT_NORMAL` and `FONT_BOLD` "100%" both 32). Measure whole strings with
+  `getTextWidth` where `lcd` is available; elsewhere add 0.6 px per
+  character (Battery Capacity's label fit check).
 - Lua coordinates are enlarged about 1.45× on the 480 × 480 panel (the
   316 × 159 window covers 454 × 228 screen pixels). Lines are drawn at Lua
   resolution and then enlarged, so curves built from 5° segments look
@@ -234,6 +263,23 @@ The app file returns a table: `init`, `loop`, `destroy` (5.00+), `author`,
 
 - `system.getSensors()` returns every sensor entry; `param == 0` is the sensor's
   name row. Useful in a setup form, too heavy for `loop()`.
+- The receivers' own values (U Rx, Q, A1/A2) are **not** sensors on the
+  transmitter: Auto-detect lists nothing for a bare receiver and
+  `getSensors()` has no entry. Read them with `system.getTxTelemetry()`
+  (`rx1Voltage`, `rx1Percent`, `RSSI`, ...). After a link loss the voltages
+  keep their last value, while `rx1Percent` (Q) and `RSSI` drop to 0, so
+  check Q before trusting a voltage (DS-24 II, PROBE MODE 7). The emulator's
+  `sensors.json` can fake them as sensors, so test this on the transmitter
+  (DS-24, 2026-11-05, Battery Capacity).
+- **Units seen on Aaron's sensors** (DS-24 II flight log and Battery
+  Capacity's lists, 2026-11-07): CBOX210 "U Accu 1/2" `V`, "I Accu 1/2" `A`,
+  "Capacity 1/2" `mAh` (used); VOLTARIO "Voltage" `V`; turbine ECU "Bat."
+  `V`; SW "PwrVol" `V`; MSPEED "Velocity" `m/s`. The log writes the receivers
+  as "Rx1"/"Rx2" with "U Rx1" `V` and "Q" `%`, but Lua still can't list them.
+- **Sensor ids fit in 32 bits and may be negative** (e.g. -1598118838):
+  saving them in a `pSave` integer array round-trips fine. Don't treat a
+  negative id as "unset"; Battery Capacity reserves only -1 for receiver
+  voltages, and the log's 10-digit device numbers are not the Lua ids.
 - `system.getSensorByID(id, param)` returns a full entry;
   `system.getSensorValueByID(id, param)` returns a lighter one (no label/unit).
   Both return `nil` if the sensor doesn't exist. Always check `.valid`.

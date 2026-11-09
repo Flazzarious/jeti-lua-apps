@@ -19,6 +19,7 @@ other work. Remove an item once he says it's done.
 | Speed Gauge | `src/Apps/AG-SpdGa.lua` | `specs/001-speed-gauge/` | DFM Speed Announcer (Dave McQueeney, MIT) |
 | Throttle Setup Wizard | `src/Apps/AG-TrbSt.lua` | `specs/002-turbine-throttle-setup/` | original |
 | Flameout Alarm | `src/Apps/AG-FlmOt.lua` | `specs/003-flameout-alarm/` | original |
+| Battery Capacity | `src/Apps/AG-BatCp.lua` | `specs/005-battery-capacity/` | original |
 
 Keep this table current when an app is added.
 
@@ -114,12 +115,22 @@ src/Apps/lib/ag_xxxxx.lua  shared module, loaded with require("ag_xxxxx")
 
 ## Environment
 
-- **Target:** DS-24 II / DC-24 II only for anything drawn on screen. Design
-  for the Lua window sizes measured **on the transmitter**, not the panel's
-  480 × 480 or the emulator's: small 150 × 23, large 150 × 68, full screen
-  316 × 159, all visible, with the title drawn above the window. The JETI
-  Studio emulator (firmware 6.04) reports 157 × 60 / 157 × 127 / 320 × 260
-  with a title bar inside. Details, scaling and drawing limits are in
+- **Target:** the DS/DC-24 family, **both the II and the first version**
+  (Aaron's goal from 2026-11-05: support both unless a problem shows up).
+  Design for the Lua window sizes measured **on the transmitters**, not the
+  II panel's 480 × 480 or the emulator's: small 150 × 23, large 150 × 68,
+  full screen 316 × 159 on the II; small 151 × 24, large 151 × 69 on the
+  first version (full screen 319 × 159 there); all visible, with the title
+  drawn above the window. A layout for 150 × 23 / 150 × 68 fits both.
+  Check new drawing on both (the first version runs older firmware, 5.08
+  on Aaron's). The JETI Studio emulator (firmware 6.04) reports 157 × 60 /
+  157 × 127 / 320 × 260 with a title bar inside. Speed Gauge runs on both
+  since 0.4.0 (2026-11-08), with dial images per window size. Flameout
+  Alarm and Throttle Setup Wizard still check for "24 II" and show only
+  text on the first version; widening them is a separate change per app.
+  A first-version transmitter's card says `"hw":679` in
+  `Config/Config.jsn` (the II's says 3867); JETI Studio's catalog uses
+  678/679 and 3866/3867. Details, scaling and drawing limits are in
   `docs/jeti-api-notes.md`; measure more with `tools/probe/PROBE.lua`. The
   emulator plays no Lua audio, so voice can only be tested on the
   transmitter.

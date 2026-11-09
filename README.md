@@ -1,6 +1,7 @@
 # Jeti Lua Apps
 
-A collection of Lua apps for the JETI DS-24 II transmitter, built with a
+A collection of Lua apps for the JETI DS-24 transmitters (II and first
+version; see each app for what it draws on which), built with a
 spec-driven workflow (GitHub Spec Kit + Claude Code) in VS Code.
 
 ## Apps
@@ -10,6 +11,7 @@ spec-driven workflow (GitHub Spec Kit + Claude Code) in VS Code.
 | Speed Gauge | [`AG-SpdGa.lua`](src/Apps/AG-SpdGa.lua) | Released (0.4.0) | [001](specs/001-speed-gauge/spec.md) | DFM Speed Announcer by Dave McQueeney (MIT) |
 | Flameout Alarm | [`AG-FlmOt.lua`](src/Apps/AG-FlmOt.lua) | Released (0.1.0) | [003](specs/003-flameout-alarm/spec.md) | Original |
 | Throttle Setup Wizard | [`AG-TrbSt.lua`](src/Apps/AG-TrbSt.lua) | Released (0.1.0) | [002](specs/002-turbine-throttle-setup/spec.md) | Original |
+| Battery Capacity | [`AG-BatCp.lua`](src/Apps/AG-BatCp.lua) | In development (0.1.0) | [005](specs/005-battery-capacity/spec.md) | Original |
 
 ### Screenshots
 
@@ -266,6 +268,83 @@ The voice files in `src/Apps/AG-TrbSt/` are generated with
 4.0, not MIT. Install = `AG-TrbSt.lua` plus the `AG-TrbSt/` folder. Tested on
 the DS-24 II; older DC/DS transmitters should work but are untested.
 
+### Battery Capacity
+
+Shows up to four battery packs per model (receiver, turbine ECU, landing
+gear, brakes, lights, aux or flight packs) as solid battery gauges and
+speaks when a pack needs attention, naming the pack every time:
+"receiver two, 30 percent", "flight, low voltage, 3 point 5 8 volts per
+cell".
+
+- **Two windows:** a small one with one battery on its side, and a
+  double-size one with up to four upright batteries. Each fills in green,
+  yellow, orange or red by % remaining; current (or voltage) is shown under
+  each. Both window titles can be renamed in the settings.
+- **Any capacity sensor:** mAh consumed (e.g. MUI, Central Box), % remaining,
+  or voltage alone (estimated from each chemistry's resting voltage curve).
+- **Callouts:** up to four capacity levels per pack (the lowest repeats), a
+  low-voltage alarm per cell or per pack with a flashing red outline, an
+  optional current alarm, session max current (as in Speed Gauge) and an
+  optional "pack not full" check when a pack is connected.
+- **Smart defaults** from the pack's category and chemistry (LiPo, LiHV,
+  Li-ion, LiFe, NiMH/NiCd); everything can be changed.
+
+**It only listens and informs.** It never controls the model, and it doesn't
+replace the transmitter's own receiver-voltage alarm.
+
+**Give each pack a voltage sensor if you can.** When telemetry drops out and
+comes back, the app has to tell a pack swap (reset the callouts) from a
+brown-out (keep them); an mAh sensor that restarts at 0 looks like a full
+pack either way, and the voltage settles it. A gauge driven by voltage alone
+is a resting estimate: it reads low under load and is coarse in the flat
+middle of LiFe and NiMH packs.
+
+**Setup** (Applications → Battery Capacity): Add battery, pick the category,
+chemistry, cell count, capacity (mAh) and the capacity sensor; the
+thresholds fill in.
+
+**Sensor behaviour worth knowing:**
+
+- **Receiver voltages.** The transmitter doesn't list a receiver's own
+  voltage as a sensor, so the capacity and voltage lists start with
+  "Receiver 1 voltage", "Receiver 2 voltage" and "Backup Rx voltage" (read
+  from the transmitter's receiver telemetry). They count as lost as soon as
+  that receiver's signal quality drops to 0, because the transmitter keeps
+  showing the last voltage after a link loss.
+- **The voltage sensor fills in for the %.** With no capacity sensor, or an
+  mAh sensor while the pack's capacity (mAh) is still 0, the % comes from
+  the voltage sensor. A missing capacity flashes a "Capacity (mAh) not set"
+  reminder on the battery's screen until you enter it.
+- **Every battery needs a voltage sensor.** Without one (or a capacity
+  sensor in V), the battery's screen flashes "Voltage sensor not set" and
+  the main screen marks it "SETUP!". The same mark shows for a missing
+  capacity (mAh).
+- **mAh counters start from the voltage.** A Central Box keeps its mAh
+  count across power-ups, so the app doesn't read the count as "used from
+  full". At power-on it takes the pack's % from its resting voltage (100 %
+  without a voltage sensor), then subtracts what the counter adds. A
+  partly charged pack starts where it really is, and a counter reset
+  doesn't make the % jump.
+- **Central Box packs: use U Accu.** Behind a Central Box the receiver
+  measures the box's regulated output, not the pack. Pick "U Accu 1" and
+  "U Accu 2" as the voltage sensors, not the receiver voltages.
+- **Current or voltage under each battery.** The four-battery window shows
+  the current when a current sensor is set, otherwise the pack voltage.
+  Leave the current sensor at (none) to see the voltage, e.g. for receiver
+  packs on a Central Box.
+
+"Show all settings" on a battery shows the colour bands, voltages, delays
+and repeat limits. With the transmitter's voice (or without
+the voice files), each battery can play its own name file before the number.
+
+The voice files in `src/Apps/AG-BatCp/voice/` are generated with
+[`tools/voice/make_batcap.py`](tools/voice/README.md) (numbers shared with
+Speed Gauge's set) and licensed CC BY-SA 4.0, not MIT. Install =
+`AG-BatCp.lua`, the `AG-BatCp/` folder and `lib/ag_peak.lua`. The gauges
+work on the DS/DC-24 II and the first-version DS/DC-24; the callouts work on
+any DC/DS transmitter. Details
+in [spec 005](specs/005-battery-capacity/spec.md).
+
 ## Install with JETI Studio
 
 1. In JETI Studio open **File → Configuration**, and add this line to the
@@ -310,6 +389,7 @@ src/Apps/                         Mirrors /Apps on the transmitter SD card
 tools/check.py                    Syntax, forbidden-API, naming, encoding checks
 tools/pdf2md.py                   Converts Jeti's API PDF for local reference
 tests/test_ag_dens.lua            Optional desktop test for the density module (any Lua 5.3)
+tests/test_ag_peak.lua            Optional desktop test for the spike-filtered max module
 tools/probe/PROBE.lua             Dev tool: prints the screen/window sizes in the emulator
 ```
 
@@ -346,8 +426,11 @@ tools/probe/PROBE.lua             Dev tool: prints the screen/window sizes in th
    ```
    This writes `docs/vendor/jeti-api.md`. It's gitignored because the PDF is
    JETI's copyrighted document.
-4. **Lua 5.3 compiler (optional).** `tools/check.py` uses `luac5.3`/`luac` from
-   PATH for syntax checks and skips that step with a warning if absent.
+4. **Lua 5.3 compiler (recommended).** `tools/check.py` uses `luac5.3`,
+   `luac53` or `luac` from PATH for syntax checks, only if it reports Lua 5.3,
+   and skips that step with a warning otherwise. On Windows, from an admin
+   PowerShell: `choco install lua53`. Don't use Lua 5.4 (e.g. winget's
+   `DEVCOM.Lua`): it accepts syntax the transmitter's Lua 5.3 rejects.
 
 ## Workflow
 
