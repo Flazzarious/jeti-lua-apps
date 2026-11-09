@@ -453,7 +453,9 @@ on" when flipping it, with the app removed from the model.
   work on older JETI DC/DS transmitters too (Aaron, 2026-10-10): it uses
   only form screens, no drawing. Where the firmware lacks a feature, the
   app hides it instead of failing: no Open buttons below firmware 5.01,
-  no voice copy without file delete (5.00).
+  no voice copy without file delete (5.00). Since 2026-11-08 JETI Studio
+  lists it for the first-version DC/DS-24 too (Aaron: every app on both
+  models), before it has been tried there.
 
 **Voice callouts (optional, User Story 4)**
 

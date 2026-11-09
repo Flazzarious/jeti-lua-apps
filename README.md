@@ -276,7 +276,9 @@ hand: [Throttle Setup Wizard](docs/apps/throttle-setup-wizard.md).
 The voice files in `src/Apps/AG-TrbSt/` are generated with
 [`tools/voice/make_turbine.py`](tools/voice/README.md) and licensed CC BY-SA
 4.0, not MIT. Install = `AG-TrbSt.lua` plus the `AG-TrbSt/` folder. Tested on
-the DS-24 II; older DC/DS transmitters should work but are untested.
+the DS-24 II and listed for the first-version DS/DC-24 too (form screens only;
+still being tested there); other older DC/DS transmitters should work but are
+untested.
 
 ### Battery Capacity
 
