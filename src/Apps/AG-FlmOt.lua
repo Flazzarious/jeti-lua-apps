@@ -11,7 +11,7 @@
 -- contracts/). Research decisions are cited as R1..R13.
 
 local APP_NAME = "Flameout Alarm"
-local APP_VERSION = "0.1.0"
+local APP_VERSION = "0.2.0"
 local AUDIO_DIR = "/Apps/AG-FlmOt/"
 local TICK_MS = 100         -- logic runs at most 10x per second (R8)
 local CYCLE_MS = 5000       -- one alarm cycle, callout start to callout start (FR-023)
@@ -785,7 +785,7 @@ local seg = {}                -- per segment: 8 integers, x/y of four corners
 local marker = { x = 0, y = 0, h = 0, ver = -1 }   -- idle marker, from recomputeMarker()
 local rend = nil ---@type Renderer|nil  -- one renderer, reused (Speed Gauge, verified)
 local cpuWorst = 0            -- DEBUG_CPU only
-local isDs24 = false          -- set in init(): the sweep needs a DS-24 II (R11)
+local isDs24 = false          -- set in init(): the sweep needs a DC/DS-24, II or first version (R11)
 
 -- Segment corners, once in init(): no trig or allocation per frame (R11).
 local function buildSweep()
@@ -938,7 +938,7 @@ local function drawSingle(ox)
   drawRight(st.rpmText, ox + 146, 3, FONT_NORMAL)
 end
 
--- Not a DS-24 II: text only, theme colors (the alarm works everywhere).
+-- Not a DC/DS-24: text only, theme colors (the alarm works everywhere).
 local function drawText(w)
   local r, g, b = lcd.getFgColor()
   lcd.setColor(r, g, b)
@@ -992,7 +992,12 @@ local function init()
   resetSession()
   checkAudio()                -- once: five file opens (R6)
   buildSweep()
-  isDs24 = string.find(system.getDeviceType() or "", "24 II", 1, true) ~= nil
+  -- The first-version DS-24's windows (151 x 24 / 151 x 69) fit the same
+  -- 150 x 23 / 150 x 68 layout, and lcd.renderer is there since 4.27 (as in
+  -- Speed Gauge 0.4.0 and Battery Capacity).
+  local device = system.getDeviceType() or ""
+  isDs24 = string.find(device, "DS-24", 1, true) ~= nil
+    or string.find(device, "DC-24", 1, true) ~= nil
 
   system.registerForm(1, MENU_APPS, APP_NAME, initForm, nil, nil, closeForm)
   system.registerTelemetry(1, APP_NAME, 0, printRpm)

@@ -2,7 +2,7 @@
 
 An urgent, repeating alarm when a turbine flames out, from the engine's RPM
 telemetry, and an RPM bar for the main screen, for the JETI
-**DS-24 II / DC-24 II**.
+**DC/DS-24 II** and the **first-version DC/DS-24**.
 
 ![Flameout Alarm on the main screen, armed](https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/main/docs/apps/img/flameout-alarm-armed.png)
 
@@ -33,7 +33,8 @@ own monitoring.
 
 ## Requirements
 
-- JETI **DS-24 II or DC-24 II**, firmware 6.0 or newer. On other DC/DS-24
+- JETI **DC/DS-24 II** (firmware 6.0 or newer) or the **first-version DC/DS-24**
+  (since 0.2.0, still being tested there). On other DC/DS
   transmitters the alarm works and the window shows text only.
 - A turbine whose **RPM reaches the transmitter as a normal telemetry
   sensor**: JetCat, Xicoy and KingTech through their Jeti telemetry adapters

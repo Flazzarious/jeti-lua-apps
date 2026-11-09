@@ -205,6 +205,12 @@ built and checked on its own.
 
 - [X] T056 [P] Add the JETI Studio description page for Flameout Alarm, following Speed Gauge's: `docs/apps/flameout-alarm.md` and `docs/apps/flameout-alarm.html` (what it does, advisory note, ECU support, setup, test alarm switch, CC BY-SA 4.0 sounds), with transmitter screenshots of the double and single windows in `docs/apps/img/` (from T046). Link it from the README's "Install with JETI Studio" section
 - [X] T057 [P] Make the app icon `docs/apps/img/flameout-alarm-icon.png` with `tools/publish/make_icon.py` (add an option or constant for the output path and design rather than overwriting Speed Gauge's icon; keep the "AG" monogram style)
+### First-version DC/DS-24 (0.2.0, Session 2026-11-08)
+
+- [X] T059 Draw the sweep and bar on any DC/DS-24 (`getDeviceType()` contains "DS-24" or "DC-24", as Speed Gauge 0.4.0) in `src/Apps/AG-FlmOt.lua`, `APP_VERSION` 0.2.0; FR-031d, research R11, plan, description pages and README say both models
+- [ ] T060 After the tag `AG-FlmOt-v0.2.0`, point Flameout Alarm's `APPS` entry in `tools/publish/make_apps_json.py` at it with `hw` 678, 679, 3866, 3867 and name "(DC/DS-24)", regenerate `Apps.json`
+- [ ] T061 MANUAL: On the first-version DS-24, both window sizes (sweep, idle marker, FLAMEOUT banner via the test alarm switch) and the settings form (the 320 px RPM sensor row fits or clips cleanly); screenshots for the description page
+
 - [X] T058 After the release tag `AG-FlmOt-v0.1.0` exists (CLAUDE.md branch rules), add a Flameout Alarm entry to `APPS` in `tools/publish/make_apps_json.py` (script `AG-FlmOt`, files `src/Apps/AG-FlmOt.lua` and `src/Apps/AG-FlmOt`, description and icon from T056/T057), run it, and commit `Apps.json` for the merge to `main`. Try it first with `--local` in JETI Studio
 
 ---
