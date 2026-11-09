@@ -2,8 +2,8 @@
 """Pre-emulator checks for Jeti Lua apps (constitution: Verification step 2).
 
 1. Syntax-checks every .lua file under src/ and docs/examples/style/ with a
-   Lua 5.3 compiler, if one is on PATH (luac5.3 or luac). Skipped with a
-   warning otherwise.
+   Lua 5.3 compiler, if one is on PATH (luac5.3, luac53 or luac, and only
+   if it reports Lua 5.3). Skipped with a warning otherwise.
 2. Scans for APIs the constitution forbids or that don't exist on the radio.
 3. Checks files are UTF-8 without BOM, with LF line endings.
 4. Checks names in src/Apps (Principle V):
@@ -128,9 +128,20 @@ def main() -> int:
     for extra in EXTRA:
         files += sorted(extra.rglob("*.lua"))
 
-    luac = shutil.which("luac5.3") or shutil.which("luac")
+    # Chocolatey's lua53 package names it luac53. Only a 5.3 compiler counts:
+    # 5.4 accepts syntax the transmitter's 5.3 rejects (e.g. <const>).
+    luac = (shutil.which("luac5.3") or shutil.which("luac53")
+            or shutil.which("luac"))
     if luac is None:
         warnings.append("luac not found on PATH; syntax check skipped")
+    else:
+        version = subprocess.run(
+            [luac, "-v"], capture_output=True, text=True
+        )
+        banner = (version.stdout + version.stderr).strip()
+        if "Lua 5.3" not in banner:
+            warnings.append(f"{luac} is not Lua 5.3 ({banner}); syntax check skipped")
+            luac = None
 
     for path in files:
         rel = path.relative_to(ROOT).as_posix()
