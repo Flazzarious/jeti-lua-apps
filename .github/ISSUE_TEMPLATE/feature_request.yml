@@ -1,0 +1,38 @@
+name: Feature or app idea
+description: Suggest a change to an app, or a new app.
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Apps here are for telemetry, announcements, alarms, timers and displays only.
+        Nothing may control surfaces, throttle or any flight function.
+  - type: dropdown
+    id: app
+    attributes:
+      label: App
+      options:
+        - Speed Gauge
+        - Flameout Alarm
+        - Throttle Setup Wizard
+        - Battery Capacity
+        - A new app
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem would it solve?
+      description: What you'd like to know, hear or see on the transmitter, and why.
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: How you imagine it
+      description: Settings, callouts, what the window shows. Sketches or photos of similar displays are welcome.
+  - type: input
+    id: hardware
+    attributes:
+      label: Transmitter and sensors
+      placeholder: "e.g. DS-24 II, JetCat ECU, MSpeed"

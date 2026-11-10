@@ -1,0 +1,67 @@
+name: Bug report
+description: Something in one of the apps doesn't work as described.
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting. The details below help reproduce the problem on the same transmitter.
+        Never test a fix on a model you'll fly the same day.
+  - type: dropdown
+    id: app
+    attributes:
+      label: App
+      options:
+        - Speed Gauge
+        - Flameout Alarm
+        - Throttle Setup Wizard
+        - Battery Capacity
+        - Other / not sure
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: App version
+      description: At the bottom of most apps' settings screens, or the version you installed in JETI Studio.
+      placeholder: "e.g. 0.2.0"
+    validations:
+      required: true
+  - type: dropdown
+    id: transmitter
+    attributes:
+      label: Transmitter
+      options:
+        - DS-24 II
+        - DC-24 II
+        - DS-24 (first version)
+        - DC-24 (first version)
+        - JETI Studio emulator
+        - Other
+    validations:
+      required: true
+  - type: input
+    id: firmware
+    attributes:
+      label: Firmware version
+      placeholder: "e.g. 6.04"
+  - type: input
+    id: sensor
+    attributes:
+      label: Sensor or ECU converter
+      description: For telemetry apps, which sensor, ECU or converter you use.
+      placeholder: "e.g. JetCat ECU via VSpeak converter, MSpeed, MUI 75"
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+      description: What you did, what you expected, and what happened instead.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Screenshots or log
+      description: |
+        For display problems, attach the transmitter's screenshot (it saves ScreenNNN.png to the SD card).
+        From the emulator, paste the Lua console output.

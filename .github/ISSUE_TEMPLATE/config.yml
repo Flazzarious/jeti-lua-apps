@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: App descriptions and setup
+    url: https://github.com/Flazzarious/jeti-lua-apps/tree/main/docs/apps
+    about: How each app works and how to set it up.
+  - name: Install with JETI Studio
+    url: https://github.com/Flazzarious/jeti-lua-apps#install-with-jeti-studio
+    about: Add this repo's app list to JETI Studio.
