@@ -1,0 +1,65 @@
+name: Test result
+description: Tell us how an app worked on your transmitter, good or bad.
+labels: ["test result"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Results from real transmitters, sensors and engines decide what gets fixed next, for example
+        "works on my first-version DS-24" or "the alarm is too quiet with my ECU". For a clear fault, use **Bug report** instead.
+  - type: dropdown
+    id: app
+    attributes:
+      label: App
+      options:
+        - Speed Gauge
+        - Flameout Alarm
+        - Throttle Setup Wizard
+        - Battery Capacity
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: App version
+      placeholder: "e.g. 0.2.0"
+    validations:
+      required: true
+  - type: dropdown
+    id: transmitter
+    attributes:
+      label: Transmitter
+      options:
+        - DS-24 II
+        - DC-24 II
+        - DS-24 (first version)
+        - DC-24 (first version)
+        - JETI Studio emulator
+        - Other
+    validations:
+      required: true
+  - type: input
+    id: firmware
+    attributes:
+      label: Firmware version
+      placeholder: "e.g. 5.08"
+  - type: input
+    id: sensor
+    attributes:
+      label: Sensor or ECU converter
+      placeholder: "e.g. Xicoy telemetry adapter, MSpeed 450 EX, Central Box 210"
+  - type: dropdown
+    id: result
+    attributes:
+      label: Overall
+      options:
+        - Works as described
+        - Works, with remarks
+        - Doesn't work
+    validations:
+      required: true
+  - type: textarea
+    id: notes
+    attributes:
+      label: Notes
+      description: What you tried and what you noticed. Screenshots welcome.
