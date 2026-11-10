@@ -10,7 +10,7 @@ built spec-first with GitHub Spec Kit (`/speckit-specify`, `/speckit-plan`,
 At the start of a session, remind Aaron of any items here before starting
 other work. Remove an item once he says it's done.
 
-- Install and set up RTK to help with console commands.
+- (none)
 
 ## Apps in this repo
 
