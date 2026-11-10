@@ -497,6 +497,12 @@ firmware may add functions that aren't in it. Entries marked `UNVERIFIED` were
 inferred where the PDF is silent. When a newer API document turns up, update
 the stubs and `docs/jeti-api-notes.md` together.
 
+## Contributing
+
+Bug reports, test results from your transmitter and pull requests are
+welcome. See [CONTRIBUTING.md](CONTRIBUTING.md) and the
+[Code of Conduct](CODE_OF_CONDUCT.md).
+
 ## Credits
 
 Speed Gauge is based on **DFM Speed Announcer** by DFM (Dave McQueeney),
