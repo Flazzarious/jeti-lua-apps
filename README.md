@@ -501,7 +501,8 @@ the stubs and `docs/jeti-api-notes.md` together.
 
 Bug reports, test results from your transmitter and pull requests are
 welcome. See [CONTRIBUTING.md](CONTRIBUTING.md) and the
-[Code of Conduct](CODE_OF_CONDUCT.md).
+[Code of Conduct](CODE_OF_CONDUCT.md). Report anything that could affect
+flight privately, as described in [SECURITY.md](SECURITY.md).
 
 ## Credits
 
