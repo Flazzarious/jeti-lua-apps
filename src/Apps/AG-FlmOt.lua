@@ -11,7 +11,7 @@
 -- contracts/). Research decisions are cited as R1..R13.
 
 local APP_NAME = "Flameout Alarm"
-local APP_VERSION = "0.2.0"
+local APP_VERSION = "0.3.0"
 local AUDIO_DIR = "/Apps/AG-FlmOt/"
 local TICK_MS = 100         -- logic runs at most 10x per second (R8)
 local CYCLE_MS = 5000       -- one alarm cycle, callout start to callout start (FR-023)
