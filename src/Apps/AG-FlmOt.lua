@@ -133,10 +133,11 @@ local d = {
   idleRpm = 0, armRpm = 0, flRpm = 0, fullRpm = 1,
   armMs = 3000, detMs = 1000, lossMs = 2000,
   ver = 0,                  -- bumped on every recompute; the window follows it
+  simOn = false,            -- SIM only: a running profile stands in for the RPM sensor
 }
 
 local function recompute()
-  d.active = cfg.en == 1 and cfg.sId ~= 0 and cfg.swCut ~= nil and cfg.idle > 0
+  d.active = cfg.en == 1 and (cfg.sId ~= 0 or d.simOn) and cfg.swCut ~= nil and cfg.idle > 0
   d.kScale = SCALES[cfg.scl]
   d.idleRpm = cfg.idle * 100
   d.armRpm = d.idleRpm * cfg.armP // 100
@@ -452,7 +453,7 @@ end
 -- What monitoring still needs (FR-003); "" when complete.
 local function missingText()
   local parts = {}
-  if cfg.sId == 0 then
+  if cfg.sId == 0 and not d.simOn then
     parts[#parts + 1] = "RPM sensor"
   end
   if cfg.swCut == nil then
@@ -618,6 +619,11 @@ local function initForm()
     form.addLabel({ label = "SIM profile", width = px(120) })
     form.addSelectbox(sim.names, sim.idx, false, function(i)
       sim.idx, sim.t0 = i, system.getTimeCounter()
+      -- A profile counts as the RPM sensor, so the app can be tried on a
+      -- transmitter with no telemetry (no receiver on).
+      d.simOn = i > 1
+      recompute()
+      updateNeeds()
       onCut()                 -- start each profile disarmed and silent
     end, { width = px(200) })
   end
