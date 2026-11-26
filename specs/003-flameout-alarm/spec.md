@@ -135,6 +135,16 @@ threshold < idle RPM < start overshoot.
   4.27+, used by Speed Gauge 0.4.0 and Battery Capacity on a DS-24 with
   5.08). FR-031d covers it; released as 0.2.0.
 
+### Session 2026-11-25 (native drawing on the DS-24 II)
+
+- Q: Should the window use the DS-24 II's native drawing mode, as Speed
+  Gauge now does? → A: Yes (Aaron: "fix all of the apps in my repo that can
+  benefit"). `system.setProperty("NativeDraw", 1)` (constitution 1.4.0,
+  allowed for an app whose spec names it) draws the window in the panel's
+  own pixels: 223 × 55 / 223 × 151 with the bottom 4 px hidden, against
+  150 × 23 / 150 × 68 that leave the bottom third of the tile empty. The
+  setting is per app and covers the settings form too. FR-031e, research R14.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Hear a flameout the moment it happens (Priority: P1)
@@ -704,6 +714,13 @@ once.
   family, the II and the first version (device type contains "DS-24" or
   "DC-24"; Session 2026-11-08). Other transmitters show the state and RPM as
   text, and the alarm works on all of them.
+- **FR-031e**: On the DS-24 II the app MUST switch its own drawing to native
+  mode (`system.setProperty("NativeDraw", 1)`, constitution 1.4.0) and map
+  its 150 × 68 / 150 × 23 layouts onto the visible native window (223 × 147
+  / 223 × 51): widths scaled 1.45×, heights stretched to fill the window,
+  one-line texts centered. The settings form's fixed widths scale 1.45× too.
+  If the setting doesn't take, the default layouts stay. It can't affect
+  flight: it changes only how this app's window and form are drawn.
 
 **Safety and footprint**
 
