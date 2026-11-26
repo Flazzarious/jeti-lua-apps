@@ -26,6 +26,19 @@
 --             fields every 200 ms and prints them whenever they change, to
 --             see what they do when the receiver is switched off (Battery
 --             Capacity, research R1); "Probe small" (size 1) for comparison.
+--   MODE = 8: native drawing on the DS-24 II (system.setProperty("NativeDraw",
+--             1) in init, as DFM-Maps and DFM-InsP do; constitution 1.4.0):
+--             "Probe full" (size 4) and "Probe size5" (size 5, which Dave
+--             McQueeney's test apps use as "full screen").
+--   MODE = 9: native drawing, "Probe small" (size 1) and "Probe large"
+--             (size 2).
+--             To see whether the setting is global, run a copy in MODE 1
+--             (not native) at the same time, or put Speed Gauge's windows on
+--             the same desktop page: if their sizes or drawing change while
+--             a MODE 8/9 copy runs, one app's setting affects every app.
+-- Every window shows "ND=" and system.getProperty("NativeDraw") as it
+-- stands at that draw, and "ND before" the value init() read before setting
+-- it (another app may already have turned it on).
 -- A ruler down the right edge (tick every 10 px, number every 20 px) shows
 -- how much of the reported height is actually visible: the DS-24 II desktop
 -- draws a title bar inside each window and clips the bottom of the canvas.
@@ -40,6 +53,14 @@
 -- Sensors must already be connected: reload the app if they came later.
 
 local MODE = 2
+
+-- Names that say which copy is which when several run at once: the app and
+-- menu name (at most 15 characters show in User Applications), and "Pn " in
+-- front of every window title.
+local MODE_NAMES = { "Normal sm+lg", "Full+bar/full", "Auto+small", "Untitled auto",
+  "Untitled full", "Widths", "Rx", "NATIVE full", "NATIVE sm+lg" }
+local APP_NAME = "P" .. MODE .. " " .. (MODE_NAMES[MODE] or "Probe")
+local TAG = "P" .. MODE .. " "
 
 local reported = {}
 
@@ -63,13 +84,16 @@ end
 -- Device name and firmware, built once in init(); shown on screen so they can
 -- be read on a transmitter, which has no Lua console (added for the DS-24 v1).
 local deviceText = ""
+-- NativeDraw as init() found it, then what setting it returned (MODE 8, 9).
+local ndBefore = ""
 
 local function drawInfo(tag, w, h)
   report(tag, w, h)
   drawRuler(w, h)
   lcd.drawRectangle(0, 0, w, h)
   lcd.drawLine(0, 0, w - 1, h - 1)
-  lcd.drawText(4, 2, tag .. " " .. w .. "x" .. h, FONT_BOLD)
+  lcd.drawText(4, 2, tag .. " " .. w .. "x" .. h .. "  ND=" .. tostring(system.getProperty("NativeDraw"))
+    .. ndBefore, FONT_BOLD)
   local y = 2 + lcd.getTextHeight(FONT_BOLD)
   lcd.drawText(4, y, "fonts N/B/M/Mx: "
     .. lcd.getTextHeight(FONT_NORMAL) .. "/" .. lcd.getTextHeight(FONT_BIG)
@@ -83,6 +107,7 @@ local function printFullBar(w, h) drawInfo("full+bar", w, h) end
 local function printFull(w, h) drawInfo("full", w, h) end
 local function printAuto(w, h) drawInfo("auto", w, h) end
 local function printForm(w, h) drawInfo("form", w, h) end
+local function printSize5(w, h) drawInfo("size5", w, h) end
 
 -- MODE 6: widths are measured on the first draw (lcd works only here) and
 -- kept as lines of text.
@@ -188,31 +213,46 @@ local function init()
       print("PROBE sensor: " .. tostring(s.label) .. " unit=" .. unit .. " bytes=" .. #unit)
     end
   end
-  if MODE == 1 then
-    system.registerTelemetry(1, "Probe small", 1, printSmall)
-    system.registerTelemetry(2, "Probe large", 2, printLarge)
+  if MODE == 8 or MODE == 9 then
+    local before = system.getProperty("NativeDraw")
+    -- pcall: the property may not exist on older firmware (first-version DS-24).
+    local ok = pcall(function() system.setProperty("NativeDraw", 1) end)
+    ndBefore = " (before " .. tostring(before) .. (ok and "" or ", set failed") .. ")"
+    print("PROBE NativeDraw before " .. tostring(before) .. ", set ok " .. tostring(ok)
+      .. ", now " .. tostring(system.getProperty("NativeDraw")))
+  end
+  if MODE == 8 then
+    system.registerTelemetry(1, TAG .. "full", 4, printFull)
+    print("PROBE size-5 register result: "
+      .. tostring(system.registerTelemetry(2, TAG .. "size5", 5, printSize5)))
+  elseif MODE == 9 then
+    system.registerTelemetry(1, TAG .. "small", 1, printSmall)
+    system.registerTelemetry(2, TAG .. "large", 2, printLarge)
+  elseif MODE == 1 then
+    system.registerTelemetry(1, TAG .. "small", 1, printSmall)
+    system.registerTelemetry(2, TAG .. "large", 2, printLarge)
   elseif MODE == 3 then
-    system.registerTelemetry(1, "Probe auto", 0, printAuto)
-    system.registerTelemetry(2, "Probe small", 1, printSmall)
+    system.registerTelemetry(1, TAG .. "auto", 0, printAuto)
+    system.registerTelemetry(2, TAG .. "small", 1, printSmall)
   elseif MODE == 4 then
     print("PROBE empty-title register result: "
       .. tostring(system.registerTelemetry(1, "", 0, printAuto)))
-    system.registerTelemetry(2, "Probe small", 1, printSmall)
+    system.registerTelemetry(2, TAG .. "small", 1, printSmall)
   elseif MODE == 5 then
     print("PROBE empty-title full register result: "
       .. tostring(system.registerTelemetry(1, "", 4, printAuto)))
-    system.registerTelemetry(2, "Probe full", 4, printFull)
+    system.registerTelemetry(2, TAG .. "full", 4, printFull)
   elseif MODE == 6 then
-    system.registerTelemetry(1, "Probe widths", 4, printWidths)
-    system.registerTelemetry(2, "Probe large", 2, printLarge)
+    system.registerTelemetry(1, TAG .. "widths", 4, printWidths)
+    system.registerTelemetry(2, TAG .. "large", 2, printLarge)
   elseif MODE == 7 then
-    system.registerTelemetry(1, "Probe small", 1, printSmall)
-    system.registerTelemetry(2, "Probe Rx", 2, printRx)
+    system.registerTelemetry(1, TAG .. "small", 1, printSmall)
+    system.registerTelemetry(2, TAG .. "Rx", 2, printRx)
   else
-    system.registerTelemetry(1, "Probe full+bar", 3, printFullBar)
-    system.registerTelemetry(2, "Probe full", 4, printFull)
+    system.registerTelemetry(1, TAG .. "full+bar", 3, printFullBar)
+    system.registerTelemetry(2, TAG .. "full", 4, printFull)
   end
-  system.registerForm(1, MENU_APPS, "Screen Probe", nil, nil, printForm)
+  system.registerForm(1, MENU_APPS, APP_NAME, nil, nil, printForm)
 end
 
-return { init = init, loop = loop, author = "Aaron George", version = "1.5", name = "Screen Probe" }
+return { init = init, loop = loop, author = "Aaron George", version = "1.6", name = APP_NAME }

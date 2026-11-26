@@ -18,20 +18,23 @@ glow cost too much CPU on the transmitter (a redraw hit the limit at speed
 with a long overspeed zone, 2026-10-03).
 
 The app shows only the needed part of a ring with lcd.setClipping. Sizes:
-316 x 159 (full screen) and 150 x 68 (double window). Output goes to
-src/Apps/AG-SpdGa/.
+316 x 159 (full screen) and 150 x 68 (double window) on the DS-24 II, 319 x
+159 and 151 x 69 on the original DS-24, and the II's native drawing mode
+(research R18): 458 x 339 and 223 x 147, where every fixed size is scaled
+1.45x (px() below, as in the app). Output goes to src/Apps/AG-SpdGa/.
 
 The geometry must match buildFull / buildRound in src/Apps/AG-SpdGa.lua,
 and the colors C_BG, C_FACE, C_TRACK, C_ZONE and COLORS. Run after
 changing either:
 
-    python tools/dial/make_dial.py
+    python tools/dial/make_dial.py [WxH ...]
 
 Standard library only.
 """
 
 import math
 import struct
+import sys
 import zlib
 from pathlib import Path
 
@@ -47,26 +50,32 @@ COLORS = [  # COLORS in the app, same order (research R8)
     (170, 240, 0), (230, 60, 230), (150, 100, 255), (170, 170, 170),
     (255, 225, 0),
 ]
-TRACK_W = 3          # live track width
+TRACK_W = 3          # live track width (default-mode px)
 GLOW = (0.36, 0.02)  # glow alpha at the arc and at its deepest (app: GLOW)
-ZONE_W = 4           # live overspeed zone width
+ZONE_W = 4           # live overspeed zone width (default-mode px)
 SS = 4               # samples per pixel along each axis
+NATIVE = 1.45        # the app's S in native drawing mode
 
 
-def full_geometry(w, h):
+def px(n, s):
+    """A fixed size scaled for native drawing: px() in the app."""
+    return math.floor(n * s + 0.5)
+
+
+def full_geometry(w, h, s):
     """buildFull: dial on the left of the full-screen window."""
-    r = math.floor(min((h - 4) / 1.707, (w - 130) / 2 - 2))
+    r = math.floor(min((h - px(4, s)) / 1.707, (w - (160 if s > 1 else 130)) / 2 - px(2, s)))
     cy = math.floor((h - r * 1.707) / 2 + r)
-    return {"r": r, "cx": 2 + r, "cy": cy, "arc_r": r - 5, "arc_w": 7,
-            "glow_depth": 9 * 3}     # buildGlow(L, 3, 9)
+    return {"r": r, "cx": px(2, s) + r, "cy": cy, "arc_r": r - px(5, s),
+            "arc_w": px(7, s), "glow_depth": 9 * px(3, s)}   # buildGlow(L, px(3), 9)
 
 
-def round_geometry(w, h):
+def round_geometry(w, h, s):
     """buildRound: small dial on the left of the double window."""
-    r = math.floor(min((h - 4) / 1.707, w * 0.55 / 2))
+    r = math.floor(min((h - px(4, s)) / 1.707, w * 0.55 / 2))
     cy = math.floor((h - r * 1.707) / 2 + r)
-    return {"r": r, "cx": 2 + r, "cy": cy, "arc_r": r - 3, "arc_w": 4,
-            "glow_depth": 6 * 2}     # buildGlow(L, 2, 6)
+    return {"r": r, "cx": px(2, s) + r, "cy": cy, "arc_r": r - px(3, s),
+            "arc_w": px(4, s), "glow_depth": 6 * px(2, s)}   # buildGlow(L, px(2), 6)
 
 
 def in_sweep(dx, dy):
@@ -179,10 +188,10 @@ def write_png(path, w, h, rows, alpha):
                      + chunk(b"IEND", b""))
 
 
-def dial_image(w, h, g):
+def dial_image(w, h, g, s):
     """Opaque: background, face, track ring."""
     face = face_coverage(w, h, g)
-    track = ring_coverage(w, h, g, g["arc_r"], TRACK_W)
+    track = ring_coverage(w, h, g, g["arc_r"], px(TRACK_W, s))
     rows = []
     for fr, tr in zip(face, track):
         row = []
@@ -200,15 +209,21 @@ def ring_image(cov, color):
 
 
 def main():
-    # DS-24 II (316 x 159, 150 x 68) and the original DS-24 (319 x 159,
-    # 151 x 69; measured 2026-11-08).
-    for w, h, geometry in ((316, 159, full_geometry), (150, 68, round_geometry),
-                           (319, 159, full_geometry), (151, 69, round_geometry)):
-        g = geometry(w, h)
-        img_w = min(w, g["cx"] + g["r"] + 2)   # just the dial; the app fills the rest
+    # DS-24 II (316 x 159, 150 x 68), the original DS-24 (319 x 159,
+    # 151 x 69; measured 2026-11-08) and the II in native drawing mode
+    # (458 x 343 and 223 x 151 less the 4 hidden rows; 2026-11-25).
+    only = set(sys.argv[1:])     # e.g. "458x339": just those sizes
+    for w, h, geometry, s in ((316, 159, full_geometry, 1), (150, 68, round_geometry, 1),
+                              (319, 159, full_geometry, 1), (151, 69, round_geometry, 1),
+                              (458, 339, full_geometry, NATIVE),
+                              (223, 147, round_geometry, NATIVE)):
         tag = f"{w}x{h}"
-        write_png(OUT / f"dial-{tag}.png", img_w, h, dial_image(img_w, h, g), False)
-        zone = ring_glow_alpha(img_w, h, g, g["arc_r"], ZONE_W)
+        if only and tag not in only:
+            continue
+        g = geometry(w, h, s)
+        img_w = min(w, g["cx"] + g["r"] + px(2, s))   # just the dial; the app fills the rest
+        write_png(OUT / f"dial-{tag}.png", img_w, h, dial_image(img_w, h, g, s), False)
+        zone = ring_glow_alpha(img_w, h, g, g["arc_r"], px(ZONE_W, s))
         write_png(OUT / f"ring-{tag}-z.png", img_w, h, ring_image(zone, C_ZONE), True)
         value = ring_glow_alpha(img_w, h, g, g["arc_r"], g["arc_w"])
         write_png(OUT / f"ring-{tag}-o.png", img_w, h, ring_image(value, C_ZONE), True)

@@ -413,3 +413,25 @@ test.
 the form is open and can't be bound to a transmitter switch; could be added
 later); one cycle per press (a held switch couldn't check the 5-second
 rhythm).
+
+## R14. Native drawing on the DS-24 II (FR-031e)
+
+- **Finding:** see Speed Gauge's research R18 (spec 001): on a DS-24 II,
+  `system.setProperty("NativeDraw", 1)` draws an app's windows and form in
+  the panel's own pixels, per app. Measured: small 223 × 55, double
+  223 × 151, bottom 4 px hidden; fonts 26/31/18/57 (N/B/M/Mx) against
+  17/20/12/38. In the default mode this window's 150 × 68 covers only the
+  top 100 of the tile's 147 rows.
+- **Decision:** keep the 150 × 68 / 150 × 23 layout coordinates and map them
+  with `X(v) = floor(v * sx + 0.5)` and `Y(v) = floor(v * sy + 0.5)`: sx =
+  1.45 (the font scale, centered in the 223 px width), sy = visible height
+  / 68 or / 23, so the sweep grows taller and fills the tile. The sweep's
+  corners are rebuilt only when the scale changes. In the default mode
+  sx = sy = 1 and every coordinate is what 0.2.0 drew. The FLAMEOUT banner
+  text and the single window's one-line texts are centered in native mode
+  (a stretched fixed offset would sit high). Form widths go through
+  `px()` = 1.45×, because native mode covers the form too (Speed Gauge's
+  labels were cut off without it).
+- **Alternatives considered:** a uniform 1.45× scale (leaves a third of
+  the tile empty, as now); new hand-made native layouts (more code to keep
+  in step with the default ones).

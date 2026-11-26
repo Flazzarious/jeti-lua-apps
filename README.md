@@ -17,11 +17,10 @@ spec-driven workflow (GitHub Spec Kit + Claude Code) in VS Code.
 
 Taken on a DS-24 II transmitter.
 
-**Speed Gauge:** full screen at 121 mph, double size, single size
+**Speed Gauge:** full screen at 162 mph, single and double size
 
-<img src="docs/apps/img/speed-gauge.png" width="200" alt="Speed Gauge full screen: dial at 121 mph, max 140, with stall, overspeed, air density and temperature rows">
-<img src="docs/apps/img/speed-gauge-double.png" width="200" alt="Speed Gauge double-size dial at 105 mph on the main screen">
-<img src="docs/apps/img/speed-gauge-single.png" width="200" alt="Speed Gauge single-size speed bar at 98 mph on the main screen">
+<img src="docs/apps/img/speed-gauge.png" width="200" alt="Speed Gauge full screen: dial at 162 mph, max 160, with stall, overspeed, air density, elevation, temperature and raw speed rows">
+<img src="docs/apps/img/speed-gauge-double.png" width="200" alt="Speed Gauge single-size speed bar and double-size dial at 96 mph, max 219, on the main screen">
 
 **Flameout Alarm:** armed at 60,000 RPM, flameout alarm, disarmed
 
@@ -140,8 +139,10 @@ The gauge:
 - The dial's arc shows the current speed (overspeed color past the limit);
   a yellow marker stays at the session max. The colors can be changed.
 - The gauge runs on the DS-24 II / DC-24 II and the original DS-24 /
-  DC-24. On other transmitters the callouts and warnings work, and the
-  window shows a notice instead.
+  DC-24. On the II it draws in the screen's own pixels (since 0.5.0), so
+  the full-screen dial uses most of the screen and every window is sharp
+  and fills its tile. On other transmitters the callouts and warnings work,
+  and the window shows a notice instead.
 
 **Air density correction** (optional, airspeed sensors only). A pitot
 reads low where the air is thin: about 8% at 5,000 ft on a standard day,

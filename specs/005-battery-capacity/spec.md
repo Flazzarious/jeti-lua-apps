@@ -151,6 +151,17 @@ filename becomes permanent at first release (constitution V).
 - Emulator review (Aaron, 2026-11-01): the two windows' titles ("Battery",
   "Batteries") must be editable in the settings (FR-009a).
 
+### Session 2026-11-25 (native drawing on the DS-24 II)
+
+- Q: Should the windows use the DS-24 II's native drawing mode, as Speed
+  Gauge now does? → A: Yes (Aaron: "fix all of the apps in my repo that can
+  benefit"). `system.setProperty("NativeDraw", 1)` (constitution 1.4.0,
+  allowed for an app whose spec names it) draws the windows in the panel's
+  own pixels: 223 × 55 / 223 × 151 with the bottom 4 px hidden, against
+  150 × 23 / 150 × 68 that leave the bottom third of each tile empty. The
+  setting is per app and covers the settings form too. FR-010a, research
+  R15.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - See how full a pack is (Priority: P1)
@@ -499,6 +510,14 @@ batteries) is not committed; the sketches replace it.
   is assigned). The session max current is not shown in the small window.
   The sketch's three stacked text lines do not fit 23 px and are replaced
   by this arrangement.
+- **FR-010a**: On the DS-24 II the app MUST switch its own drawing to native
+  mode (`system.setProperty("NativeDraw", 1)`, constitution 1.4.0) and map
+  the 150 × 23 / 150 × 68 layouts onto the visible native windows
+  (223 × 51 / 223 × 147): horizontal sizes scaled 1.45×, vertical ones
+  stretched to fill the window, the small window's % and its two text
+  lines centered. The settings form's fixed widths scale 1.45× too. If the
+  setting doesn't take, the default layouts stay. It can't affect flight:
+  it changes only how this app's windows and form are drawn.
 - **FR-011**: Double window: batteries stand upright (cap on top, filling
   bottom-up), same size and spacing, left-justified in configured order.
   With fewer than 4, each keeps its four-battery size and position and the
