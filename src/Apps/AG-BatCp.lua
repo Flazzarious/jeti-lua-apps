@@ -11,7 +11,7 @@
 -- contracts/). Research decisions are cited as R1..R14.
 
 local APP_NAME = "Battery Capacity"
-local APP_VERSION = "0.1.0"
+local APP_VERSION = "0.2.0"
 local peak = require("ag_peak")
 
 -- Debug switches, both off for release (R13).
