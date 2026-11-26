@@ -215,7 +215,7 @@ built and checked on its own.
 
 - [X] T062 FR-031e, R14: in `src/Apps/AG-FlmOt.lua`, set `NativeDraw` on a "24 II"; `X()`/`Y()` map layout coordinates (sweep corners rebuilt when the scale changes, idle marker, texts, bar); native height less 4 hidden rows; `px()` scales the form widths
 - [X] T063 MANUAL: On the DS-24 II with a SIM profile: sweep and single windows fill their tiles and draw sharp, FLAMEOUT banner and texts fit, settings labels aren't cut, worst CPU below 50% (passed 2026-11-25 with the Flameout profile: DISARMED, ARMED at 60,000, FLAMEOUT banner centered; worst CPU 15%)
-- [ ] T064 Release 0.3.0: bump `APP_VERSION` and the description page, tag `AG-FlmOt-v0.3.0`, update `make_apps_json.py` and `Apps.json`
+- [X] T064 Release 0.3.0: bump `APP_VERSION` and the description page, tag `AG-FlmOt-v0.3.0`, update `make_apps_json.py` and `Apps.json` (published 2026-11-25)
 
 - [X] T058 After the release tag `AG-FlmOt-v0.1.0` exists (CLAUDE.md branch rules), add a Flameout Alarm entry to `APPS` in `tools/publish/make_apps_json.py` (script `AG-FlmOt`, files `src/Apps/AG-FlmOt.lua` and `src/Apps/AG-FlmOt`, description and icon from T056/T057), run it, and commit `Apps.json` for the merge to `main`. Try it first with `--local` in JETI Studio
 
