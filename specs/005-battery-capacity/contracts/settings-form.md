@@ -57,7 +57,7 @@ current sensor; **C** only for Custom.
 | 26 | Check pack is full | checkbox | default off | FR-029 |
 | 27 | Full above **A** | intbox | 50–99 % | |
 | | **Voice** | | | |
-| 28 | Name for transmitter voice | `addAudioFilebox` | file from /Audio | FR-033; empty = number only |
+| 28 | Tx voice name file | `addAudioFilebox` | file from /Audio | FR-033; empty = number only. Label shortened 2026-11-25 (cut off) |
 | | **Advanced A** | | | |
 | 29 | Bands yellow / orange / red | three intboxes | descending | FR-007 |
 | 30 | Full / Nominal / Warning / Cutoff | four intboxes, 2 decimals | cV per cell | FR-006; editing sets the edited bit |

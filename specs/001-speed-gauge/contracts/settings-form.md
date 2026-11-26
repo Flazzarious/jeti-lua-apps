@@ -11,14 +11,14 @@ px as in v2.1; hints are `FONT_MINI` rows.
 | 1 | Speed sensor | selectbox (dialog) | "(none)", sensors, optional "<label> (not found)" (R4) |
 | 3 | Sensor type | selectbox | Airspeed (pitot) / GPS; with GPS a hint row reads "GPS: warnings use ground speed, wind shifts them" (spec Assumptions) |
 | 4 | Units | selectbox | mph, km/h, kt, m/s, ft/s; converts settings (R10) |
-| 5 | Sensor calibration (%) | intbox 1–200 | hint "100 = unchanged" |
+| 5 | Calibration (%) | intbox 1–200 | hint "Sensor calibration: 100 = unchanged" (shortened 2026-11-25: cut off) |
 | 6 | Callouts on/off switch | inputbox | proportional allowed. Hints (rewritten 2026-11-07): "On: normal callouts, slower when speed is" / "steady, faster when it changes or landing" |
-| 7 | Continuous callouts switch | inputbox | Hints (rewritten 2026-11-07): "On: just the number, every 'Shortest time'," / "while above 'Callouts start above'. Takes" / "over from on/off, and works without it" / "Warnings sound if either switch is on" (FR-009a) |
+| 7 | Continuous callouts switch | inputbox | Hints (rewritten 2026-11-07): "On: just the number, every 'Shortest interval'," / "while above 'Callouts start above'. Takes" / "over from on/off, and works without it" / "Warnings sound if either switch is on" (FR-009a) |
 | | **Callouts** | | |
-| 8 | Callout sensitivity (*unit*) | intbox 1–100 | |
-| 9 | *hint* | label | "Speak sooner when speed changes by this much" |
-| 10 | Shortest time between callouts (s) | intbox 1–10 | |
-| 11 | Longest time between callouts (s) | intbox 2–60 | Never below row 10: it stops at the shortest, and raising the shortest past it raises it (FR-005, 2026-10-04) |
+| 8 | Sensitivity (*unit*) | intbox 1–100 | Was "Callout sensitivity (*unit* change)", cut off (2026-11-25) |
+| 9 | *hint* | label | "Callouts come sooner when speed changes by this much" |
+| 10 | Shortest interval (s) | intbox 1–10 | Was "Shortest time between callouts (s)", cut off (2026-11-25) |
+| 11 | Longest interval (s) | intbox 2–60 | Never below row 10: it stops at the shortest, and raising the shortest past it raises it (FR-005, 2026-10-04) |
 | 11a | Callouts start above (*unit*) | intbox 0–1000, default 30 | FR-009, added 2026-10-03; saves `vArm` |
 | 11b | *hint* | label | "No callouts or 'airspeed alive' until first this fast" |
 | 11c | Landing speed callouts | checkbox, default on | FR-006, added 2026-10-03; saves `landOn` |
@@ -38,12 +38,12 @@ px as in v2.1; hints are `FONT_MINI` rows.
 | 21 | Field elevation (ft \| m) | intbox −300–10000 / −90–3050, step 10 | FR-020, FR-023 |
 | 22 | Temperature source | selectbox Standard / Manual / Sensor | FR-038; saves `tSrc`. Replaces the 0.1.0 "Use standard temperature" checkbox (R10, R16) |
 | 23 | Temperature, manual (°F \| °C) | intbox −20–130 / −29–54 | FR-020; enabled only for Manual |
-| 24 | Temperature sensor | selectbox (dialog) | FR-039; enabled only for Sensor. "(none)", sensors whose unit is °C/°F, optional "<label> (not found)" (R15, R4) |
+| 24 | Temp. sensor | selectbox (dialog) | FR-039; enabled only for Sensor. "(none)", sensors whose unit is °C/°F, optional "<label> (not found)" (R15, R4) |
 | 24a | *hint* | label | "Sensors inside the model can read warmer than outside air" |
 | 24b | *temperature status* | label | FR-042, while correction is on: "Temp: 15 °C standard" / "Temp: 20 °C manual" / "Temp: 35 °C from MSpeed 450" / "Sensor not available - using standard". Updated live while the form is open (R17) |
 | 24c | *hint* | label | "Leave correction off if your sensor already corrects for air density" |
 | | **Gauge** | | |
-| 25 | Gauge max limit (*unit*, 0 = auto) | intbox 0–2000 | Renamed from "Gauge full scale" (2026-10-03). Hints: "Highest speed on the dial. To use your sensor's whole range, enter its top speed:" / "MSpeed: 20-350 km/h (12-215 mph)" / "MSpeed 450 EX: 80-450 km/h (50-280 mph)" (sensor ranges from the user, 2026-10-03) and "Auto (overspeed + 15%): 230" |
+| 25 | Gauge max (*unit*) | intbox 0–2000 | Renamed from "Gauge full scale" (2026-10-03), shortened from "Gauge max limit (*unit*, 0 = auto)" (2026-11-25: cut off). Hints: "Highest speed on the dial; 0 = auto. To use your sensor's whole range, enter its top speed:" / "MSpeed: 20-350 km/h (12-215 mph)" / "MSpeed 450 EX: 80-450 km/h (50-280 mph)" (sensor ranges from the user, 2026-10-03) and "Auto (overspeed + 15%): 230" |
 | 26 | Current speed color | selectbox | R8 presets (no red or orange); default Cyan |
 | 27 | Max speed color | selectbox | R8 presets; default Yellow |
 | 28 | Reset max speed | link | clears session max (FR-019, US3 #6) |

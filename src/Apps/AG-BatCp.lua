@@ -11,7 +11,7 @@
 -- contracts/). Research decisions are cited as R1..R14.
 
 local APP_NAME = "Battery Capacity"
-local APP_VERSION = "0.2.0"
+local APP_VERSION = "0.2.1"
 local peak = require("ag_peak")
 
 -- Debug switches, both off for release (R13).
@@ -1996,7 +1996,8 @@ local function initBattery(k)
   -- 28 Name for the transmitter voice (FR-033)
   heading("Voice")
   form.addRow(2)
-  form.addLabel({ label = "Name file (transmitter voice)", width = px(LABEL_W) })
+  -- Was "Name file (transmitter voice)", cut off at the label column.
+  form.addLabel({ label = "Tx voice name file", width = px(LABEL_W) })
   form.addAudioFilebox(b.s[S.VOICE], function(fileName)
     b.s[S.VOICE] = fileName or ""
     saveBattery(k)
