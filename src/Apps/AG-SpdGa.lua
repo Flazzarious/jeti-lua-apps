@@ -34,6 +34,13 @@ local TITLE_H = 26
 -- show (probe on the transmitter, firmware 6.06, 2026-11-25).
 local NATIVE_CUT = 4
 local S = 1                 -- scale of fixed pixel sizes: 1.45 in native mode
+
+-- A fixed size in default-mode pixels, scaled for native drawing: window
+-- layouts and form widths alike (native form labels were cut off with
+-- unscaled widths, 2026-11-25). Must match px() in tools/dial/make_dial.py.
+local function px(n)
+  return math.floor(n * S + 0.5)
+end
 local HOLD_MS = 1000        -- a reading held this long counts as real for the max (R5)
 
 local SND_STALL = AUDIO_DIR .. "stall_warning.wav"
@@ -677,7 +684,7 @@ end
 
 local function addInt(label, key, lo, hi, default, step, after, params)
   form.addRow(2)
-  form.addLabel({ label = label, width = LABEL_W })
+  form.addLabel({ label = label, width = px(LABEL_W) })
   return form.addIntbox(clamp(cfg[key], lo, hi), lo, hi, default, 0, step, function(value)
     save(key, value)
     if after then
@@ -688,7 +695,7 @@ end
 
 local function addCheck(label, key, after, params)
   form.addRow(2)
-  form.addLabel({ label = label, width = CHECK_W })
+  form.addLabel({ label = label, width = px(CHECK_W) })
   local idx
   idx = form.addCheckbox(cfg[key] == 1, function(value)
     -- The callback gets the old state; toggle it, as DFM v2.1 does.
@@ -809,7 +816,7 @@ local function initForm()
   -- Sensor and switches
   heading("Sensor and switches")
   form.addRow(2)
-  form.addLabel({ label = "Speed sensor", width = 120 })
+  form.addLabel({ label = "Speed sensor", width = px(120) })
   local selected, tSelected = buildSensorList()   -- rebuilds both lists; call before passing them
   form.addSelectbox(sensorLabels, selected, true, function(i)
     save("sId", sensorIds[i])
@@ -819,10 +826,10 @@ local function initForm()
     elseif i ~= notFoundIdx then
       save("sLbl", string.sub(sensorLabels[i], 1, 63))
     end
-  end, { width = 200 })
+  end, { width = px(200) })
 
   form.addRow(2)
-  form.addLabel({ label = "Sensor type", width = LABEL_W })
+  form.addLabel({ label = "Sensor type", width = px(LABEL_W) })
   form.addSelectbox({ "Airspeed (pitot)", "GPS" }, cfg.sType, false, function(i)
     save("sType", i)
     onTempSourceChanged()
@@ -833,21 +840,21 @@ local function initForm()
   idxGpsHint = hint("GPS: warnings use ground speed, wind shifts them", cfg.sType == 2)
 
   form.addRow(2)
-  form.addLabel({ label = "Units", width = LABEL_W })
+  form.addLabel({ label = "Units", width = px(LABEL_W) })
   form.addSelectbox(UNITS_TEXT, cfg.units, false, onUnitsChanged)
 
   addInt("Sensor calibration (%)", "cal", 1, 200, 100, 1, recomputeSensor)
   hint("100 = unchanged")
 
   form.addRow(2)
-  form.addLabel({ label = "Callouts on/off switch", width = LABEL_W })
+  form.addLabel({ label = "Callouts on/off switch", width = px(LABEL_W) })
   form.addInputbox(cfg.swOn, true, function(v) save("swOn", v) end)
   -- Hints rewritten for clarity (user, 2026-11-07): what each switch does,
   -- then how they combine. Behavior unchanged.
   hint("On: normal callouts, slower when speed is")
   hint("steady, faster when it changes or landing")
   form.addRow(2)
-  form.addLabel({ label = "Continuous callouts switch", width = LABEL_W })
+  form.addLabel({ label = "Continuous callouts switch", width = px(LABEL_W) })
   form.addInputbox(cfg.swCont, true, function(v) save("swCont", v) end)
   hint("On: just the number, every 'Shortest time',")
   hint("while above 'Callouts start above'. Takes")
@@ -881,7 +888,7 @@ local function initForm()
   addCheck("Announce stall speed at startup", "startAnn")
   -- Voice (FR-032): an unset choice shows what is actually used.
   form.addRow(2)
-  form.addLabel({ label = "Voice", width = LABEL_W })
+  form.addLabel({ label = "Voice", width = px(LABEL_W) })
   local vSel = cfg.voice
   if vSel == 0 then
     vSel = voiceOk and 1 or 2
@@ -909,7 +916,7 @@ local function initForm()
     addInt("Field elevation (m)", "elev", LIM.elevM[1], LIM.elevM[2], 0, 10, onDensityChanged)
   end
   form.addRow(2)
-  form.addLabel({ label = "Temperature source", width = LABEL_W })
+  form.addLabel({ label = "Temperature source", width = px(LABEL_W) })
   form.addSelectbox({ "Standard", "Manual", "Sensor" }, cfg.tSrc, false, function(i)
     save("tSrc", i)
     onTempSourceChanged()
@@ -922,7 +929,7 @@ local function initForm()
       onDensityChanged, { enabled = cfg.tSrc == 2 })
   end
   form.addRow(2)
-  form.addLabel({ label = "Temperature sensor", width = 120 })
+  form.addLabel({ label = "Temperature sensor", width = px(120) })
   idxTSens = form.addSelectbox(tempLabels, tSelected, true, function(i)
     save("tId", tempIds[i])
     save("tPar", tempPars[i])
@@ -932,7 +939,7 @@ local function initForm()
       save("tLbl", string.sub(tempLabels[i], 1, 63))
     end
     onTempSourceChanged()
-  end, { width = 200, enabled = cfg.tSrc == 3 })
+  end, { width = px(200), enabled = cfg.tSrc == 3 })
   hint("Sensors inside the model can read warmer than outside air")
   idxTStat = hint("")
   hint("Leave correction off if your sensor already corrects for air density")
@@ -947,10 +954,10 @@ local function initForm()
   hint("MSpeed 450 EX: 80-450 km/h (50-280 mph)")
   idxAutoHint = hint("")
   form.addRow(2)
-  form.addLabel({ label = "Current speed color", width = LABEL_W })
+  form.addLabel({ label = "Current speed color", width = px(LABEL_W) })
   form.addSelectbox(COLOR_NAMES, cfg.colCur, false, function(i) save("colCur", i) end)
   form.addRow(2)
-  form.addLabel({ label = "Max speed color", width = LABEL_W })
+  form.addLabel({ label = "Max speed color", width = px(LABEL_W) })
   form.addSelectbox(COLOR_NAMES, cfg.colMax, false, function(i) save("colMax", i) end)
   form.addRow(1)
   form.addLink(resetMax, { label = "Reset max speed" })
@@ -1000,12 +1007,6 @@ end
 
 local function round(v)
   return math.floor(v + 0.5)
-end
-
--- A fixed size in default-mode pixels, scaled for native drawing. Must match
--- px() in tools/dial/make_dial.py.
-local function px(n)
-  return math.floor(n * S + 0.5)
 end
 
 -- Largest of the given fonts where sample text fits in maxW x maxH.
