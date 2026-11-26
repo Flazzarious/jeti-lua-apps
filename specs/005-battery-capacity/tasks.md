@@ -218,7 +218,7 @@ so US2, US4 and US5 are testable without the voice files.
 
 - [X] T065 FR-010a, R15: in `src/Apps/AG-BatCp.lua`, set `NativeDraw` on a "24 II"; `nativeLayout()` scales L's horizontal fields 1.45x and stretches its vertical ones to the visible height (built once per window size); the drawing functions take the layout; native height less 4 hidden rows; `px()` scales the form widths
 - [X] T066 MANUAL: On the DS-24 II with `SIM` (four batteries): both windows fill their tiles and draw sharp, labels, % and current/voltage lines fit, settings labels aren't cut, worst CPU below 50% (passed 2026-11-25: both windows fill their tiles, FLIGHT 74% with 23.7 V, four slots with labels; worst CPU 6%)
-- [ ] T067 Release 0.2.0: bump `APP_VERSION` and the description page, tag `AG-BatCp-v0.2.0`, update `make_apps_json.py` and `Apps.json`
+- [X] T067 Release 0.2.0: bump `APP_VERSION` and the description page, tag `AG-BatCp-v0.2.0`, update `make_apps_json.py` and `Apps.json` (published 2026-11-25)
 
 ---
 
