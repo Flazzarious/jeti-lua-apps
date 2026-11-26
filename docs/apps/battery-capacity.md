@@ -25,7 +25,7 @@ JETI **DC/DS-24 II** and the **first-version DC/DS-24**.
   optional current alarm, session max current and an optional "pack not
   full" check when you plug a pack in.
 
-  ![One receiver pack and the ECU pack unplugged: red outlines and the low-voltage alarm](https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/main/docs/apps/img/battery-capacity-alarm.png)
+  ![An empty flight pack: red outline and the low-voltage alarm](https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/main/docs/apps/img/battery-capacity-alarm.png)
 - **Pack swap or brown-out:** after telemetry drops out and comes back, a
   fresh pack resets that pack's callouts; a brief dropout keeps them.
 - **Smart defaults** from the pack's category and chemistry (LiPo, LiHV,

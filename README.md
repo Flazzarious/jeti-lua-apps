@@ -22,11 +22,11 @@ Taken on a DS-24 II transmitter.
 <img src="docs/apps/img/speed-gauge.png" width="200" alt="Speed Gauge full screen: dial at 162 mph, max 160, with stall, overspeed, air density, elevation, temperature and raw speed rows">
 <img src="docs/apps/img/speed-gauge-double.png" width="200" alt="Speed Gauge single-size speed bar and double-size dial at 96 mph, max 219, on the main screen">
 
-**Flameout Alarm:** armed at 60,000 RPM, flameout alarm, disarmed
+**Flameout Alarm:** armed at idle (35,000 RPM), flameout alarm, disarmed
 
-<img src="docs/apps/img/flameout-alarm-armed.png" width="200" alt="Flameout Alarm armed, RPM bar at 60,000">
+<img src="docs/apps/img/flameout-alarm-armed.png" width="200" alt="Flameout Alarm armed at 35,000 RPM, the sweep lit up to the idle marker">
 <img src="docs/apps/img/flameout-alarm-flameout.png" width="200" alt="Flameout Alarm showing the red FLAMEOUT alarm at 0 RPM">
-<img src="docs/apps/img/flameout-alarm-disarmed.png" width="200" alt="Flameout Alarm disarmed at 35,000 RPM">
+<img src="docs/apps/img/flameout-alarm-disarmed.png" width="200" alt="Flameout Alarm disarmed at 0 RPM, the idle marker on the unlit sweep">
 
 **Throttle Setup Wizard:** a guided step, verify passed,
 the summary. Full guide:
@@ -37,12 +37,12 @@ the summary. Full guide:
 <img src="docs/apps/img/throttle-setup-wizard-summary.png" width="200" alt="Throttle Setup Wizard Summary: setup complete with measured values">
 
 **Battery Capacity:** two receiver packs and the ECU on a Central Box 210,
-two packs unplugged (low-voltage alarm), both window sizes. More:
+an empty pack (low-voltage alarm), both window sizes. More:
 [Battery Capacity](docs/apps/battery-capacity.md).
 
 <img src="docs/apps/img/battery-capacity-main.png" width="200" alt="Battery Capacity: RX-1, RX-2 and ECU packs with current and voltage under each">
-<img src="docs/apps/img/battery-capacity-alarm.png" width="200" alt="Battery Capacity: RX-2 and ECU unplugged, outlined in red">
-<img src="docs/apps/img/battery-capacity-windows.png" width="200" alt="Battery Capacity single-size and double-size windows, flight pack at 93%">
+<img src="docs/apps/img/battery-capacity-alarm.png" width="200" alt="Battery Capacity: the flight pack empty at 21.0 V, outlined in red for the low-voltage alarm">
+<img src="docs/apps/img/battery-capacity-windows.png" width="200" alt="Battery Capacity single-size and double-size windows, flight pack at 70%">
 
 ### Speed Gauge
 
