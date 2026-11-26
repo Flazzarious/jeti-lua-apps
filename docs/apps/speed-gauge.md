@@ -56,7 +56,7 @@ transmitter is slow. Let JETI Studio finish before disconnecting.
      it's held you hear just the number every few seconds. Warnings sound
      when either switch is on;
    - set your model's **landing**, **stall** and **overspeed** speeds;
-   - set **Gauge max limit** to your sensor's top speed to use its whole
+   - set **Gauge max** to your sensor's top speed to use its whole
      range (MSpeed: 350 km/h / 215 mph; MSpeed 450 EX: 450 km/h / 280 mph).
 3. Put **Speed Gauge** (single or double size) or **Speed Gauge (full
    screen)** on a page in *Timers/Sensors → Displayed telemetry*.

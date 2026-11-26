@@ -843,8 +843,10 @@ local function initForm()
   form.addLabel({ label = "Units", width = px(LABEL_W) })
   form.addSelectbox(UNITS_TEXT, cfg.units, false, onUnitsChanged)
 
-  addInt("Sensor calibration (%)", "cal", 1, 200, 100, 1, recomputeSensor)
-  hint("100 = unchanged")
+  -- Short labels: longer ones were cut off at the label column on both
+  -- models (2026-11-25); the detail is in the hint below.
+  addInt("Calibration (%)", "cal", 1, 200, 100, 1, recomputeSensor)
+  hint("Sensor calibration: 100 = unchanged")
 
   form.addRow(2)
   form.addLabel({ label = "Callouts on/off switch", width = px(LABEL_W) })
@@ -856,15 +858,15 @@ local function initForm()
   form.addRow(2)
   form.addLabel({ label = "Continuous callouts switch", width = px(LABEL_W) })
   form.addInputbox(cfg.swCont, true, function(v) save("swCont", v) end)
-  hint("On: just the number, every 'Shortest time',")
+  hint("On: just the number, every 'Shortest interval',")
   hint("while above 'Callouts start above'. Takes")
   hint("over from on/off, and works without it")
   hint("Warnings sound if either switch is on")
 
   -- Callouts
   heading("Callouts")
-  addInt("Callout sensitivity (" .. u .. " change)", "sens", 1, 100, 10, 1)
-  hint("Speak sooner when speed changes by this much")
+  addInt("Sensitivity (" .. u .. ")", "sens", 1, 100, 10, 1)
+  hint("Callouts come sooner when speed changes by this much")
   -- Longest 2-60 s, never below shortest (FR-005, changed 2026-10-04):
   -- it stops at the shortest, and raising the shortest past it raises it.
   local idxTMax
@@ -876,8 +878,9 @@ local function initForm()
       end
     end
   end
-  addInt("Shortest time between callouts (s)", "tMin", 1, 10, 2, 1, keepTMax)
-  idxTMax = addInt("Longest time between callouts (s)", "tMax", 2, 60, 40, 1, keepTMax)
+  -- Were "Shortest/Longest time between callouts (s)": the "(s)" was cut off.
+  addInt("Shortest interval (s)", "tMin", 1, 10, 2, 1, keepTMax)
+  idxTMax = addInt("Longest interval (s)", "tMax", 2, 60, 40, 1, keepTMax)
   addInt("Callouts start above (" .. u .. ")", "vArm", 0, 1000, 30, 1)
   hint("No callouts or 'airspeed alive' until first this fast")
   addCheck("Landing speed callouts", "landOn")
@@ -929,7 +932,7 @@ local function initForm()
       onDensityChanged, { enabled = cfg.tSrc == 2 })
   end
   form.addRow(2)
-  form.addLabel({ label = "Temperature sensor", width = px(120) })
+  form.addLabel({ label = "Temp. sensor", width = px(120) })
   idxTSens = form.addSelectbox(tempLabels, tSelected, true, function(i)
     save("tId", tempIds[i])
     save("tPar", tempPars[i])
@@ -946,10 +949,11 @@ local function initForm()
 
   -- Gauge
   heading("Gauge")
-  -- Renamed from "Gauge full scale" after transmitter testing (2026-10-03).
-  addInt("Gauge max limit (" .. u .. ", 0 = auto)", "fScale", 0, 2000, 0, 10, onThresholdChanged)
-  hint("Highest speed on the dial. To use your sensor's")
-  hint("whole range, enter its top speed:")
+  -- Renamed from "Gauge full scale" after transmitter testing (2026-10-03),
+  -- then shortened from "Gauge max limit (mph, 0 = auto)" (cut off, 2026-11-25).
+  addInt("Gauge max (" .. u .. ")", "fScale", 0, 2000, 0, 10, onThresholdChanged)
+  hint("Highest speed on the dial; 0 = auto. To use your")
+  hint("sensor's whole range, enter its top speed:")
   hint("MSpeed: 20-350 km/h (12-215 mph)")
   hint("MSpeed 450 EX: 80-450 km/h (50-280 mph)")
   idxAutoHint = hint("")
