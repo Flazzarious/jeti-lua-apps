@@ -54,6 +54,14 @@
 
 local MODE = 2
 
+-- Names that say which copy is which when several run at once: the app and
+-- menu name (at most 15 characters show in User Applications), and "Pn " in
+-- front of every window title.
+local MODE_NAMES = { "Normal sm+lg", "Full+bar/full", "Auto+small", "Untitled auto",
+  "Untitled full", "Widths", "Rx", "NATIVE full", "NATIVE sm+lg" }
+local APP_NAME = "P" .. MODE .. " " .. (MODE_NAMES[MODE] or "Probe")
+local TAG = "P" .. MODE .. " "
+
 local reported = {}
 
 local function report(tag, w, h)
@@ -214,37 +222,37 @@ local function init()
       .. ", now " .. tostring(system.getProperty("NativeDraw")))
   end
   if MODE == 8 then
-    system.registerTelemetry(1, "Probe full", 4, printFull)
+    system.registerTelemetry(1, TAG .. "full", 4, printFull)
     print("PROBE size-5 register result: "
-      .. tostring(system.registerTelemetry(2, "Probe size5", 5, printSize5)))
+      .. tostring(system.registerTelemetry(2, TAG .. "size5", 5, printSize5)))
   elseif MODE == 9 then
-    system.registerTelemetry(1, "Probe small", 1, printSmall)
-    system.registerTelemetry(2, "Probe large", 2, printLarge)
+    system.registerTelemetry(1, TAG .. "small", 1, printSmall)
+    system.registerTelemetry(2, TAG .. "large", 2, printLarge)
   elseif MODE == 1 then
-    system.registerTelemetry(1, "Probe small", 1, printSmall)
-    system.registerTelemetry(2, "Probe large", 2, printLarge)
+    system.registerTelemetry(1, TAG .. "small", 1, printSmall)
+    system.registerTelemetry(2, TAG .. "large", 2, printLarge)
   elseif MODE == 3 then
-    system.registerTelemetry(1, "Probe auto", 0, printAuto)
-    system.registerTelemetry(2, "Probe small", 1, printSmall)
+    system.registerTelemetry(1, TAG .. "auto", 0, printAuto)
+    system.registerTelemetry(2, TAG .. "small", 1, printSmall)
   elseif MODE == 4 then
     print("PROBE empty-title register result: "
       .. tostring(system.registerTelemetry(1, "", 0, printAuto)))
-    system.registerTelemetry(2, "Probe small", 1, printSmall)
+    system.registerTelemetry(2, TAG .. "small", 1, printSmall)
   elseif MODE == 5 then
     print("PROBE empty-title full register result: "
       .. tostring(system.registerTelemetry(1, "", 4, printAuto)))
-    system.registerTelemetry(2, "Probe full", 4, printFull)
+    system.registerTelemetry(2, TAG .. "full", 4, printFull)
   elseif MODE == 6 then
-    system.registerTelemetry(1, "Probe widths", 4, printWidths)
-    system.registerTelemetry(2, "Probe large", 2, printLarge)
+    system.registerTelemetry(1, TAG .. "widths", 4, printWidths)
+    system.registerTelemetry(2, TAG .. "large", 2, printLarge)
   elseif MODE == 7 then
-    system.registerTelemetry(1, "Probe small", 1, printSmall)
-    system.registerTelemetry(2, "Probe Rx", 2, printRx)
+    system.registerTelemetry(1, TAG .. "small", 1, printSmall)
+    system.registerTelemetry(2, TAG .. "Rx", 2, printRx)
   else
-    system.registerTelemetry(1, "Probe full+bar", 3, printFullBar)
-    system.registerTelemetry(2, "Probe full", 4, printFull)
+    system.registerTelemetry(1, TAG .. "full+bar", 3, printFullBar)
+    system.registerTelemetry(2, TAG .. "full", 4, printFull)
   end
-  system.registerForm(1, MENU_APPS, "Screen Probe", nil, nil, printForm)
+  system.registerForm(1, MENU_APPS, APP_NAME, nil, nil, printForm)
 end
 
-return { init = init, loop = loop, author = "Aaron George", version = "1.6", name = "Screen Probe" }
+return { init = init, loop = loop, author = "Aaron George", version = "1.6", name = APP_NAME }
