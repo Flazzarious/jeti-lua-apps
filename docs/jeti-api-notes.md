@@ -156,7 +156,7 @@ the emulator's numbers above:
   full-screen Lua window, covering its lower-left 157 × ~110. No Lua API hides
   it; whether a desktop setting or size 4 avoids it is still being checked.
 
-### Native drawing on the DS-24 II (studied 2026-11-25, not yet measured)
+### Native drawing on the DS-24 II (studied and measured 2026-11-25)
 
 Not in API v1.5. Found in Dave McQueeney's DFM apps
 (github.com/davidmcq137/JetiLuaDFM, `dev` branch, MIT; studied, not copied):
@@ -180,10 +180,21 @@ Not in API v1.5. Found in Dave McQueeney's DFM apps
   it. A renderer polyline breaks above about 128 points. Off-screen
   rendering can swap red and blue.
 
-Still to measure with `tools/probe/PROBE.lua` modes 8 and 9: the sizes each
-window reports in native mode, whether the setting is global (does one app
-setting it change every app's windows?), and what the first-version DS-24
-does with it.
+**Measured on the II** (firmware 6.06, `tools/probe/PROBE.lua` modes 1, 8
+and 9, 2026-11-25):
+
+- Native sizes: small **223 × 55**, large **223 × 151**, full screen (size 4)
+  **458 × 343**, size 5 the same as size 4, form **460 × 317**. Each window's
+  bottom 4 px are hidden (visible 223 × 51, 223 × 147, 458 × 339). Default
+  mode for comparison: 150 × 23, 150 × 68, 316 × 159, form 310 × 175.
+- Native pixels are the panel's: the window's top-left is screen (11, 85).
+  Fonts (N/B/M/Mx height) are 26/31/18/57, against 17/20/12/38.
+- **Per app:** a default-mode probe running beside a native one kept
+  `getProperty("NativeDraw") == 0` and its default sizes. One app's
+  setting doesn't change another's windows.
+- It covers all of the app's windows and its form, not only full screen.
+- Not yet tried on the first-version DS-24 (Speed Gauge doesn't set it
+  there).
 
 ## CPU figure and off-screen images (emulator, 2026-09-27)
 
