@@ -56,7 +56,7 @@ APPS = [
     {
         "name": "Speed Gauge (DC/DS-24)",
         "script": "AG-SpdGa",
-        "tag": "AG-SpdGa-v0.5.0",
+        "tag": "AG-SpdGa-v0.5.1",
         "author": "Aaron George (based on DFM Speed Announcer by Dave McQueeney)",
         "hw": HW_DCDS24 + HW_DCDS24_II,   # both models since 0.4.0 (spec FR-013a)
         "description": "docs/apps/speed-gauge.html",
@@ -97,7 +97,7 @@ APPS = [
     {
         "name": "Battery Capacity (DC/DS-24)",
         "script": "AG-BatCp",
-        "tag": "AG-BatCp-v0.2.0",
+        "tag": "AG-BatCp-v0.2.1",
         "author": "Aaron George",
         "hw": HW_DCDS24 + HW_DCDS24_II,   # tested on both (spec 005, T064)
         "description": "docs/apps/battery-capacity.html",

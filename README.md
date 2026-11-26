@@ -8,10 +8,10 @@ spec-driven workflow (GitHub Spec Kit + Claude Code) in VS Code.
 
 | App | Script | Status | Spec | Based on |
 | --- | --- | --- | --- | --- |
-| Speed Gauge | [`AG-SpdGa.lua`](src/Apps/AG-SpdGa.lua) | Released (0.5.0) | [001](specs/001-speed-gauge/spec.md) | DFM Speed Announcer by Dave McQueeney (MIT) |
+| Speed Gauge | [`AG-SpdGa.lua`](src/Apps/AG-SpdGa.lua) | Released (0.5.1) | [001](specs/001-speed-gauge/spec.md) | DFM Speed Announcer by Dave McQueeney (MIT) |
 | Flameout Alarm | [`AG-FlmOt.lua`](src/Apps/AG-FlmOt.lua) | Released (0.3.0) | [003](specs/003-flameout-alarm/spec.md) | Original |
 | Throttle Setup Wizard | [`AG-TrbSt.lua`](src/Apps/AG-TrbSt.lua) | Released (0.1.0) | [002](specs/002-turbine-throttle-setup/spec.md) | Original |
-| Battery Capacity | [`AG-BatCp.lua`](src/Apps/AG-BatCp.lua) | Released (0.2.0) | [005](specs/005-battery-capacity/spec.md) | Original |
+| Battery Capacity | [`AG-BatCp.lua`](src/Apps/AG-BatCp.lua) | Released (0.2.1) | [005](specs/005-battery-capacity/spec.md) | Original |
 
 ### Screenshots
 
