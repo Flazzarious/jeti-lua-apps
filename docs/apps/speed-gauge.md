@@ -20,8 +20,7 @@ gauge for the JETI **DC/DS-24**, both the II and the original.
   (double size) or a full-screen dial with stall, overspeed, air density,
   elevation, temperature and raw sensor speed.
 
-  ![Speed Gauge double size, on the main screen](https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/main/docs/apps/img/speed-gauge-double.png)
-  ![Speed Gauge single size, on the main screen](https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/main/docs/apps/img/speed-gauge-single.png)
+  ![Speed Gauge single and double size, on the main screen](https://raw.githubusercontent.com/Flazzarious/jeti-lua-apps/main/docs/apps/img/speed-gauge-double.png)
 - **Air density correction** (optional) shows true airspeed from your field
   elevation and the temperature: standard, entered by hand, or read live
   from a sensor such as the MSpeed's. See
@@ -30,8 +29,9 @@ gauge for the JETI **DC/DS-24**, both the II and the original.
 
 ## Requirements
 
-- JETI **DS-24 II / DC-24 II** (firmware 6.x) or the original **DS-24 /
-  DC-24** (tested with firmware 5.08).
+- JETI **DS-24 II / DC-24 II** (firmware 6.x; drawn in the screen's own
+  pixels, so the full-screen dial uses most of the screen) or the original
+  **DS-24 / DC-24** (tested with firmware 5.08).
 - A telemetry sensor that reports speed.
 - **Only one speed announcer.** If you used **DFM Speed Announcer**
   before, remove it in *Applications → User Applications*. With both

@@ -20,7 +20,16 @@ behaves.
   feature genuinely needs one, it requires an explicit amendment to this
   constitution, a non-critical-use justification in the spec, and a
   control label that says so.
-- MUST NOT call `system.setProperty` (it can switch wireless trainer mode).
+- MUST NOT call `system.setProperty` (it can switch wireless trainer mode),
+  with one exception (amended 1.4.0): `system.setProperty("NativeDraw", 0)`
+  or `("NativeDraw", 1)`, with literal arguments, which switches the DS-24
+  II's Lua drawing between enlarged 316 × 159 coordinates and the panel's
+  own pixels. It changes only how Lua windows are drawn, nothing about the
+  model, the radio link or the transmitter's outputs, so an app that sets
+  it and then fails cannot affect flight. Approved for Speed Gauge
+  (`AG-SpdGa`, spec 001) and the screen probe (`tools/probe/`); another app
+  needs its spec to name the property and say why. Any other property
+  stays forbidden. `tools/check.py` allows exactly these two calls.
 - MUST NOT drive `gpio` outputs or write to `serial` ports unless a spec
   explicitly scopes that hardware and states why failure is harmless.
 - An app that crashes, stalls or is removed MUST leave the model flying
@@ -172,7 +181,7 @@ Principle I cannot be relaxed for convenience; an amendment to it must name
 the specific API, the specific app, and why failure of that app cannot affect
 flight.
 
-**Version**: 1.3.0 | **Ratified**: 2026-09-26 | **Last Amended**: 2026-09-27
+**Version**: 1.4.0 | **Ratified**: 2026-09-26 | **Last Amended**: 2026-11-25
 
 ### Amendment history
 

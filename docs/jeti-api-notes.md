@@ -129,9 +129,10 @@ the emulator's numbers above:
   px each. Adding points to a curve doesn't help. Renderer alpha does work
   on the device (semi-transparent glow bands blend), so a wider translucent
   pass under an edge can soften it.
-- No app gets more than this area: DFM-InsP (MIT; studied, not copied) also
-  registers size-4 windows, clears `0, 0, 319, 158`, and ships its panel
-  images at 318 × 159.
+- In the default drawing mode no app gets more than this area: DFM-InsP
+  (MIT; studied, not copied) registered size-4 windows, cleared
+  `0, 0, 319, 158`, and shipped its panel images at 318 × 159. Native
+  drawing (below) is how DFM-InsP and DFM-Maps now get more.
 - **`lcd.setClipping(x, y, w, h)` also moves the origin** to (x, y): after
   it, `lcd.drawImage(0, 0, img)` puts the image's corner at the clip
   rectangle's corner, not the window's. Draw at `(-x, -y)` to keep window
@@ -154,6 +155,46 @@ the emulator's numbers above:
   stays in the bottom-left slot on every desktop page and is drawn **over** a
   full-screen Lua window, covering its lower-left 157 × ~110. No Lua API hides
   it; whether a desktop setting or size 4 avoids it is still being checked.
+
+### Native drawing on the DS-24 II (studied and measured 2026-11-25)
+
+Not in API v1.5. Found in Dave McQueeney's DFM apps
+(github.com/davidmcq137/JetiLuaDFM, `dev` branch, MIT; studied, not copied):
+
+- `system.setProperty("NativeDraw", 1)` switches Lua drawing to the
+  panel's own pixels, without the 1.45× enlargement;
+  `system.getProperty("NativeDraw")` returns 1 then, 0 in the default
+  ("compatibility") mode. DFM-Maps and DFM-InsP set it in `init()` only when
+  `getDeviceType()` contains "24 II", and check `getProperty` afterwards.
+  DFM-InsP also switches it back to 0 while drawing a panel made for the old
+  size, so it can change at run time.
+- Their full-screen images are 458 × 343 (old size 320 × 160), drawn in
+  ordinary size-4 windows. Dave's renderer test apps (ColorSwap, PolyLimit,
+  ImgBudget) register **size 5** windows, described as "full screen"; the
+  difference from size 4 is not documented.
+- A JETI-authored test app in the same repo sets it too, and also uses
+  `lcd.getColor` and `system.setTelemetryButton` (not stubbed here).
+- Dave's notes from the same work: since firmware 6.05 each Lua callback is
+  charged its wall time against a 10 ms budget by default (the Lua console's
+  time-limit multiplier raises it); a single `lcd.loadImage` can use all of
+  it. A renderer polyline breaks above about 128 points. Off-screen
+  rendering can swap red and blue.
+
+**Measured on the II** (firmware 6.06, `tools/probe/PROBE.lua` modes 1, 8
+and 9, 2026-11-25):
+
+- Native sizes: small **223 × 55**, large **223 × 151**, full screen (size 4)
+  **458 × 343**, size 5 the same as size 4, form **460 × 317**. Each window's
+  bottom 4 px are hidden (visible 223 × 51, 223 × 147, 458 × 339). Default
+  mode for comparison: 150 × 23, 150 × 68, 316 × 159, form 310 × 175.
+- Native pixels are the panel's: the window's top-left is screen (11, 85).
+  Fonts (N/B/M/Mx height) are 26/31/18/57, against 17/20/12/38.
+- **Per app:** a default-mode probe running beside a native one kept
+  `getProperty("NativeDraw") == 0` and its default sizes. One app's
+  setting doesn't change another's windows.
+- It covers all of the app's windows and its form, not only full screen.
+- Not yet tried on the first-version DS-24 (Speed Gauge doesn't set it
+  there).
 
 ## CPU figure and off-screen images (emulator, 2026-09-27)
 
@@ -338,3 +379,5 @@ The app file returns a table: `init`, `loop`, `destroy` (5.00+), `author`,
 
 `system.registerControl`, `system.setControl`, `system.setProperty`, `os.*`,
 `debug.*`, `coroutine.*`, and `gpio`/`serial` output without a scoped spec.
+The one `setProperty` exception is `("NativeDraw", 0)` / `("NativeDraw", 1)`
+(constitution 1.4.0, see "Native drawing on the DS-24 II").

@@ -562,3 +562,38 @@ Everything else matches v2.1.
   reopened (the pilot couldn't watch it change, and FR-042 asks for the
   temperature in use); draw it in a form print function with `lcd` (form
   layout and scrolling make the position unreliable).
+
+## R18. Native drawing on the DS-24 II (FR-013b)
+
+- **Finding:** Dave McQueeney's DFM-Maps and DFM-InsP (MIT; `dev` branch of
+  github.com/davidmcq137/JetiLuaDFM, studied 2026-11-25, not copied) call
+  `system.setProperty("NativeDraw", 1)` on a "24 II" and check
+  `system.getProperty("NativeDraw") == 1`. Lua windows then draw in the
+  panel's own pixels, with no 1.45× enlargement. Not in API v1.5.
+- **Measured** with `tools/probe/PROBE.lua` modes 1, 8 and 9 (DS-24 II,
+  firmware 6.06, 2026-11-25, `E:/Screen001-008.png`):
+
+  | Window | Default mode | Native mode | Native, visible |
+  | --- | --- | --- | --- |
+  | Small | 150 × 23 | 223 × 55 | 223 × 51 |
+  | Large | 150 × 68 | 223 × 151 | 223 × 147 |
+  | Full screen (size 4) | 316 × 159 | 458 × 343 | 458 × 339 |
+  | Size 5 | - | 458 × 343 | 458 × 339 |
+  | Form | 310 × 175 | 460 × 317 | - |
+
+  Fonts (N/B/M/Mx height): 17/20/12/38 default, 26/31/18/57 native. Native
+  pixels are screen pixels (window origin at screen 11, 85). The setting is
+  **per app**: a default-mode probe beside a native one kept `ND=0` and its
+  default sizes.
+- **Decision:** set it in `init()` on a "24 II" only, and use native sizes
+  if `getProperty` confirms it. One scale `S` (1.45 native, else 1) and
+  `px(n) = floor(n * S + 0.5)` scale every fixed pixel size in the layouts,
+  so default mode is unchanged (its images regenerate byte-identical). The
+  full-screen panel is 160 px wide instead of 130: native fonts are 1.5×
+  and "SENSOR OUT" needs about 145 px. Native heights leave out the 4 hidden
+  rows. Dial images for 458 × 339 and 223 × 147 come from
+  `tools/dial/make_dial.py` with the same `px()`. A size without images
+  (e.g. the emulator in native mode) draws live with polylines.
+- **Alternatives considered:** a bigger full-screen dial using the whole
+  339 px height (R 196 leaves only about 60 px for the panel); a setting
+  to turn native mode off (no pSave key left: 30 of 30 used).

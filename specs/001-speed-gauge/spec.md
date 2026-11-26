@@ -122,6 +122,19 @@ principle I).
   family. In JETI Studio it becomes one entry, "Speed Gauge (DC/DS-24)",
   for both models.
 
+### Session 2026-11-25 (native drawing on the DS-24 II)
+
+- Q: Can the gauge use the whole DS-24 II screen, as Dave McQueeney's new
+  Maps and Instrument Panel do? → A: Yes. They call
+  `system.setProperty("NativeDraw", 1)`, which draws Lua windows in the
+  panel's own pixels instead of enlarging 316 × 159 coordinates 1.45×.
+  Aaron asked for the probe tests, the app change and the constitution
+  amendment (1.4.0, which allows exactly this property). Measured on the II
+  (firmware 6.06): full screen 458 × 343, large 223 × 151, small
+  223 × 55, form 460 × 317, each window's bottom 4 px hidden; size 5 is
+  the same as size 4; the setting is per app (a second app stayed in the
+  default mode beside it). See FR-013b and research R18.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Hear speed during flight (Priority: P1)
@@ -299,6 +312,10 @@ screenshots, 2026-10-03):
 | Single (small) | **150 × 23 px**, all visible | 157 × 60, about 157 × 34 visible |
 | Double (large) | **150 × 68 px**, all visible | 157 × 127, about 157 × 101 visible |
 | Full screen (sizes 3 and 4) | **316 × 159 px**, all visible | 320 × 260, about 320 × 234 visible |
+
+In native drawing mode (FR-013b, 2026-11-25) the II reports 223 × 55,
+223 × 151 and 458 × 343, in the panel's own pixels, with the bottom 4 px
+of each hidden.
 
 **The transmitter is the target.** The first design used the emulator's
 sizes. On the transmitter (2026-10-03) the single window showed only the
@@ -616,6 +633,14 @@ settings screen must say the voice files are missing.
   short notice ("Speed Gauge needs a DC/DS-24") instead of a mis-drawn
   gauge. Callouts and warnings
   MUST still work, because they don't depend on the screen.
+- **FR-013b**: On the DS-24 II the app MUST switch its own drawing to
+  native mode (`system.setProperty("NativeDraw", 1)`, constitution 1.4.0)
+  and lay out its windows at the native sizes, leaving out the hidden
+  bottom 4 px: small 223 × 51, large 223 × 147, full screen 458 × 339. The
+  layouts are the same as in default mode with every fixed size scaled
+  1.45×; the full-screen panel is 160 px wide. If the setting doesn't take
+  (`getProperty` isn't 1), the default-mode layouts stay. The original
+  DS-24 never sets it.
 - **FR-014**: The window MUST show a round, speedometer-style gauge following
   the visual design reference in User Story 3:
   - a dark dial face;

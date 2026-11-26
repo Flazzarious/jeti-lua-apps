@@ -18,7 +18,7 @@ local gauge = require("ag_gauge")
 local dens = require("ag_dens")
 
 local APP_NAME = "Speed Gauge"
-local APP_VERSION = "0.4.0"
+local APP_VERSION = "0.5.0"
 local AUDIO_DIR = "/Apps/AG-SpdGa/"
 local TICK_MS = 100         -- loop logic runs at most 10x per second (R9)
 -- The JETI Studio emulator draws each window's title bar inside the reported
@@ -27,6 +27,20 @@ local TICK_MS = 100         -- loop logic runs at most 10x per second (R9)
 -- above the window and reports only what is visible: 150 x 23, 150 x 68,
 -- 316 x 159 (2026-10-03). The emulator's widths (157, 320) tell them apart.
 local TITLE_H = 26
+-- Native drawing (constitution 1.4.0, research R18): on the DS-24 II,
+-- system.setProperty("NativeDraw", 1) makes this app's windows and form draw
+-- in the panel's own pixels, 1.45x the default coordinates, and only this
+-- app's: 223 x 55, 223 x 151 and 458 x 343, of which the bottom 4 px never
+-- show (probe on the transmitter, firmware 6.06, 2026-11-25).
+local NATIVE_CUT = 4
+local S = 1                 -- scale of fixed pixel sizes: 1.45 in native mode
+
+-- A fixed size in default-mode pixels, scaled for native drawing: window
+-- layouts and form widths alike (native form labels were cut off with
+-- unscaled widths, 2026-11-25). Must match px() in tools/dial/make_dial.py.
+local function px(n)
+  return math.floor(n * S + 0.5)
+end
 local HOLD_MS = 1000        -- a reading held this long counts as real for the max (R5)
 
 local SND_STALL = AUDIO_DIR .. "stall_warning.wav"
@@ -670,7 +684,7 @@ end
 
 local function addInt(label, key, lo, hi, default, step, after, params)
   form.addRow(2)
-  form.addLabel({ label = label, width = LABEL_W })
+  form.addLabel({ label = label, width = px(LABEL_W) })
   return form.addIntbox(clamp(cfg[key], lo, hi), lo, hi, default, 0, step, function(value)
     save(key, value)
     if after then
@@ -681,7 +695,7 @@ end
 
 local function addCheck(label, key, after, params)
   form.addRow(2)
-  form.addLabel({ label = label, width = CHECK_W })
+  form.addLabel({ label = label, width = px(CHECK_W) })
   local idx
   idx = form.addCheckbox(cfg[key] == 1, function(value)
     -- The callback gets the old state; toggle it, as DFM v2.1 does.
@@ -802,7 +816,7 @@ local function initForm()
   -- Sensor and switches
   heading("Sensor and switches")
   form.addRow(2)
-  form.addLabel({ label = "Speed sensor", width = 120 })
+  form.addLabel({ label = "Speed sensor", width = px(120) })
   local selected, tSelected = buildSensorList()   -- rebuilds both lists; call before passing them
   form.addSelectbox(sensorLabels, selected, true, function(i)
     save("sId", sensorIds[i])
@@ -812,10 +826,10 @@ local function initForm()
     elseif i ~= notFoundIdx then
       save("sLbl", string.sub(sensorLabels[i], 1, 63))
     end
-  end, { width = 200 })
+  end, { width = px(200) })
 
   form.addRow(2)
-  form.addLabel({ label = "Sensor type", width = LABEL_W })
+  form.addLabel({ label = "Sensor type", width = px(LABEL_W) })
   form.addSelectbox({ "Airspeed (pitot)", "GPS" }, cfg.sType, false, function(i)
     save("sType", i)
     onTempSourceChanged()
@@ -826,21 +840,21 @@ local function initForm()
   idxGpsHint = hint("GPS: warnings use ground speed, wind shifts them", cfg.sType == 2)
 
   form.addRow(2)
-  form.addLabel({ label = "Units", width = LABEL_W })
+  form.addLabel({ label = "Units", width = px(LABEL_W) })
   form.addSelectbox(UNITS_TEXT, cfg.units, false, onUnitsChanged)
 
   addInt("Sensor calibration (%)", "cal", 1, 200, 100, 1, recomputeSensor)
   hint("100 = unchanged")
 
   form.addRow(2)
-  form.addLabel({ label = "Callouts on/off switch", width = LABEL_W })
+  form.addLabel({ label = "Callouts on/off switch", width = px(LABEL_W) })
   form.addInputbox(cfg.swOn, true, function(v) save("swOn", v) end)
   -- Hints rewritten for clarity (user, 2026-11-07): what each switch does,
   -- then how they combine. Behavior unchanged.
   hint("On: normal callouts, slower when speed is")
   hint("steady, faster when it changes or landing")
   form.addRow(2)
-  form.addLabel({ label = "Continuous callouts switch", width = LABEL_W })
+  form.addLabel({ label = "Continuous callouts switch", width = px(LABEL_W) })
   form.addInputbox(cfg.swCont, true, function(v) save("swCont", v) end)
   hint("On: just the number, every 'Shortest time',")
   hint("while above 'Callouts start above'. Takes")
@@ -874,7 +888,7 @@ local function initForm()
   addCheck("Announce stall speed at startup", "startAnn")
   -- Voice (FR-032): an unset choice shows what is actually used.
   form.addRow(2)
-  form.addLabel({ label = "Voice", width = LABEL_W })
+  form.addLabel({ label = "Voice", width = px(LABEL_W) })
   local vSel = cfg.voice
   if vSel == 0 then
     vSel = voiceOk and 1 or 2
@@ -902,7 +916,7 @@ local function initForm()
     addInt("Field elevation (m)", "elev", LIM.elevM[1], LIM.elevM[2], 0, 10, onDensityChanged)
   end
   form.addRow(2)
-  form.addLabel({ label = "Temperature source", width = LABEL_W })
+  form.addLabel({ label = "Temperature source", width = px(LABEL_W) })
   form.addSelectbox({ "Standard", "Manual", "Sensor" }, cfg.tSrc, false, function(i)
     save("tSrc", i)
     onTempSourceChanged()
@@ -915,7 +929,7 @@ local function initForm()
       onDensityChanged, { enabled = cfg.tSrc == 2 })
   end
   form.addRow(2)
-  form.addLabel({ label = "Temperature sensor", width = 120 })
+  form.addLabel({ label = "Temperature sensor", width = px(120) })
   idxTSens = form.addSelectbox(tempLabels, tSelected, true, function(i)
     save("tId", tempIds[i])
     save("tPar", tempPars[i])
@@ -925,7 +939,7 @@ local function initForm()
       save("tLbl", string.sub(tempLabels[i], 1, 63))
     end
     onTempSourceChanged()
-  end, { width = 200, enabled = cfg.tSrc == 3 })
+  end, { width = px(200), enabled = cfg.tSrc == 3 })
   hint("Sensors inside the model can read warmer than outside air")
   idxTStat = hint("")
   hint("Leave correction off if your sensor already corrects for air density")
@@ -940,10 +954,10 @@ local function initForm()
   hint("MSpeed 450 EX: 80-450 km/h (50-280 mph)")
   idxAutoHint = hint("")
   form.addRow(2)
-  form.addLabel({ label = "Current speed color", width = LABEL_W })
+  form.addLabel({ label = "Current speed color", width = px(LABEL_W) })
   form.addSelectbox(COLOR_NAMES, cfg.colCur, false, function(i) save("colCur", i) end)
   form.addRow(2)
-  form.addLabel({ label = "Max speed color", width = LABEL_W })
+  form.addLabel({ label = "Max speed color", width = px(LABEL_W) })
   form.addSelectbox(COLOR_NAMES, cfg.colMax, false, function(i) save("colMax", i) end)
   form.addRow(1)
   form.addLink(resetMax, { label = "Reset max speed" })
@@ -1062,41 +1076,44 @@ local function buildGlow(L, step, n)
   L.glowA, L.glowT = a, A
 end
 
--- Double window (transmitter 150 x 68): a small 270-degree dial on the left
--- without scale numbers (too small to read), current speed and MAX on the
--- right. Stall and overspeed stay as rim marks only (FR-016 "SHOULD").
+-- Double window (transmitter 150 x 68, native 223 x 147): a small 270-degree
+-- dial on the left without scale numbers (too small to read), current speed
+-- and MAX on the right. Stall and overspeed stay as rim marks only (FR-016
+-- "SHOULD"). Must match round_geometry in tools/dial/make_dial.py.
 local function buildRound(L, w, h)
-  local R = math.floor(math.min((h - 4) / 1.707, w * 0.55 / 2))
-  L.R, L.cx = R, 2 + R
+  local R = math.floor(math.min((h - px(4)) / 1.707, w * 0.55 / 2))
+  L.R, L.cx = R, px(2) + R
   L.cy = math.floor((h - R * 1.707) / 2 + R)
-  L.arcR, L.arcW, L.markW = R - 3, 4, 3
-  buildGlow(L, 2, 6)
-  L.tickOut, L.majorLen, L.minorLen = R - 7, 4, 2
+  L.arcR, L.arcW, L.markW = R - px(3), px(4), px(3)
+  buildGlow(L, px(2), 6)
+  L.tickOut, L.majorLen, L.minorLen = R - px(7), px(4), px(2)
   L.labelFont = FONT_MINI
   L.dial, L.face, L.showMarks = roundDial, true, true
   buildScale(L, roundDial, 0, false)
   L.hMini = lcd.getTextHeight(FONT_MINI)
-  L.colX = 2 * R + 8
-  local colW = w - L.colX - 2
+  L.colX = 2 * R + px(8)
+  local colW = w - L.colX - px(2)
   L.numFont = fitFont(NUM_FONTS, "888", colW, h - 2 * L.hMini - lcd.getTextHeight(FONT_NORMAL))
   L.hNum = lcd.getTextHeight(L.numFont)
   L.maxValY = h - lcd.getTextHeight(FONT_NORMAL)
   L.maxLabelY = L.maxValY - L.hMini
 end
 
--- Full screen (transmitter 316 x 159): dial about 180 px across on the
--- left, MAX in its open bottom; one-line panel rows on the right.
+-- Full screen (transmitter 316 x 159, native 458 x 339): dial about 180
+-- (native 290) px across on the left, MAX in its open bottom; one-line panel
+-- rows on the right, 130 px wide (native 160: its fonts are 1.5x larger).
+-- Must match full_geometry in tools/dial/make_dial.py.
 local function buildFull(L, w, h)
-  local R = math.floor(math.min((h - 4) / 1.707, (w - 130) / 2 - 2))
-  local big = R >= 110        -- emulator-sized dial: larger scale text
-  L.R, L.cx = R, 2 + R
+  local R = math.floor(math.min((h - px(4)) / 1.707, (w - (S > 1 and 160 or 130)) / 2 - px(2)))
+  local big = R >= px(110)    -- emulator-sized dial: larger scale text
+  L.R, L.cx = R, px(2) + R
   L.cy = math.floor((h - R * 1.707) / 2 + R)
-  L.arcR, L.arcW, L.markW = R - 5, 7, 5
-  buildGlow(L, 3, 9)
-  L.tickOut, L.majorLen, L.minorLen = R - 11, 9, 5
+  L.arcR, L.arcW, L.markW = R - px(5), px(7), px(5)
+  buildGlow(L, px(3), 9)
+  L.tickOut, L.majorLen, L.minorLen = R - px(11), px(9), px(5)
   L.labelFont = big and FONT_NORMAL or FONT_MINI
   L.unitFont = L.labelFont
-  L.labelR = R - (big and 36 or 28)
+  L.labelR = R - px(big and 36 or 28)
   L.dial, L.face, L.showMarks = roundDial, true, true
   buildScale(L, roundDial, big and 4 or 1, true)
   L.numFont = fitFont(NUM_FONTS, "888", R, R // 2)
@@ -1105,8 +1122,8 @@ local function buildFull(L, w, h)
   L.maxValY = h - L.hBig - 1
   L.maxLabelY = L.maxValY - L.hMini
   -- Panel: up to six one-line rows, label left and value right-aligned.
-  L.panelX, L.panelR = 2 * R + 10, w - 2
-  L.rowH = math.min(h // 6, L.hNorm + 12)
+  L.panelX, L.panelR = 2 * R + px(10), w - px(2)
+  L.rowH = math.min(h // 6, L.hNorm + px(12))
   L.rowY = (h - 6 * L.rowH) // 2
 end
 
@@ -1115,9 +1132,9 @@ end
 -- color, overspeed zone at the end, max tick in the max color.
 local function buildStrip(L, w, h)
   L.hMini = lcd.getTextHeight(FONT_MINI)
-  L.barH = 4
-  L.barY = h - L.barH - 1
-  L.barX, L.barW = 2, w - 4
+  L.barH = px(4)
+  L.barY = h - L.barH - px(1)
+  L.barX, L.barW = px(2), w - px(4)
   L.numFont = fitFont(NUM_FONTS, "888", w // 3, L.barY - 1)
   L.hNum = lcd.getTextHeight(L.numFont)
   L.numY = math.max(0, (L.barY - 1 - L.hNum) // 2)
@@ -1160,7 +1177,7 @@ local function softArc(r, dial, cx, cy, radius, f0, f1, width)
     return
   end
   local hw = width / 2
-  gauge.band(r, dial, cx, cy, radius + hw + 1, radius - hw - 1, f0, f1, SOFT_ALPHA)
+  gauge.band(r, dial, cx, cy, radius + hw + px(1), radius - hw - px(1), f0, f1, SOFT_ALPHA)
   gauge.band(r, dial, cx, cy, radius + hw, radius - hw, f0, f1)
 end
 
@@ -1261,13 +1278,16 @@ local function drawStatic(L, w, h)
   if L.img then
     lcd.drawImage(0, 0, L.img)
   else
+    -- No images for this size (an emulator window, or native mode where the
+    -- emulator's sizes are unknown): polylines, which its simulator survives.
+    liveLines = true
     setColor(C_FACE)
     gauge.face(r, faceCircle, cx, cy, L.R, h - 1)
     -- Soften the face's round edge along the dial's sweep (the open bottom
     -- is cut flat anyway, and the renderer doesn't clip to the window).
-    gauge.arc(r, dial, cx, cy, L.R, 0, 1, 2, SOFT_ALPHA)
+    gauge.arc(r, dial, cx, cy, L.R, 0, 1, px(2), SOFT_ALPHA)
     setColor(C_TRACK)
-    softArc(r, dial, cx, cy, arcR, 0, 1, 3)
+    softArc(r, dial, cx, cy, arcR, 0, 1, px(3))
   end
   setColor(C_ZONE)
   -- Ring images include their glow; drawing the glow live cost too much
@@ -1276,7 +1296,7 @@ local function drawStatic(L, w, h)
     drawRing(L, L.ringZone, fOver, 1)
   else
     drawGlow(L, r, fOver, 1)
-    softArc(r, dial, cx, cy, arcR, fOver, 1, 4)
+    softArc(r, dial, cx, cy, arcR, fOver, 1, px(4))
   end
   setColor(C_MINOR)
   for k = 1, #L.nx1 do
@@ -1287,8 +1307,8 @@ local function drawStatic(L, w, h)
     lcd.drawLine(L.mx1[k], L.my1[k], L.mx2[k], L.my2[k])
   end
   if L.showMarks then
-    gauge.tick(dial, cx, cy, L.R - 1, arcR - 4, fStall)
-    gauge.tick(dial, cx, cy, L.R - 1, arcR - 4, fLand)
+    gauge.tick(dial, cx, cy, L.R - px(1), arcR - px(4), fStall)
+    gauge.tick(dial, cx, cy, L.R - px(1), arcR - px(4), fLand)
   end
 end
 
@@ -1326,12 +1346,12 @@ local function drawValue(L)
       end
     end
     setColor(C_TEXT)
-    gauge.mark(rend, dial, cx, cy, arcR - L.arcW, arcR + 2, f, 2)
+    gauge.mark(rend, dial, cx, cy, arcR - L.arcW, arcR + px(2), f, px(2))
   end
   if maxSpd > 0 then
     setColor(COLORS[cfg.colMax])
     -- Thick and long enough to stand out: from inside the value arc to the rim.
-    gauge.mark(rend, dial, cx, cy, arcR - L.arcW - 4, L.R, maxSpd / fullScale, L.markW)
+    gauge.mark(rend, dial, cx, cy, arcR - L.arcW - px(4), L.R, maxSpd / fullScale, L.markW)
   end
 end
 
@@ -1375,7 +1395,7 @@ local function drawPanelRow(L, i, label, value, unit, labelColor)
     x = x - lcd.getTextWidth(FONT_MINI, unit)
     setColor(C_MINOR)
     lcd.drawText(x, y + L.hNorm - L.hMini, unit, FONT_MINI)
-    x = x - 3
+    x = x - px(3)
   end
   x = x - lcd.getTextWidth(FONT_NORMAL, value)
   setColor(C_TEXT)
@@ -1389,7 +1409,7 @@ local function drawFull(w, h)
   drawDial(L, w, h)
   setColor(C_TEXT)
   local tw = lcd.getTextWidth(L.numFont, curText)
-  lcd.drawText(L.cx - tw // 2, L.cy - L.hNum // 2 - 2, curText, L.numFont)
+  lcd.drawText(L.cx - tw // 2, L.cy - L.hNum // 2 - px(2), curText, L.numFont)
   setColor(C_SCALE)
   tw = lcd.getTextWidth(L.unitFont, unitText)
   lcd.drawText(L.cx - tw // 2, L.cy + L.hNum // 2, unitText, L.unitFont)
@@ -1420,8 +1440,8 @@ local function drawFull(w, h)
       cpuPeak = c
     end
     setColor(C_ZONE)
-    lcd.drawNumber(2, 0, c, FONT_MINI)
-    lcd.drawNumber(26, 0, cpuPeak, FONT_MINI)
+    lcd.drawNumber(px(2), 0, c, FONT_MINI)
+    lcd.drawNumber(px(26), 0, cpuPeak, FONT_MINI)
   end
 end
 
@@ -1433,19 +1453,20 @@ local function drawStrip(w, h)
   setColor(C_TEXT)
   lcd.drawText(L.barX, L.numY, curText, L.numFont)
   setColor(C_SCALE)
-  lcd.drawText(L.barX + lcd.getTextWidth(L.numFont, curText) + 3, L.miniY, unitText, FONT_MINI)
-  local vx = w - 2 - lcd.getTextWidth(FONT_MINI, maxText)
+  lcd.drawText(L.barX + lcd.getTextWidth(L.numFont, curText) + px(3), L.miniY, unitText, FONT_MINI)
+  local vx = w - px(2) - lcd.getTextWidth(FONT_MINI, maxText)
   setColor(COLORS[cfg.colMax])
   lcd.drawText(vx, L.miniY, maxText, FONT_MINI)
   setColor(C_MINOR)
-  lcd.drawText(vx - 3 - lcd.getTextWidth(FONT_MINI, TXT_MAX), L.miniY, TXT_MAX, FONT_MINI)
+  lcd.drawText(vx - px(3) - lcd.getTextWidth(FONT_MINI, TXT_MAX), L.miniY, TXT_MAX, FONT_MINI)
   -- Bar: track, overspeed zone, value (overspeed color past the mark), max tick.
   local x0, y, bw, bh = L.barX, L.barY, L.barW, L.barH
   local xo = x0 + round(bw * fOver)
+  local inset = px(1)
   setColor(C_TRACK)
-  lcd.drawFilledRectangle(x0, y + 1, bw, bh - 2)
+  lcd.drawFilledRectangle(x0, y + inset, bw, bh - 2 * inset)
   setColor(C_ZONE)
-  lcd.drawFilledRectangle(xo, y + 1, x0 + bw - xo, bh - 2)
+  lcd.drawFilledRectangle(xo, y + inset, x0 + bw - xo, bh - 2 * inset)
   if shownSpd ~= nil then
     local xv = x0 + round(bw * math.min(shownSpd / fullScale, 1))
     setColor(COLORS[cfg.colCur])
@@ -1458,7 +1479,7 @@ local function drawStrip(w, h)
   if maxSpd > 0 then
     setColor(COLORS[cfg.colMax])
     local xm = x0 + round(bw * math.min(maxSpd / fullScale, 1))
-    lcd.drawFilledRectangle(xm - 1, y - 2, 2, bh + 3)
+    lcd.drawFilledRectangle(xm - inset, y - px(2), px(2), bh + px(3))
   end
 end
 
@@ -1474,14 +1495,17 @@ local function printGauge(w, h)
   if not rend then
     rend = lcd.renderer()
   end
-  -- Only the emulator hides a title bar inside the window (see TITLE_H).
+  -- Only the emulator hides a title bar inside the window (see TITLE_H);
+  -- native windows hide their bottom rows (see NATIVE_CUT).
   liveLines = w == 157 or w == 320
   if liveLines then
     h = h - TITLE_H
+  elseif S > 1 then
+    h = h - NATIVE_CUT
   end
-  if h < 45 then
+  if h < px(45) then
     drawStrip(w, h)
-  elseif w < 250 then
+  elseif w < px(250) then
     drawRound(w, h)
   else
     drawFull(w, h)
@@ -1567,6 +1591,14 @@ local function init()
   local device = system.getDeviceType() or ""
   gaugeOk = string.find(device, "DS-24", 1, true) ~= nil
     or string.find(device, "DC-24", 1, true) ~= nil
+  -- The II draws sharper and larger in its own pixels (R18), as DFM-Maps and
+  -- DFM-InsP do. Only if it took: otherwise the default layouts stay.
+  if string.find(device, "24 II", 1, true) then
+    system.setProperty("NativeDraw", 1)
+    if system.getProperty("NativeDraw") == 1 then
+      S = 1.45
+    end
+  end
 
   system.registerForm(1, MENU_APPS, APP_NAME, initForm, keyForm, nil, closeForm)
   system.registerTelemetry(1, APP_NAME, 0, printGauge)
