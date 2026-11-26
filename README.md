@@ -68,7 +68,7 @@ correction.
 - Your model's **landing**, **stall** and **overspeed** speeds, entered as
   the model's sea-level values. The settings flag an illogical order (stall
   must be below landing, landing below overspeed).
-- **Gauge max limit**: the top of the dial. Set it to your sensor's top
+- **Gauge max**: the top of the dial. Set it to your sensor's top
   speed to use its whole range (MSpeed: 350 km/h / 215 mph; MSpeed 450 EX:
   450 km/h / 280 mph). 0 = auto: overspeed + 15%.
 
@@ -80,7 +80,7 @@ The two switches:
   slow down to land (details below).
 - **Continuous callouts switch:** for moments when you want constant
   updates, such as a speed pass. While it's on, you hear just the number
-  ("eighty five") every "Shortest time between callouts", as long as you're
+  ("eighty five") every "Shortest interval", as long as you're
   above "Callouts start above". It takes over from the on/off switch and
   works without it. Below that speed it does nothing.
 - **Warnings** (stall, overspeed, "airspeed alive") sound when either switch
