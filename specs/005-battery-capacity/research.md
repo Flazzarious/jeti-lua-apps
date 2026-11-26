@@ -458,3 +458,25 @@ Every call the design uses is already declared in `types/jeti.lua`:
 `lcd.getFgColor`, `getBgColor`, `setColor`, `drawRectangle`,
 `drawFilledRectangle`, `drawText`, `getTextWidth`, `setClipping`,
 `resetClipping`; Jeti `io.open`/`io.close`. No new stubs.
+
+## R15. Native drawing on the DS-24 II (FR-010a)
+
+- **Finding:** see Speed Gauge's research R18 (spec 001): on a DS-24 II,
+  `system.setProperty("NativeDraw", 1)` draws an app's windows and form in
+  the panel's own pixels, per app. Measured: small 223 × 55, double
+  223 × 151, bottom 4 px hidden; fonts 26/31/18/57 (N/B/M/Mx) against
+  17/20/12/38. In the default mode the 150 × 68 window covers only the top
+  100 of the tile's 147 rows.
+- **Decision:** keep `L` (the default layout) and build a native copy per
+  window size in `nativeLayout()`: the horizontal fields (`L_X`) × 1.45, the
+  vertical ones (`L_Y`) × visible height / 23 or / 68, so the batteries
+  grow taller and fill the tile. The small window's % and its label and
+  reading lines are centered, since a stretched offset would leave them
+  high. The drawing functions take the layout as a parameter; default mode
+  passes `L` and draws exactly what 0.1.0 drew. The label fit check (R6)
+  keeps the default slot width: native FONT_MINI is 1.5× and the slot
+  1.45×, so a label that just fits may run about 1 px wider than its slot.
+  Form widths go through `px()` = 1.45×, because native mode covers the
+  form too.
+- **Alternatives considered:** a uniform 1.45× scale (leaves a third of
+  each tile empty, as now); separate hand-made native layouts.

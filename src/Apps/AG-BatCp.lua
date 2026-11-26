@@ -33,6 +33,19 @@ local T = {
 -- canvas (157 x 127 / 157 x 60); the transmitter draws it above and reports
 -- 150 x 68 / 150 x 23 (Speed Gauge, 2026-10-03).
 local TITLE_H = 26
+-- Native drawing on the DS-24 II (FR-010a, research R15; constitution
+-- 1.4.0): system.setProperty("NativeDraw", 1) draws this app's windows and
+-- form in the panel's own pixels: 223 x 55 / 223 x 151, the bottom 4 px
+-- hidden (Speed Gauge's probe, firmware 6.06, 2026-11-25). k scales fixed
+-- sizes 1.45x; the 150 x 23 / 150 x 68 layout (L) is mapped onto the
+-- visible window by nativeLayout().
+local NATIVE_CUT = 4
+local view = { native = false, k = 1, small = nil, double = nil }
+
+-- A fixed size in default-mode pixels, scaled for native drawing.
+local function px(n)
+  return math.floor(n * view.k + 0.5)
+end
 
 local TXT = {
   noTel = "NO TELEM", no = "NO", telem = "TELEM", dash = "--",
@@ -123,6 +136,11 @@ local L = {
   dLabelY = 0, dCapW = 10, dCapY = 12, dCapH = 3, dx = 5, dy = 15, dw = 26, dh = 40,
   dfx = 7, dfw = 22, dfBottom = 53, dfh = 36, dPctY = 40, dLineY = 56, dNoY = 24, dTelY = 36,
 }
+-- Which L fields are horizontal and which vertical, for nativeLayout().
+local L_X = { "sx", "sw", "capX", "capW", "sfx", "sfw", "stx",
+  "slotW", "dCapW", "dx", "dw", "dfx", "dfw" }
+local L_Y = { "sy", "sh", "capY", "capH", "sfy", "sfh",
+  "dLabelY", "dCapY", "dCapH", "dy", "dh", "dfBottom", "dPctY", "dLineY", "dNoY", "dTelY" }
 
 ------------------------------------------------------------------------------
 -- Settings (persisted per model; data-model.md "Saved settings"). Per
@@ -1515,7 +1533,7 @@ end
 -- A checkbox; the callback gets the old state (Speed Gauge, Flameout).
 local function addCheck(label, on, onChange)
   form.addRow(2)
-  form.addLabel({ label = label, width = LABEL_W })
+  form.addLabel({ label = label, width = px(LABEL_W) })
   local i
   i = form.addCheckbox(on, function(value)
     local now = not value
@@ -1529,7 +1547,7 @@ end
 
 local function addIntRow(label, value, lo, hi, def, decimals, step, onChange)
   form.addRow(2)
-  form.addLabel({ label = label, width = LABEL_W })
+  form.addLabel({ label = label, width = px(LABEL_W) })
   return form.addIntbox(value, lo, hi, def, decimals, step, onChange)
 end
 
@@ -1547,7 +1565,7 @@ local function initMain()
       labels[k] = dv[k].label
     end
     form.addRow(2)
-    form.addLabel({ label = "Small window shows", width = LABEL_W })
+    form.addLabel({ label = "Small window shows", width = px(LABEL_W) })
     form.addSelectbox(labels, clamp(cfg.smallB, 1, #bat), false, function(i)
       saveApp("smallB", i)
     end)
@@ -1557,7 +1575,7 @@ local function initMain()
   for n = 1, 2 do
     local key = "title" .. n
     form.addRow(2)
-    form.addLabel({ label = n == 1 and "Small window title" or "Double window title", width = LABEL_W })
+    form.addLabel({ label = n == 1 and "Small window title" or "Double window title", width = px(LABEL_W) })
     local title = cfg[key] --[[@as string]]
     form.addTextbox(title ~= "" and title or TITLE[n], TITLE_MAX, function(text)
       if text == TITLE[n] then
@@ -1571,18 +1589,18 @@ local function initMain()
   hint("New titles show after the model is reloaded.", note.title)
   if SIM then                 -- debug only (R13): pick a scripted profile for battery 1
     form.addRow(2)
-    form.addLabel({ label = "SIM profile", width = 120 })
+    form.addLabel({ label = "SIM profile", width = px(120) })
     form.addSelectbox(sim.names, sim.idx, false, function(i)
       sim.idx, sim.t0 = i, system.getTimeCounter()
       if ss[1] then
         ss[1].tel = TEL.NONE
       end
-    end, { width = 200 })
+    end, { width = px(200) })
   end
   -- Voice (FR-031, FR-032): the app voice by default when its files are there.
   heading("Voice")
   form.addRow(2)
-  form.addLabel({ label = "Voice", width = LABEL_W })
+  form.addLabel({ label = "Voice", width = px(LABEL_W) })
   local voices = { app.voiceOk and APP_NAME or (APP_NAME .. " (files missing)"), "Transmitter" }
   form.addSelectbox(voices, app.useAppVoice and 1 or 2, false, function(i)
     saveApp("voice", i)
@@ -1674,7 +1692,7 @@ local function initBattery(k)
     end
   end
   form.addRow(2)
-  form.addLabel({ label = "Category", width = LABEL_W })
+  form.addLabel({ label = "Category", width = px(LABEL_W) })
   form.addSelectbox(catNames, catSel, true, function(i)
     setCategory(k, CAT_ORDER[i])
     refresh()
@@ -1683,7 +1701,7 @@ local function initBattery(k)
   -- 2 Name (Custom), width-checked (R6)
   if p[P.CAT] == CUSTOM then
     form.addRow(2)
-    form.addLabel({ label = "Name", width = LABEL_W })
+    form.addLabel({ label = "Name", width = px(LABEL_W) })
     form.addTextbox(b.s[S.NAME], 8, function(text)
       local fitted = text
       local num = p[P.NUM] > 0 and ("-" .. p[P.NUM]) or ""
@@ -1701,12 +1719,12 @@ local function initBattery(k)
 
   -- 3 Label
   form.addRow(2)
-  form.addLabel({ label = "Label", width = LABEL_W })
+  form.addLabel({ label = "Label", width = px(LABEL_W) })
   form.addLabel({ label = dv[k].label, alignRight = true })
 
   -- 4 Chemistry, 5 Cells (FR-006, FR-008)
   form.addRow(2)
-  form.addLabel({ label = "Chemistry", width = LABEL_W })
+  form.addLabel({ label = "Chemistry", width = px(LABEL_W) })
   form.addSelectbox(CHEM_NAMES, p[P.CHEM], true, function(i)
     if i ~= p[P.CHEM] then
       p[P.CHEM] = i
@@ -1740,7 +1758,7 @@ local function initBattery(k)
 
   -- 7-9 Sensors, filtered by unit (R1, FR-004)
   form.addRow(2)
-  form.addLabel({ label = "Capacity sensor", width = 130 })
+  form.addLabel({ label = "Capacity sensor", width = px(130) })
   form.addSelectbox(lists.cap.labels, lists.cap.sel, true, function(i)
     onSensor(k, lists.cap, i, P.CAPID, P.CAPPAR, S.CAPLBL)
     if i ~= lists.cap.nf then
@@ -1750,14 +1768,14 @@ local function initBattery(k)
     saveBattery(k)
     ss[k].tel = TEL.NONE
     refresh()
-  end, { width = 180 })
+  end, { width = px(180) })
   idx.capHint = hint("", false)
   updateCapHint(k)
   hint("Lists sensors in mAh, Ah, % or V. No sensors? Turn the receiver on.",
     #lists.cap.labels == 1 + #RXV_LABEL)
 
   form.addRow(2)
-  form.addLabel({ label = "Voltage sensor", width = 130 })
+  form.addLabel({ label = "Voltage sensor", width = px(130) })
   form.addSelectbox(lists.volt.labels, lists.volt.sel, true, function(i)
     onSensor(k, lists.volt, i, P.VID, P.VPAR, S.VLBL)
     recompute(k)
@@ -1766,12 +1784,12 @@ local function initBattery(k)
       ss[k].tel = TEL.NONE      -- the % source changed too
     end
     refresh()
-  end, { width = 180 })
+  end, { width = px(180) })
   idx.vHint = hint(HINT_V)
   updateVHint(k)
 
   form.addRow(2)
-  form.addLabel({ label = "Current sensor", width = 130 })
+  form.addLabel({ label = "Current sensor", width = px(130) })
   form.addSelectbox(lists.cur.labels, lists.cur.sel, true, function(i)
     onSensor(k, lists.cur, i, P.IID, P.IPAR, S.ILBL)
     if i ~= lists.cur.nf then
@@ -1784,12 +1802,12 @@ local function initBattery(k)
     recompute(k)
     saveBattery(k)
     refresh()
-  end, { width = 180 })
+  end, { width = px(180) })
   hint("When set, the 4-battery window shows current, not voltage.")
 
   -- 10 Live value, updated from loop() while the form is open
   form.addRow(2)
-  form.addLabel({ label = "Now", width = LABEL_W })
+  form.addLabel({ label = "Now", width = px(LABEL_W) })
   idx.live = form.addLabel({ label = TXT.dash, alignRight = true })
 
   -- 11-16 Capacity callouts (FR-016 - FR-018)
@@ -1824,7 +1842,7 @@ local function initBattery(k)
     local field = A.LVL1 + i - 1
     local bit = 1 << (i - 1)
     form.addRow(3)
-    form.addLabel({ label = "Level " .. i .. " (%)", width = 150 })
+    form.addLabel({ label = "Level " .. i .. " (%)", width = px(150) })
     local ci
     ci = form.addCheckbox(levelOn(a, i), function(value)
       local on = not value      -- the callback gets the old state
@@ -1835,14 +1853,14 @@ local function initBattery(k)
       levelChanged(function()
         a[A.LVLON] = a[A.LVLON] ~ bit
       end)
-    end, { width = 40 })
+    end, { width = px(40) })
     form.addIntbox(a[field], 1, 99, a[field], 0, 1, function(value)
       local old = a[field]
       a[field] = value
       levelChanged(function()
         a[field] = old
       end)
-    end, { width = 110 })
+    end, { width = px(110) })
   end
   hint("Levels must go down, e.g. 60 > 50 > 40 > 30.", note.levels)
   if a[A.SHOWALL] == 1 then
@@ -1861,7 +1879,7 @@ local function initBattery(k)
   if dv[k].hasV then
     heading("Low voltage")
     form.addRow(2)
-    form.addLabel({ label = "Low-voltage alarm", width = LABEL_W })
+    form.addLabel({ label = "Low-voltage alarm", width = px(LABEL_W) })
     form.addSelectbox({ "Off", "Per cell", "Per pack" }, a[A.LVMODE] + 1, false, function(i)
       local old, new = a[A.LVMODE], i - 1
       -- Off and per cell keep the threshold per cell; per pack is the pack
@@ -1978,7 +1996,7 @@ local function initBattery(k)
   -- 28 Name for the transmitter voice (FR-033)
   heading("Voice")
   form.addRow(2)
-  form.addLabel({ label = "Name file (transmitter voice)", width = LABEL_W })
+  form.addLabel({ label = "Name file (transmitter voice)", width = px(LABEL_W) })
   form.addAudioFilebox(b.s[S.VOICE], function(fileName)
     b.s[S.VOICE] = fileName or ""
     saveBattery(k)
@@ -2171,39 +2189,65 @@ local function drawCentered(cx, y, text, font)
 end
 
 -- Fill size in px for `pct` over `full` px, rounded; never thinner than
--- L.minFill at 0-2 % (FR-012).
-local function fillSize(full, pct)
+-- the layout's minFill at 0-2 % (FR-012).
+local function fillSize(Lw, full, pct)
   local n = (full * pct + 50) // 100
-  if pct <= L.minFillPct and n < L.minFill then
-    return L.minFill
+  if pct <= Lw.minFillPct and n < Lw.minFill then
+    return Lw.minFill
   end
   return n
 end
 
 -- Small window (150 x 23): one battery on its side (FR-010).
-local function drawSmall(ox, k)
+local function drawSmall(Lw, ox, k)
   local s = ss[k]
   local live = s.tel == TEL.LIVE
   outlineColor(s, live)
-  lcd.drawRectangle(ox + L.sx, L.sy, L.sw, L.sh, 2)
-  lcd.drawFilledRectangle(ox + L.capX, L.capY, L.capW, L.capH)
-  local cx = ox + L.sx + L.sw // 2
+  lcd.drawRectangle(ox + Lw.sx, Lw.sy, Lw.sw, Lw.sh, px(2))
+  lcd.drawFilledRectangle(ox + Lw.capX, Lw.capY, Lw.capW, Lw.capH)
+  local cx = ox + Lw.sx + Lw.sw // 2
   if live then
-    local fw = fillSize(L.sfw, s.pct)
+    local fw = fillSize(Lw, Lw.sfw, s.pct)
     if fw > 0 then
       setColor(BAND[s.band])
-      lcd.drawFilledRectangle(ox + L.sfx, L.sfy, fw, L.sfh)
+      lcd.drawFilledRectangle(ox + Lw.sfx, Lw.sfy, fw, Lw.sfh)
     end
     local tx = cx - lcd.getTextWidth(FONT_NORMAL, s.txtPct) // 2
-    drawSplitText(tx, L.sPctY, s.txtPct, FONT_NORMAL, ox + L.sfx, L.sfy, fw, L.sfh, s.band)
+    drawSplitText(tx, Lw.sPctY, s.txtPct, FONT_NORMAL, ox + Lw.sfx, Lw.sfy, fw, Lw.sfh, s.band)
     setColor(fg)
   else
     setColor(fg, 100)
     local text = s.tel == TEL.LOST and TXT.noTel or TXT.dash
-    drawCentered(cx, L.sy + (L.sh - lcd.getTextHeight(FONT_MINI)) // 2, text, FONT_MINI)
+    drawCentered(cx, Lw.sy + (Lw.sh - lcd.getTextHeight(FONT_MINI)) // 2, text, FONT_MINI)
   end
-  lcd.drawText(ox + L.stx, L.sLabelY, dv[k].label, FONT_MINI)
-  lcd.drawText(ox + L.stx, L.sValY, s.txtSmall, FONT_MINI)
+  lcd.drawText(ox + Lw.stx, Lw.sLabelY, dv[k].label, FONT_MINI)
+  lcd.drawText(ox + Lw.stx, Lw.sValY, s.txtSmall, FONT_MINI)
+end
+
+-- The layout for a native window of visible height h: L's horizontal
+-- fields scaled like the fonts (1.45x), its vertical ones stretched to fill
+-- the height (base 23 or 68). Texts that a stretched offset would leave high
+-- are centered instead. Built once per window size; lcd is needed for the
+-- font heights, so only from a print function.
+local function nativeLayout(h, base)
+  local t, sy = {}, h / base
+  for key, v in pairs(L) do
+    t[key] = v
+  end
+  for _, key in ipairs(L_X) do
+    t[key] = px(L[key])
+  end
+  for _, key in ipairs(L_Y) do
+    t[key] = math.floor(L[key] * sy + 0.5)
+  end
+  t.minFill = px(L.minFill)
+  t.dfh = t.dfBottom - math.floor((L.dfBottom - L.dfh) * sy + 0.5)
+  local hn, hm = lcd.getTextHeight(FONT_NORMAL), lcd.getTextHeight(FONT_MINI)
+  t.sPctY = t.sy + (t.sh - hn) // 2
+  t.sLabelY = (h - 2 * hm - px(2)) // 2
+  t.sValY = t.sLabelY + hm + px(2)
+  t.h = h
+  return t
 end
 
 local function windowSetup(w, h)
@@ -2212,6 +2256,9 @@ local function windowSetup(w, h)
   if w == 157 then            -- emulator: title inside the window
     h = h - TITLE_H
     ox = 3
+  elseif view.native then     -- the bottom rows never show; layout centered
+    h = h - NATIVE_CUT
+    ox = (w - px(150)) // 2
   end
   if not app.gaugeOk or #bat == 0 then
     setColor(fg)
@@ -2222,63 +2269,79 @@ local function windowSetup(w, h)
 end
 
 local function printSmall(w, h)
-  local ox = windowSetup(w, h)
+  local ox
+  ox, h = windowSetup(w, h)
   if ox then
-    drawSmall(ox, clamp(cfg.smallB, 1, #bat))
+    local Lw = L
+    if view.native then
+      if not view.small or view.small.h ~= h then
+        view.small = nativeLayout(h, 23)
+      end
+      Lw = view.small
+    end
+    drawSmall(Lw, ox, clamp(cfg.smallB, 1, #bat))
   end
 end
 
 -- One upright battery in slot k of the double window (FR-011). Slots keep
 -- their four-battery positions; unused slots draw nothing.
-local function drawUpright(ox, k)
+local function drawUpright(Lw, ox, k)
   local s = ss[k]
   local live = s.tel == TEL.LIVE
-  local x0 = ox + 1 + (k - 1) * L.slotW
-  local cx = x0 + L.slotW // 2
+  local x0 = ox + px(1) + (k - 1) * Lw.slotW
+  local cx = x0 + Lw.slotW // 2
   if live then
     setColor(fg)
   else
     setColor(fg, 100)
   end
-  drawCentered(cx, L.dLabelY, dv[k].label, FONT_MINI)
+  drawCentered(cx, Lw.dLabelY, dv[k].label, FONT_MINI)
   outlineColor(s, live)
-  lcd.drawFilledRectangle(cx - L.dCapW // 2, L.dCapY, L.dCapW, L.dCapH)
-  lcd.drawRectangle(x0 + L.dx, L.dy, L.dw, L.dh, 2)
+  lcd.drawFilledRectangle(cx - Lw.dCapW // 2, Lw.dCapY, Lw.dCapW, Lw.dCapH)
+  lcd.drawRectangle(x0 + Lw.dx, Lw.dy, Lw.dw, Lw.dh, px(2))
   if live then
-    local fh = fillSize(L.dfh, s.pct)
-    local fy = L.dfBottom - fh
+    local fh = fillSize(Lw, Lw.dfh, s.pct)
+    local fy = Lw.dfBottom - fh
     if fh > 0 then
       setColor(BAND[s.band])
-      lcd.drawFilledRectangle(x0 + L.dfx, fy, L.dfw, fh)
+      lcd.drawFilledRectangle(x0 + Lw.dfx, fy, Lw.dfw, fh)
     end
     local tx = cx - lcd.getTextWidth(FONT_MINI, s.txtPct) // 2
-    drawSplitText(tx, L.dPctY, s.txtPct, FONT_MINI, x0 + L.dfx, fy, L.dfw, fh, s.band)
+    drawSplitText(tx, Lw.dPctY, s.txtPct, FONT_MINI, x0 + Lw.dfx, fy, Lw.dfw, fh, s.band)
     setColor(fg)
   else
     setColor(fg, 100)
     if s.tel == TEL.LOST then
-      drawCentered(cx, L.dNoY, TXT.no, FONT_MINI)
-      drawCentered(cx, L.dTelY, TXT.telem, FONT_MINI)
+      drawCentered(cx, Lw.dNoY, TXT.no, FONT_MINI)
+      drawCentered(cx, Lw.dTelY, TXT.telem, FONT_MINI)
     else
-      drawCentered(cx, L.dTelY, TXT.dash, FONT_MINI)
+      drawCentered(cx, Lw.dTelY, TXT.dash, FONT_MINI)
     end
   end
-  drawCentered(cx, L.dLineY, s.txtLine, FONT_MINI)
+  drawCentered(cx, Lw.dLineY, s.txtLine, FONT_MINI)
 end
 
--- Double window (150 x 68): up to four upright batteries.
+-- Double window (150 x 68, native 223 x 147): up to four upright batteries.
 local function printDouble(w, h)
-  local ox = windowSetup(w, h)
+  local ox
+  ox, h = windowSetup(w, h)
   if not ox then
     return
   end
+  local Lw = L
+  if view.native then
+    if not view.double or view.double.h ~= h then
+      view.double = nativeLayout(h, 68)
+    end
+    Lw = view.double
+  end
   for k = 1, #bat do
-    drawUpright(ox, k)
+    drawUpright(Lw, ox, k)
   end
   if DEBUG_CPU then
     local cpu = system.getCPU()
     app.cpuWorst = math.max(app.cpuWorst, cpu)
-    lcd.drawText(ox + 100, 56, string.format("CPU %d/%d", cpu, app.cpuWorst), FONT_MINI)
+    lcd.drawText(ox + px(100), Lw.dLineY, string.format("CPU %d/%d", cpu, app.cpuWorst), FONT_MINI)
   end
 end
 
@@ -2294,7 +2357,16 @@ local function init()
   -- Gauges on the DS/DC-24 family, II and first version: both report
   -- about 150 x 23 / 150 x 68 windows (API notes, 2026-11-05). Callouts work
   -- on any transmitter.
-  app.gaugeOk = string.find(system.getDeviceType() or "", "24", 1, true) ~= nil
+  local device = system.getDeviceType() or ""
+  app.gaugeOk = string.find(device, "24", 1, true) ~= nil
+  -- Sharper, and filling the whole tile, on the II (FR-010a, R15), as Speed
+  -- Gauge does. Only if it took: otherwise the default layout stays.
+  if string.find(device, "24 II", 1, true) then
+    system.setProperty("NativeDraw", 1)
+    if system.getProperty("NativeDraw") == 1 then
+      view.native, view.k = true, 1.45
+    end
+  end
   checkVoice()              -- once: 19 file opens (R9)
   local now = system.getTimeCounter()
   app.fastT, app.slowT = now, now

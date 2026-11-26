@@ -214,6 +214,12 @@ so US2, US4 and US5 are testable without the voice files.
 - [X] T062 MANUAL: SC-001 timing (one battery under 2 minutes, four under 6) and Aaron's sign-off on readability outdoors in both themes (SC-005), which also confirms or replaces FR-012a. Signed off by Aaron 2026-11-08
 - [X] T064 MANUAL: First-version DS-24 (added 2026-11-05, both models are targets): with the app, its folder and `lib/ag_peak.lua` copied to a card without other AG- apps (SC-017), both windows draw the gauges (fills, bands, split % text, 0 % sliver, NO TELEM, low-voltage flash) in its theme; settings work; callouts play in the Amy voice (SIM profile 1: "flight, twenty, percent"); CPU figure and no CPU-limit error. Screenshots in `docs/jeti-api-notes.md` findings if anything differs from the II
 
+### Native drawing on the DS-24 II (Session 2026-11-25)
+
+- [X] T065 FR-010a, R15: in `src/Apps/AG-BatCp.lua`, set `NativeDraw` on a "24 II"; `nativeLayout()` scales L's horizontal fields 1.45x and stretches its vertical ones to the visible height (built once per window size); the drawing functions take the layout; native height less 4 hidden rows; `px()` scales the form widths
+- [ ] T066 MANUAL: On the DS-24 II with `SIM` (four batteries): both windows fill their tiles and draw sharp, labels, % and current/voltage lines fit, settings labels aren't cut, worst CPU below 50%
+- [ ] T067 Release 0.2.0: bump `APP_VERSION` and the description page, tag `AG-BatCp-v0.2.0`, update `make_apps_json.py` and `Apps.json`
+
 ---
 
 ## Dependencies & Execution Order
