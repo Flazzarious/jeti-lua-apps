@@ -328,11 +328,17 @@ function system.getIMU(smoothed) end
 function system.getRawIMU() end
 
 ---FORBIDDEN in this repo (Constitution I): can switch wireless/trainer mode.
----@deprecated
+---The one exception (constitution 1.4.0): system.setProperty("NativeDraw", 0|1)
+---on the DS-24 II, 1 = draw in the panel's own pixels, 0 = enlarged 316 x 159
+---coordinates (not in API v1.5; used by DFM-Maps, DFM-InsP and a JETI test
+---app, github.com/davidmcq137/JetiLuaDFM dev branch, 2026-11). check.py
+---rejects every other use.
 ---@param name string
 ---@param value any
 function system.setProperty(name, value) end
 
+---getProperty("NativeDraw") returns 1 in native drawing mode, 0 otherwise
+---(same source as setProperty).
 ---@param name string
 ---@return any
 function system.getProperty(name) end

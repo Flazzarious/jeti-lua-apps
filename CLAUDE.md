@@ -77,7 +77,9 @@ src/Apps/lib/ag_xxxxx.lua  shared module, loaded with require("ag_xxxxx")
 ## Hard rules (summary; the constitution has the detail)
 
 - Never call `system.registerControl`, `system.setControl` or
-  `system.setProperty`. Nothing an app does may affect flight.
+  `system.setProperty`. Nothing an app does may affect flight. The one
+  exception is `system.setProperty("NativeDraw", 0 or 1)` (constitution
+  1.4.0, for Speed Gauge and the probe), which `check.py` allows.
 - Every variable and function is `local`. An app file ends with
   `return { init=..., loop=..., author=..., version=..., name=... }`.
 - No `os`, `debug`, `coroutine`, `bit32`. The JETI Studio emulator has them, but

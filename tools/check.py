@@ -37,13 +37,20 @@ EXTRA = [ROOT / "docs" / "examples" / "style"]
 FORBIDDEN = [
     (r"\bsystem\s*\.\s*registerControl\b", "Principle I: Lua controls can be assigned to flight functions"),
     (r"\bsystem\s*\.\s*setControl\b", "Principle I: Lua controls can be assigned to flight functions"),
-    (r"\bsystem\s*\.\s*setProperty\b", "Principle I: can change wireless/trainer mode"),
+    (r"\bsystem\s*\.\s*setProperty\b", "Principle I: can change wireless/trainer mode; only "
+     "system.setProperty(\"NativeDraw\", 0 or 1) is allowed"),
     (r"\bos\s*\.", "Principle III: os library does not exist on the transmitter"),
     (r"\bdebug\s*\.", "Principle III: debug library does not exist on the transmitter"),
     (r"\bcoroutine\s*\.", "Principle III: coroutine library does not exist on the transmitter"),
     (r"\bbit32\s*\.", "Principle III: bit32 is absent; use native bitwise operators"),
     (r"\bmobdebug\b", "Emulator-only debugger; remove before deploying"),
 ]
+# The one exception to a FORBIDDEN pattern (Principle I, constitution 1.4.0):
+# the raw text right after a system.setProperty match must be
+# ("NativeDraw", 0) or ("NativeDraw", 1), with literal arguments.
+ALLOWED_AFTER = {
+    FORBIDDEN[2][0]: re.compile(r'\s*\(\s*"NativeDraw"\s*,\s*[01]\s*\)'),
+}
 # Allowed only with an explicit spec; reported as warnings.
 CAUTION = [
     (r"\bgpio\s*\.\s*(write|mode)\b", "Principle I: gpio output needs a scoped spec"),
@@ -166,9 +173,14 @@ def main() -> int:
                 errors.append(f"{rel}: syntax error: {result.stderr.strip()}")
 
         code = strip_comments_and_strings(text)
+        raw_lines = text.splitlines()
         for lineno, line in enumerate(code.splitlines(), start=1):
             for pattern, reason in FORBIDDEN:
-                if re.search(pattern, line):
+                allowed = ALLOWED_AFTER.get(pattern)
+                for m in re.finditer(pattern, line):
+                    # Stripping keeps columns, so m.end() indexes the raw line.
+                    if allowed and allowed.match(raw_lines[lineno - 1], m.end()):
+                        continue
                     errors.append(f"{rel}:{lineno}: forbidden API ({reason})")
             for pattern, reason in CAUTION:
                 if re.search(pattern, line):
